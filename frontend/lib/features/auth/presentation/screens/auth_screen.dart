@@ -114,7 +114,7 @@ class _AuthScreenState extends State<AuthScreen>
       // On web: redirect back to wherever the app is actually running.
       // On mobile: use deep link scheme.
       final redirectUrl = kIsWeb
-          ? Uri.base.origin  // e.g. http://localhost:55555 or https://yourapp.github.io
+          ? Uri.base.toString().replaceAll(RegExp(r'[#?].*'), '')  // preserve /iFridge/ base path
           : 'io.supabase.flutter://login-callback';
 
       await Supabase.instance.client.auth.signInWithOAuth(
