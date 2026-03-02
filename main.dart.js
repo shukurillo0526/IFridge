@@ -35048,8 +35048,8 @@ eO(){var s,r=$.cz().b
 r===$&&A.a()
 r=r.gfK().c
 s=r==null?null:r.r
-r=s==null?null:s.a
-return r==null?"00000000-0000-4000-8000-000000000001":r},
+if(s==null)throw A.h(A.aN("currentUserId() called without an auth session"))
+return s.a},
 aVs(a){var s=B.a8u.h(0,B.c.hQ(a.toLowerCase()))
 return s==null?u.o:s},
 adw(a){var s=B.aan.h(0,B.c.hQ(a.toLowerCase()))
