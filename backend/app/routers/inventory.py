@@ -84,3 +84,90 @@ async def add_inventory_item(req: AddItemRequest):
     except Exception as e:
         logger.error(f"[Inventory] Failed to add item: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class UpdateItemRequest(BaseModel):
+    quantity: Optional[float] = None
+    unit: Optional[str] = None
+    item_state: Optional[str] = None
+    location: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@router.patch("/api/v1/inventory/{item_id}")
+async def update_inventory_item(item_id: str, req: UpdateItemRequest):
+    """Update an inventory item's properties."""
+    db = get_supabase()
+
+    try:
+        update_data = {}
+        if req.quantity is not None:
+            update_data["quantity"] = req.quantity
+        if req.unit is not None:
+            update_data["unit"] = req.unit
+        if req.item_state is not None:
+            update_data["item_state"] = req.item_state
+        if req.location is not None:
+            update_data["location"] = req.location
+        if req.notes is not None:
+            update_data["notes"] = req.notes
+
+        if not update_data:
+            return {"status": "no_changes"}
+
+        db.table("inventory_items").update(update_data).eq("id", item_id).execute()
+
+        logger.info(f"[Inventory] Updated item {item_id}")
+        return {"status": "success"}
+
+    except Exception as e:
+        logger.error(f"[Inventory] Update failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/api/v1/inventory/{item_id}")
+async def delete_inventory_item(item_id: str):
+    """Delete an inventory item."""
+    db = get_supabase()
+
+    try:
+        db.table("inventory_items").delete().eq("id", item_id).execute()
+        logger.info(f"[Inventory] Deleted item {item_id}")
+        return {"status": "success"}
+
+    except Exception as e:
+        logger.error(f"[Inventory] Delete failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class ConsumeItemRequest(BaseModel):
+    inventory_id: str
+    quantity_to_consume: float
+
+
+@router.post("/api/v1/inventory/consume")
+async def consume_inventory_item(req: ConsumeItemRequest):
+    """
+    Consume (decrement) an inventory item's quantity.
+    Uses the consume_inventory_item RPC which auto-deletes at 0.
+    """
+    db = get_supabase()
+
+    try:
+        db.rpc(
+            "consume_inventory_item",
+            {
+                "p_inventory_id": req.inventory_id,
+                "p_qty_to_consume": req.quantity_to_consume,
+            },
+        ).execute()
+
+        logger.info(
+            f"[Inventory] Consumed {req.quantity_to_consume} from {req.inventory_id}"
+        )
+        return {"status": "success"}
+
+    except Exception as e:
+        logger.error(f"[Inventory] Consume failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+

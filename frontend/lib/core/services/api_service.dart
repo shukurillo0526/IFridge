@@ -285,6 +285,183 @@ class ApiService {
     }
   }
 
+  // ── Inventory CRUD ──────────────────────────────────────────────
+
+  /// Update an inventory item's properties.
+  Future<Map<String, dynamic>> updateInventoryItem({
+    required String itemId,
+    double? quantity,
+    String? unit,
+    String? itemState,
+    String? location,
+    String? notes,
+  }) async {
+    final body = <String, dynamic>{};
+    if (quantity != null) body['quantity'] = quantity;
+    if (unit != null) body['unit'] = unit;
+    if (itemState != null) body['item_state'] = itemState;
+    if (location != null) body['location'] = location;
+    if (notes != null) body['notes'] = notes;
+
+    final response = await _client.patch(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/inventory/$itemId'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Delete an inventory item.
+  Future<Map<String, dynamic>> deleteInventoryItem(String itemId) async {
+    final response = await _client.delete(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/inventory/$itemId'),
+      headers: _headers,
+    );
+    return _handleResponse(response);
+  }
+
+  /// Consume (decrement) an inventory item.
+  Future<Map<String, dynamic>> consumeInventoryItem({
+    required String inventoryId,
+    required double quantityToConsume,
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/inventory/consume'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'inventory_id': inventoryId,
+        'quantity_to_consume': quantityToConsume,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  // ── User Data ───────────────────────────────────────────────────
+
+  /// Initialize a user's profile rows (idempotent).
+  Future<Map<String, dynamic>> initUser({
+    required String userId,
+    required String email,
+    String? displayName,
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/init'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'email': email,
+        if (displayName != null) 'display_name': displayName,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Fetch the complete user dashboard in a single call.
+  Future<Map<String, dynamic>> getUserDashboard({
+    required String userId,
+  }) async {
+    final response = await _client.get(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/$userId/dashboard'),
+      headers: _headers,
+    );
+    return _handleResponse(response);
+  }
+
+  /// Update user profile fields.
+  Future<Map<String, dynamic>> updateUserProfile({
+    required String userId,
+    String? displayName,
+    List<String>? dietaryTags,
+    String? avatarUrl,
+  }) async {
+    final body = <String, dynamic>{'user_id': userId};
+    if (displayName != null) body['display_name'] = displayName;
+    if (dietaryTags != null) body['dietary_tags'] = dietaryTags;
+    if (avatarUrl != null) body['avatar_url'] = avatarUrl;
+
+    final response = await _client.patch(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/profile'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    return _handleResponse(response);
+  }
+
+  // ── Shopping List ───────────────────────────────────────────────
+
+  /// Add an item to the shopping list.
+  Future<Map<String, dynamic>> addShoppingItem({
+    required String userId,
+    required String ingredientName,
+    double quantity = 1.0,
+    String unit = 'pcs',
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/shopping-list'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'ingredient_name': ingredientName,
+        'quantity': quantity,
+        'unit': unit,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Toggle a shopping list item's purchased status.
+  Future<Map<String, dynamic>> toggleShoppingItem({
+    required String itemId,
+    required bool isPurchased,
+  }) async {
+    final response = await _client.patch(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/shopping-list/$itemId'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({'is_purchased': isPurchased}),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Delete a shopping list item.
+  Future<Map<String, dynamic>> deleteShoppingItem(String itemId) async {
+    final response = await _client.delete(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/shopping-list/$itemId'),
+      headers: _headers,
+    );
+    return _handleResponse(response);
+  }
+
+  // ── Meal Plan ───────────────────────────────────────────────────
+
+  /// Plan a recipe for a specific date.
+  Future<Map<String, dynamic>> addMealPlan({
+    required String userId,
+    required String recipeId,
+    required String plannedDate,
+    String mealType = 'dinner',
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/meal-plan'),
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'recipe_id': recipeId,
+        'planned_date': plannedDate,
+        'meal_type': mealType,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Delete a planned meal.
+  Future<Map<String, dynamic>> deleteMealPlan(String mealId) async {
+    final response = await _client.delete(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/user/meal-plan/$mealId'),
+      headers: _headers,
+    );
+    return _handleResponse(response);
+  }
+
   void dispose() => _client.close();
 }
 

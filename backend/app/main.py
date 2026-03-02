@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory
+from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory, user_data
 from app.services.ollama_service import get_ollama_service
 import uvicorn
 
@@ -8,7 +8,7 @@ import uvicorn
 app = FastAPI(
     title="I-Fridge AI Backend",
     description="Vision and Intelligence layer for the I-Fridge consumer app. Local Ollama AI + vector search.",
-    version="3.1.0"
+    version="3.2.0"
 )
 
 # Allow CORS for Flutter Frontend
@@ -27,6 +27,7 @@ app.include_router(vision_detect.router)
 app.include_router(recipe_ai.router)
 app.include_router(embeddings.router)
 app.include_router(inventory.router)
+app.include_router(user_data.router)
 
 @app.get("/")
 async def root():

@@ -131,6 +131,32 @@ Systematically iterated through each major screen, fixing bugs, adding features,
 - **Shopping List Counter:** Title now shows checked vs total count (e.g., "Shopping List (2/5)").
 - **Meal Planner Clear:** Long-press the edit icon on any planned meal to remove it from the schedule.
 
+---
+
+## 🗄️ Phase 15: Data Architecture Overhaul (Complete)
+
+Systematically audited and rebuilt the app's data layer for efficiency, consistency, and proper per-user isolation.
+
+### Database Fixes
+- **`increment_gamification_stats` RPC:** Was literally empty (0 bytes). Now atomically handles XP increment, level calculation (`floor(sqrt(xp/100))+1`), streak management (consecutive day detection), and stat counters.
+- **`get_recommended_recipes` RPC:** Fixed broken reference to non-existent `master_ingredients` → `ingredients`, and `expiry_date` → `computed_expiry`.
+
+### Backend Data API (`v3.2.0`)
+- **`user_data.py` Router:** 8 new endpoints — `POST /init` (atomic user profile creation), `GET /{id}/dashboard` (single call replaces 5 parallel queries), `PATCH /profile`, shopping list CRUD, meal plan CRUD.
+- **`inventory.py` Expansion:** Added `PATCH /{id}`, `DELETE /{id}`, `POST /consume` (wraps `consume_inventory_item` RPC).
+- All writes now route through the backend (service role key), ensuring consistent RLS bypass.
+
+### Frontend Repository Layer
+- **`InventoryRepository`:** Centralized read/write/realtime for inventory. Reads via Supabase anon key (RLS), writes via backend API.
+- **`UserRepository`:** Dashboard (1 API call → replaces 5 parallel Supabase queries), profile, shopping, meal plan mutations.
+- **`ApiService`:** 11 new methods added for all backend endpoints.
+
+### Schema Hardening (`migration_006`)
+- Added `updated_at` columns + triggers to `shopping_list` and `meal_plan`.
+- Tightened `ingredients` INSERT policy (service role only).
+- Added unique constraint on `inventory_items(user_id, ingredient_id, location)` to prevent duplicates.
+- Added trigram index on `ingredients.display_name_en` for faster autocomplete.
+- **Removed shared demo UUID** — guests now use Supabase anonymous auth with real UUIDs, eliminating data collision.
 
 ## 🚀 The Future
 
