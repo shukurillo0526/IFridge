@@ -7,8 +7,9 @@ Uses local LLM (Ollama) for food identification + ingredient DB for calorie data
 
 import json
 import logging
+import base64
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -18,6 +19,97 @@ from app.services.ollama_service import get_ollama_service
 logger = logging.getLogger("ifridge.calories")
 
 router = APIRouter()
+
+
+@router.post("/api/v1/calories/analyze-image")
+async def analyze_image_calories(file: UploadFile = File(...)):
+    """
+    Analyze a food photo for calorie content.
+    Uses vision model to identify food items, then looks up calories.
+    """
+    image_bytes = await file.read()
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    ollama = get_ollama_service()
+    if not await ollama.is_available():
+        raise HTTPException(status_code=503, detail="AI service unavailable")
+
+    # Step 1: Identify food items from image using vision model
+    vision_prompt = (
+        "List ALL food items visible in this image. "
+        "Return a JSON object with a single key 'items' containing an array of food item names. "
+        "Example: {\"items\": [\"grilled chicken breast\", \"white rice\", \"steamed broccoli\"]}. "
+        "Return ONLY the JSON, no other text."
+    )
+    vision_result = await ollama.analyze_image(b64, vision_prompt)
+    
+    # Parse food items from vision result
+    food_items = []
+    if isinstance(vision_result, dict) and "items" in vision_result:
+        food_items = vision_result["items"]
+    elif isinstance(vision_result, str):
+        # Try to extract JSON from text
+        try:
+            import re
+            json_match = re.search(r'\{.*\}', vision_result, re.DOTALL)
+            if json_match:
+                parsed = json.loads(json_match.group())
+                food_items = parsed.get("items", [])
+        except Exception:
+            # Fallback: split by comma/newline
+            food_items = [s.strip().strip('-•') for s in vision_result.replace('\n', ',').split(',') if s.strip()]
+
+    if not food_items:
+        return {"status": "no_food_detected", "items": [], "total_estimated_calories": 0}
+
+    # Step 2: Look up calories for each identified item
+    db = get_supabase()
+    results = []
+    unknown_items = []
+
+    for item_name in food_items:
+        match = (
+            db.table("ingredients")
+            .select("display_name_en, calories_per_100g, default_unit, category")
+            .ilike("display_name_en", f"%{item_name}%")
+            .limit(1)
+            .execute()
+        )
+        if match.data and len(match.data) > 0 and match.data[0].get("calories_per_100g"):
+            ing = match.data[0]
+            cal = ing["calories_per_100g"]
+            serving = _estimate_serving(ing.get("category", ""))
+            results.append({
+                "name": ing["display_name_en"],
+                "source": "database",
+                "calories_per_100g": cal,
+                "estimated_serving_g": serving,
+                "estimated_calories": round(cal * serving / 100),
+                "category": ing.get("category"),
+            })
+        else:
+            unknown_items.append(item_name)
+
+    # AI fallback for unknown items
+    if unknown_items:
+        prompt = f"""Estimate nutrition for: {', '.join(unknown_items)}.
+Return JSON: {{"items": [{{"name": "...", "serving_g": 150, "calories_per_100g": 200, "estimated_calories": 300, "protein_g": 10, "carbs_g": 30, "fat_g": 15}}]}}"""
+        system = "Certified nutritionist. Return ONLY valid JSON."
+        ai_result = await ollama.generate_text_json(prompt, system_prompt=system)
+        if "items" in ai_result:
+            for item in ai_result["items"]:
+                item["source"] = "ai_estimate"
+                results.append(item)
+
+    total_calories = sum(r.get("estimated_calories", 0) for r in results)
+    return {
+        "status": "success",
+        "detected_items": food_items,
+        "items": results,
+        "total_estimated_calories": total_calories,
+        "item_count": len(results),
+    }
+
 
 
 class CalorieAnalyzeRequest(BaseModel):

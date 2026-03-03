@@ -15,6 +15,9 @@ import 'package:ifridge_app/features/gamification/domain/badges.dart' show level
 import 'package:ifridge_app/core/services/auth_helper.dart';
 import 'package:ifridge_app/l10n/app_localizations.dart';
 import 'package:ifridge_app/core/services/app_settings.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/flavor_profile_page.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/nutrition_tracker_page.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/gamification_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -464,19 +467,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // ── Badges Section ─────────────────────────────────────
                 SlideInItem(
                   delay: 350,
-                  child: _SectionCard(
-                    title: l10n?.profileBadges ?? 'Badges & Achievements',
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final itemWidth = (constraints.maxWidth - 24) / 4; // 4 per row
-                        return Wrap(
-                          spacing: 8,
-                          runSpacing: 12,
-                          children: allBadges.map((badge) {
-                            return SizedBox(width: itemWidth.clamp(60, 90), child: badge);
-                          }).toList(),
-                        );
-                      },
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GamificationPage())),
+                    child: _SectionCard(
+                      title: l10n?.profileBadges ?? 'Badges & Achievements',
+                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final itemWidth = (constraints.maxWidth - 24) / 4; // 4 per row
+                          return Wrap(
+                            spacing: 8,
+                            runSpacing: 12,
+                            children: allBadges.map((badge) {
+                              return SizedBox(width: itemWidth.clamp(60, 90), child: badge);
+                            }).toList(),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -486,15 +493,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // Flavor Profile
                 SlideInItem(
                   delay: 200,
-                  child: _SectionCard(
-                    title: l10n?.profileFlavorProfile ?? 'Flavor Profile',
-                    child: SizedBox(
-                      height: 220,
-                      width: double.infinity,
-                      child: CustomPaint(
-                        painter: _FlavorRadarPainter(
-                          values: _flavorValues,
-                          color: IFridgeTheme.primary,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FlavorProfilePage())),
+                    child: _SectionCard(
+                      title: l10n?.profileFlavorProfile ?? 'Flavor Profile',
+                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
+                      child: SizedBox(
+                        height: 220,
+                        width: double.infinity,
+                        child: CustomPaint(
+                          painter: _FlavorRadarPainter(
+                            values: _flavorValues,
+                            color: IFridgeTheme.primary,
+                          ),
                         ),
                       ),
                     ),

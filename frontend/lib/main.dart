@@ -54,7 +54,8 @@ class _IFridgeAppState extends State<IFridgeApp> {
     return MaterialApp(
       title: 'iFridge',
       debugShowCheckedModeBanner: false,
-      theme: IFridgeTheme.darkTheme,
+      theme: IFridgeTheme.lightTheme,
+      darkTheme: IFridgeTheme.darkTheme,
       themeMode: _settings.themeMode,
       locale: _settings.locale,
       localizationsDelegates: const [
@@ -107,8 +108,8 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
   final List<Widget> _screens = const [
     LivingShelfScreen(),
     CookScreen(),
-    ScanScreen(),
     ExploreScreen(),
+    ScanScreen(),
     ProfileScreen(),
   ];
 
@@ -118,8 +119,8 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
     final _navItems = [
       _NavItem(icon: Icons.kitchen_outlined, activeIcon: Icons.kitchen, label: l10n?.tabShelf ?? 'Shelf'),
       _NavItem(icon: Icons.restaurant_menu_outlined, activeIcon: Icons.restaurant_menu, label: l10n?.tabCook ?? 'Cook'),
-      _NavItem(icon: Icons.camera_alt_outlined, activeIcon: Icons.camera_alt, label: l10n?.tabScan ?? 'Scan'),
       _NavItem(icon: Icons.explore_outlined, activeIcon: Icons.explore, label: 'Explore'),
+      _NavItem(icon: Icons.camera_alt_outlined, activeIcon: Icons.camera_alt, label: l10n?.tabScan ?? 'Scan'),
       _NavItem(icon: Icons.person_outline, activeIcon: Icons.person, label: l10n?.tabProfile ?? 'Profile'),
     ];
 

@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ifridge_app/core/theme/app_theme.dart';
 import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:ifridge_app/features/explore/presentation/screens/creator_page.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -288,14 +289,23 @@ class _ReelCardState extends State<_ReelCard> {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(authorName,
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                      Text(isReel ? '🎬 Reel' : '💡 Tip',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11)),
-                    ],
+                  child: GestureDetector(
+                    onTap: () {
+                      final authorId = widget.post['author_id'];
+                      if (authorId != null) {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (_) => CreatorPage(creatorId: authorId, creatorName: authorName)));
+                      }
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(authorName,
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text(isReel ? '🎬 Reel' : '💡 Tip',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11)),
+                      ],
+                    ),
                   ),
                 ),
                 if (isReel)

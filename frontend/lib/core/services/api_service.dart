@@ -296,6 +296,16 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  /// Analyze a food photo for calorie content via vision AI.
+  Future<Map<String, dynamic>> analyzeCaloriesImage(List<int> imageBytes, String filename) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/calories/analyze-image');
+    final request = http.MultipartRequest('POST', uri);
+    request.files.add(http.MultipartFile.fromBytes('file', imageBytes, filename: filename));
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    return _handleResponse(response);
+  }
+
   // ── Health ───────────────────────────────────────────────────────
 
   /// Check backend health status.

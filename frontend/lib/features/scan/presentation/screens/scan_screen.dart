@@ -23,13 +23,14 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
   final ApiService _api = ApiService();
 
   bool _scanning = false;
-  // 0 = Receipt, 1 = Photo, 2 = Barcode, 3 = Calories
+  // 0 = Receipt, 1 = Photo, 2 = Barcode
   int _scanMode = 0;
+  late TabController _topTabController;
   Map<String, dynamic>? _results;
   String? _error;
   late AnimationController _pulseController;
@@ -42,10 +43,12 @@ class _ScanScreenState extends State<ScanScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
+    _topTabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
+    _topTabController.dispose();
     _pulseController.dispose();
     _api.dispose();
     super.dispose();
@@ -132,17 +135,34 @@ class _ScanScreenState extends State<ScanScreen>
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text(
-          'Scan Food',
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
+        title: const Text('Scan', style: TextStyle(fontWeight: FontWeight.w700)),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _topTabController,
+          indicatorColor: IFridgeTheme.primary,
+          indicatorWeight: 3,
+          labelColor: IFridgeTheme.primary,
+          unselectedLabelColor: Colors.white54,
+          labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          tabs: const [
+            Tab(icon: Icon(Icons.fastfood, size: 20), text: 'Scan Food'),
+            Tab(icon: Icon(Icons.local_fire_department, size: 20), text: 'Scan Calories'),
+          ],
+        ),
       ),
-      body: _scanning
-          ? _buildScanningState()
-          : _results != null
-              ? _buildResults()
-              : _buildCaptureState(),
+      body: TabBarView(
+        controller: _topTabController,
+        children: [
+          // Tab 1: Scan Food (existing)
+          _scanning
+              ? _buildScanningState()
+              : _results != null
+                  ? _buildResults()
+                  : _buildCaptureState(),
+          // Tab 2: Scan Calories (photo-based)
+          const _CalorieScanTab(),
+        ],
+      ),
     );
   }
 
@@ -236,13 +256,6 @@ class _ScanScreenState extends State<ScanScreen>
                     activeColor: IFridgeTheme.secondary,
                     onTap: () => setState(() => _scanMode = 2),
                   ),
-                  _ModeTab(
-                    icon: Icons.local_fire_department,
-                    label: 'Calories',
-                    isActive: _scanMode == 3,
-                    activeColor: Colors.orange,
-                    onTap: () => setState(() => _scanMode = 3),
-                  ),
                 ],
               ),
             ),
@@ -328,13 +341,10 @@ class _ScanScreenState extends State<ScanScreen>
             
             const SizedBox(height: 12),
 
-            // ── Calorie Mode UI ──────────────────────────
-            if (_scanMode == 3) ...[
-              _CalorieAnalysisSection(),
-            ],
+
             
             // Manual Entry Button
-            if (_scanMode != 3)
+
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -1387,19 +1397,20 @@ class _ModeTab extends StatelessWidget {
   }
 }
 
-// ── Calorie Analysis Section ─────────────────────────────────────
+// ── Calorie Scan Tab (photo-based) ───────────────────────────────
 
-class _CalorieAnalysisSection extends StatefulWidget {
-  const _CalorieAnalysisSection();
+class _CalorieScanTab extends StatefulWidget {
+  const _CalorieScanTab();
   @override
-  State<_CalorieAnalysisSection> createState() => _CalorieAnalysisSectionState();
+  State<_CalorieScanTab> createState() => _CalorieScanTabState();
 }
 
-class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
+class _CalorieScanTabState extends State<_CalorieScanTab> {
+  final ImagePicker _picker = ImagePicker();
   final ApiService _api = ApiService();
-  final TextEditingController _foodController = TextEditingController();
   bool _analyzing = false;
   Map<String, dynamic>? _result;
+  Uint8List? _imageBytes;
   String _mealType = 'snack';
 
   final List<String> _mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
@@ -1407,16 +1418,16 @@ class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
     'breakfast': '🌅', 'lunch': '☀️', 'dinner': '🌙', 'snack': '🍿',
   };
 
-  Future<void> _analyze() async {
-    if (_foodController.text.trim().isEmpty) return;
-    setState(() { _analyzing = true; _result = null; });
+  Future<void> _captureAndAnalyze(ImageSource source) async {
     try {
-      final items = _foodController.text
-          .split(RegExp(r'[,\n]'))
-          .map((s) => s.trim())
-          .where((s) => s.isNotEmpty)
-          .toList();
-      final result = await _api.analyzeCalories(items);
+      final XFile? image = await _picker.pickImage(
+        source: source, maxWidth: 1024, maxHeight: 1024, imageQuality: 85);
+      if (image == null) return;
+
+      final bytes = await image.readAsBytes();
+      setState(() { _analyzing = true; _result = null; _imageBytes = bytes; });
+
+      final result = await _api.analyzeCaloriesImage(bytes, image.name);
       setState(() { _result = result; _analyzing = false; });
     } catch (e) {
       setState(() => _analyzing = false);
@@ -1431,7 +1442,7 @@ class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
     if (_result == null) return;
     try {
       final userId = currentUserId();
-      final items = (_result!['items'] as List).map((item) => {
+      final items = ((_result!['items'] as List?) ?? []).map<Map<String, dynamic>>((item) => {
         'name': item['name'] ?? '',
         'calories': item['estimated_calories'] ?? 0,
         'protein_g': item['protein_g'] ?? 0,
@@ -1440,14 +1451,11 @@ class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
       }).toList();
 
       await _api.logNutrition(
-        userId: userId,
-        mealType: _mealType,
-        foodItems: items,
-      );
+        userId: userId, mealType: _mealType, foodItems: items);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Meal logged!'), backgroundColor: IFridgeTheme.freshGreen));
-        setState(() { _result = null; _foodController.clear(); });
+        setState(() { _result = null; _imageBytes = null; });
       }
     } catch (e) {
       if (mounted) {
@@ -1458,175 +1466,228 @@ class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
   }
 
   @override
-  void dispose() {
-    _foodController.dispose();
-    _api.dispose();
-    super.dispose();
-  }
+  void dispose() { _api.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Food input
-        TextField(
-          controller: _foodController,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
-          maxLines: 3,
-          minLines: 2,
-          decoration: InputDecoration(
-            hintText: 'Type food items (comma separated)\ne.g. chicken breast, rice, broccoli',
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 13),
-            filled: true,
-            fillColor: AppTheme.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.all(16),
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Analyze button
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FilledButton.icon(
-            onPressed: _analyzing ? null : _analyze,
-            icon: _analyzing
-                ? const SizedBox(width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Icon(Icons.local_fire_department, size: 22),
-            label: Text(_analyzing ? 'Analyzing...' : 'Analyze Calories',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.orange,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-          ),
-        ),
-
-        // Results
-        if (_result != null) ...[
-          const SizedBox(height: 20),
-
-          // Total calories header
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Preview image or placeholder
           Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.orange.withValues(alpha: 0.15), AppTheme.surface],
-                begin: Alignment.topLeft, end: Alignment.bottomRight),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
-            ),
-            child: Column(
-              children: [
-                Text('🔥 ${_result!['total_estimated_calories'] ?? 0}',
-                  style: const TextStyle(color: Colors.orange, fontSize: 36, fontWeight: FontWeight.w800)),
-                const Text('estimated calories',
-                  style: TextStyle(color: Colors.white54, fontSize: 13)),
-                const SizedBox(height: 12),
-                Text('${(_result!['items'] as List?)?.length ?? 0} items analyzed',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Per-item breakdown
-          ...((_result!['items'] as List?) ?? []).map((item) => Container(
-            margin: const EdgeInsets.only(bottom: 6),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            height: 220,
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+              image: _imageBytes != null
+                  ? DecorationImage(image: MemoryImage(_imageBytes!), fit: BoxFit.cover)
+                  : null,
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: _imageBytes == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(item['name'] ?? '',
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                      Text('${item['calories_per_100g'] ?? '?'} cal/100g • ~${item['estimated_serving_g'] ?? item['serving_g'] ?? '?'}g serving',
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11)),
+                      const Icon(Icons.local_fire_department, size: 56, color: Colors.orange),
+                      const SizedBox(height: 12),
+                      const Text('Snap Your Meal',
+                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 6),
+                      Text('Take a photo and AI will estimate calories',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 13)),
                     ],
-                  ),
-                ),
-                Text('${item['estimated_calories'] ?? '?'}',
-                  style: const TextStyle(color: Colors.orange, fontSize: 18, fontWeight: FontWeight.w800)),
-                const Text(' cal', style: TextStyle(color: Colors.white38, fontSize: 11)),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: (item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary)
-                        .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6)),
-                  child: Text(
-                    item['source'] == 'database' ? 'DB' : 'AI',
-                    style: TextStyle(
-                      color: item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary,
-                      fontSize: 9, fontWeight: FontWeight.w700)),
-                ),
-              ],
-            ),
-          )),
-
+                  )
+                : _analyzing
+                    ? Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.black54, borderRadius: BorderRadius.circular(16)),
+                          child: const Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(color: Colors.orange),
+                              SizedBox(height: 12),
+                              Text('Analyzing food...', style: TextStyle(color: Colors.white, fontSize: 14)),
+                            ],
+                          ),
+                        ),
+                      )
+                    : null,
+          ),
           const SizedBox(height: 16),
 
-          // Meal type selector + Log
+          // Camera / Gallery buttons
           Row(
             children: [
-              ..._mealTypes.map((type) => Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _mealType = type),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 4),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _mealType == type
-                          ? Colors.orange.withValues(alpha: 0.15)
-                          : AppTheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: _mealType == type
-                            ? Colors.orange.withValues(alpha: 0.4)
-                            : Colors.white.withValues(alpha: 0.06)),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(_mealEmoji[type] ?? '🍽️', style: const TextStyle(fontSize: 16)),
-                        Text(type[0].toUpperCase() + type.substring(1),
-                          style: TextStyle(
-                            color: _mealType == type ? Colors.orange : Colors.white38,
-                            fontSize: 10, fontWeight: FontWeight.w600)),
-                      ],
-                    ),
+              Expanded(
+                child: SizedBox(
+                  height: 52,
+                  child: FilledButton.icon(
+                    onPressed: _analyzing ? null : () => _captureAndAnalyze(ImageSource.camera),
+                    icon: const Icon(Icons.camera_alt, size: 20),
+                    label: const Text('Camera', style: TextStyle(fontWeight: FontWeight.w600)),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                   ),
                 ),
-              )),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: _analyzing ? null : () => _captureAndAnalyze(ImageSource.gallery),
+                    icon: const Icon(Icons.photo_library, size: 20, color: Colors.orange),
+                    label: const Text('Gallery', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w600)),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.orange),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                  ),
+                ),
+              ),
             ],
           ),
 
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: FilledButton.icon(
-              onPressed: _logMeal,
-              icon: const Icon(Icons.add_task, size: 20),
-              label: const Text('Log Meal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-              style: FilledButton.styleFrom(
-                backgroundColor: IFridgeTheme.freshGreen,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+          // Results
+          if (_result != null) ...[
+            const SizedBox(height: 20),
+
+            // Detected items
+            if (_result!['detected_items'] != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: ((_result!['detected_items'] as List?) ?? []).map((item) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8)),
+                    child: Text('🔍 $item',
+                      style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
+                  )).toList(),
+                ),
+              ),
+
+            // Total calories
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.orange.withValues(alpha: 0.15), AppTheme.surface],
+                  begin: Alignment.topLeft, end: Alignment.bottomRight),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                children: [
+                  Text('🔥 ${_result!['total_estimated_calories'] ?? 0}',
+                    style: const TextStyle(color: Colors.orange, fontSize: 36, fontWeight: FontWeight.w800)),
+                  const Text('estimated calories',
+                    style: TextStyle(color: Colors.white54, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  Text('${(_result!['items'] as List?)?.length ?? 0} items identified',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
+                ],
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+
+            // Per-item breakdown
+            ...((_result!['items'] as List?) ?? []).map((item) => Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item['name'] ?? '',
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text('${item['calories_per_100g'] ?? '?'} cal/100g • ~${item['estimated_serving_g'] ?? item['serving_g'] ?? '?'}g',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                  Text('${item['estimated_calories'] ?? '?'}',
+                    style: const TextStyle(color: Colors.orange, fontSize: 18, fontWeight: FontWeight.w800)),
+                  const Text(' cal', style: TextStyle(color: Colors.white38, fontSize: 11)),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: (item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary)
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6)),
+                    child: Text(
+                      item['source'] == 'database' ? 'DB' : 'AI',
+                      style: TextStyle(
+                        color: item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary,
+                        fontSize: 9, fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            )),
+
+            const SizedBox(height: 16),
+
+            // Meal type selector
+            Row(
+              children: [
+                ..._mealTypes.map((type) => Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _mealType = type),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _mealType == type ? Colors.orange.withValues(alpha: 0.15) : AppTheme.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _mealType == type ? Colors.orange.withValues(alpha: 0.4) : Colors.white.withValues(alpha: 0.06)),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(_mealEmoji[type] ?? '🍽️', style: const TextStyle(fontSize: 16)),
+                          Text(type[0].toUpperCase() + type.substring(1),
+                            style: TextStyle(
+                              color: _mealType == type ? Colors.orange : Colors.white38,
+                              fontSize: 10, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton.icon(
+                onPressed: _logMeal,
+                icon: const Icon(Icons.add_task, size: 20),
+                label: const Text('Log Meal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                style: FilledButton.styleFrom(
+                  backgroundColor: IFridgeTheme.freshGreen,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

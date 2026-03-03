@@ -109,6 +109,86 @@ class IFridgeTheme {
       ),
     );
   }
+
+  // --- Light Theme ---
+  static const Color _bgLight = Color(0xFFF6F8FA);
+  static const Color _bgCardLight = Color(0xFFFFFFFF);
+  static const Color _bgElevatedLight = Color(0xFFEEF1F5);
+  static const Color _textDark = Color(0xFF1B1F23);
+  static const Color _textSecondaryLight = Color(0xFF57606A);
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: _bgLight,
+      fontFamily: 'Inter',
+
+      colorScheme: ColorScheme.light(
+        primary: primary,
+        secondary: secondary,
+        error: error,
+        surface: _bgCardLight,
+        onPrimary: Colors.white,
+        onSecondary: _textDark,
+        onSurface: _textDark,
+        onError: Colors.white,
+      ),
+
+      appBarTheme: const AppBarTheme(
+        backgroundColor: _bgLight,
+        foregroundColor: _textDark,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          color: _textDark,
+          letterSpacing: -0.5,
+        ),
+      ),
+
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: _bgCardLight,
+        selectedItemColor: primary,
+        unselectedItemColor: _textSecondaryLight,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+
+      cardTheme: CardThemeData(
+        color: _bgCardLight,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.black.withOpacity(0.06)),
+        ),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+      ),
+
+      chipTheme: ChipThemeData(
+        backgroundColor: _bgElevatedLight,
+        labelStyle: const TextStyle(color: _textDark, fontSize: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: BorderSide(color: Colors.black.withOpacity(0.08)),
+      ),
+
+      dividerTheme: DividerThemeData(
+        color: Colors.black.withOpacity(0.08),
+        thickness: 1,
+      ),
+    );
+  }
 }
 
 /// Convenience alias used by feature screens.
