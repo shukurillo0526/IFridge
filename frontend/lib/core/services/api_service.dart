@@ -254,6 +254,48 @@ class ApiService {
     return List<Map<String, dynamic>>.from(data['ingredients'] ?? []);
   }
 
+  // ── Calorie Analysis ───────────────────────────────────────────
+
+  /// Analyze food items for calorie content.
+  Future<Map<String, dynamic>> analyzeCalories(List<String> foodItems) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/calories/analyze');
+    final response = await _client.post(
+      uri,
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({'food_items': foodItems}),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Log a meal's nutrition.
+  Future<Map<String, dynamic>> logNutrition({
+    required String userId,
+    required String mealType,
+    required List<Map<String, dynamic>> foodItems,
+    String? notes,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/calories/log');
+    final response = await _client.post(
+      uri,
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'meal_type': mealType,
+        'food_items': foodItems,
+        if (notes != null) 'notes': notes,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Get daily nutrition summary.
+  Future<Map<String, dynamic>> getDailyNutrition(String userId, {String? date}) async {
+    final params = date != null ? '?date=$date' : '';
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/calories/daily/$userId$params');
+    final response = await _client.get(uri, headers: _headers);
+    return _handleResponse(response);
+  }
+
   // ── Health ───────────────────────────────────────────────────────
 
   /// Check backend health status.

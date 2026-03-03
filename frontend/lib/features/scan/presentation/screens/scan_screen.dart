@@ -28,7 +28,7 @@ class _ScanScreenState extends State<ScanScreen>
   final ApiService _api = ApiService();
 
   bool _scanning = false;
-  // 0 = Receipt, 1 = Photo, 2 = Barcode
+  // 0 = Receipt, 1 = Photo, 2 = Barcode, 3 = Calories
   int _scanMode = 0;
   Map<String, dynamic>? _results;
   String? _error;
@@ -236,6 +236,13 @@ class _ScanScreenState extends State<ScanScreen>
                     activeColor: IFridgeTheme.secondary,
                     onTap: () => setState(() => _scanMode = 2),
                   ),
+                  _ModeTab(
+                    icon: Icons.local_fire_department,
+                    label: 'Calories',
+                    isActive: _scanMode == 3,
+                    activeColor: Colors.orange,
+                    onTap: () => setState(() => _scanMode = 3),
+                  ),
                 ],
               ),
             ),
@@ -243,7 +250,7 @@ class _ScanScreenState extends State<ScanScreen>
             const SizedBox(height: 24),
 
             // Camera button
-            if (_scanMode != 2) ...[
+            if (_scanMode != 2 && _scanMode != 3) ...[
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -291,7 +298,7 @@ class _ScanScreenState extends State<ScanScreen>
             const SizedBox(height: 12),
 
             // Gallery button
-            if (_scanMode != 2) ...[
+            if (_scanMode != 2 && _scanMode != 3) ...[
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -320,8 +327,14 @@ class _ScanScreenState extends State<ScanScreen>
             ],
             
             const SizedBox(height: 12),
+
+            // ── Calorie Mode UI ──────────────────────────
+            if (_scanMode == 3) ...[
+              _CalorieAnalysisSection(),
+            ],
             
             // Manual Entry Button
+            if (_scanMode != 3)
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -1370,6 +1383,250 @@ class _ModeTab extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ── Calorie Analysis Section ─────────────────────────────────────
+
+class _CalorieAnalysisSection extends StatefulWidget {
+  const _CalorieAnalysisSection();
+  @override
+  State<_CalorieAnalysisSection> createState() => _CalorieAnalysisSectionState();
+}
+
+class _CalorieAnalysisSectionState extends State<_CalorieAnalysisSection> {
+  final ApiService _api = ApiService();
+  final TextEditingController _foodController = TextEditingController();
+  bool _analyzing = false;
+  Map<String, dynamic>? _result;
+  String _mealType = 'snack';
+
+  final List<String> _mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
+  final Map<String, String> _mealEmoji = {
+    'breakfast': '🌅', 'lunch': '☀️', 'dinner': '🌙', 'snack': '🍿',
+  };
+
+  Future<void> _analyze() async {
+    if (_foodController.text.trim().isEmpty) return;
+    setState(() { _analyzing = true; _result = null; });
+    try {
+      final items = _foodController.text
+          .split(RegExp(r'[,\n]'))
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+      final result = await _api.analyzeCalories(items);
+      setState(() { _result = result; _analyzing = false; });
+    } catch (e) {
+      setState(() => _analyzing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Analysis failed: $e'), backgroundColor: Colors.redAccent));
+      }
+    }
+  }
+
+  Future<void> _logMeal() async {
+    if (_result == null) return;
+    try {
+      final userId = currentUserId();
+      final items = (_result!['items'] as List).map((item) => {
+        'name': item['name'] ?? '',
+        'calories': item['estimated_calories'] ?? 0,
+        'protein_g': item['protein_g'] ?? 0,
+        'carbs_g': item['carbs_g'] ?? 0,
+        'fat_g': item['fat_g'] ?? 0,
+      }).toList();
+
+      await _api.logNutrition(
+        userId: userId,
+        mealType: _mealType,
+        foodItems: items,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Meal logged!'), backgroundColor: IFridgeTheme.freshGreen));
+        setState(() { _result = null; _foodController.clear(); });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to log: $e'), backgroundColor: Colors.redAccent));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _foodController.dispose();
+    _api.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Food input
+        TextField(
+          controller: _foodController,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+          maxLines: 3,
+          minLines: 2,
+          decoration: InputDecoration(
+            hintText: 'Type food items (comma separated)\ne.g. chicken breast, rice, broccoli',
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 13),
+            filled: true,
+            fillColor: AppTheme.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.all(16),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Analyze button
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: FilledButton.icon(
+            onPressed: _analyzing ? null : _analyze,
+            icon: _analyzing
+                ? const SizedBox(width: 20, height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.local_fire_department, size: 22),
+            label: Text(_analyzing ? 'Analyzing...' : 'Analyze Calories',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.orange,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+          ),
+        ),
+
+        // Results
+        if (_result != null) ...[
+          const SizedBox(height: 20),
+
+          // Total calories header
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.orange.withValues(alpha: 0.15), AppTheme.surface],
+                begin: Alignment.topLeft, end: Alignment.bottomRight),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+            ),
+            child: Column(
+              children: [
+                Text('🔥 ${_result!['total_estimated_calories'] ?? 0}',
+                  style: const TextStyle(color: Colors.orange, fontSize: 36, fontWeight: FontWeight.w800)),
+                const Text('estimated calories',
+                  style: TextStyle(color: Colors.white54, fontSize: 13)),
+                const SizedBox(height: 12),
+                Text('${(_result!['items'] as List?)?.length ?? 0} items analyzed',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Per-item breakdown
+          ...((_result!['items'] as List?) ?? []).map((item) => Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item['name'] ?? '',
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text('${item['calories_per_100g'] ?? '?'} cal/100g • ~${item['estimated_serving_g'] ?? item['serving_g'] ?? '?'}g serving',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11)),
+                    ],
+                  ),
+                ),
+                Text('${item['estimated_calories'] ?? '?'}',
+                  style: const TextStyle(color: Colors.orange, fontSize: 18, fontWeight: FontWeight.w800)),
+                const Text(' cal', style: TextStyle(color: Colors.white38, fontSize: 11)),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: (item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary)
+                        .withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6)),
+                  child: Text(
+                    item['source'] == 'database' ? 'DB' : 'AI',
+                    style: TextStyle(
+                      color: item['source'] == 'database' ? IFridgeTheme.freshGreen : IFridgeTheme.primary,
+                      fontSize: 9, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ),
+          )),
+
+          const SizedBox(height: 16),
+
+          // Meal type selector + Log
+          Row(
+            children: [
+              ..._mealTypes.map((type) => Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _mealType = type),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _mealType == type
+                          ? Colors.orange.withValues(alpha: 0.15)
+                          : AppTheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: _mealType == type
+                            ? Colors.orange.withValues(alpha: 0.4)
+                            : Colors.white.withValues(alpha: 0.06)),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(_mealEmoji[type] ?? '🍽️', style: const TextStyle(fontSize: 16)),
+                        Text(type[0].toUpperCase() + type.substring(1),
+                          style: TextStyle(
+                            color: _mealType == type ? Colors.orange : Colors.white38,
+                            fontSize: 10, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ),
+              )),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: _logMeal,
+              icon: const Icon(Icons.add_task, size: 20),
+              label: const Text('Log Meal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              style: FilledButton.styleFrom(
+                backgroundColor: IFridgeTheme.freshGreen,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

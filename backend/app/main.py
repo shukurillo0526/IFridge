@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory, user_data
+from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory, user_data, calorie_analysis
 from app.services.ollama_service import get_ollama_service
 import uvicorn
 
@@ -28,6 +28,7 @@ app.include_router(recipe_ai.router)
 app.include_router(embeddings.router)
 app.include_router(inventory.router)
 app.include_router(user_data.router)
+app.include_router(calorie_analysis.router)
 
 @app.get("/")
 async def root():
