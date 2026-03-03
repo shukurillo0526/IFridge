@@ -1,11 +1,13 @@
-// I-Fridge — Active Cooking Screen
-// ==================================
+// I-Fridge — Active Cooking Screen (Enhanced)
+// =============================================
 // Distraction-free, step-by-step cooking tutorial.
-// Features: contextual icons, interactive countdown timers,
-// attention flags, wakelock, and swipeable step cards.
+// Features: persistent timer bar, auto-start timers, interactive countdown,
+// attention flags, wakelock, swipeable step cards, and AI tips.
 
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:ifridge_app/core/theme/app_theme.dart';
 import 'package:ifridge_app/core/services/api_service.dart';
@@ -15,6 +17,8 @@ class CookingRunScreen extends StatefulWidget {
   final String recipeId;
   final String title;
   final List<Map<String, dynamic>> steps;
+  final List<Map<String, dynamic>>? ingredients;
+  final List<String>? prepNotes;
   final int matchedIngredientsCount;
   final double matchPct;
 
@@ -23,6 +27,8 @@ class CookingRunScreen extends StatefulWidget {
     required this.recipeId,
     required this.title,
     required this.steps,
+    this.ingredients,
+    this.prepNotes,
     required this.matchedIngredientsCount,
     required this.matchPct,
   });
@@ -34,19 +40,64 @@ class CookingRunScreen extends StatefulWidget {
 class _CookingRunScreenState extends State<CookingRunScreen> {
   late PageController _pageController;
   int _currentIndex = 0;
+  bool _showPrepNotes = true;
+
+  // Global timer tracking: step_index → remaining seconds
+  final Map<int, int> _activeTimers = {};
+  final Map<int, Timer> _timerObjects = {};
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     WakelockPlus.enable();
+    // Hide prep notes if none exist
+    if (widget.prepNotes == null || widget.prepNotes!.isEmpty) {
+      _showPrepNotes = false;
+    }
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    for (final t in _timerObjects.values) {
+      t.cancel();
+    }
     WakelockPlus.disable();
     super.dispose();
+  }
+
+  void _startTimerForStep(int stepIndex, int seconds) {
+    if (_activeTimers.containsKey(stepIndex)) return; // already running
+    _activeTimers[stepIndex] = seconds;
+    _timerObjects[stepIndex] = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) { timer.cancel(); return; }
+      setState(() {
+        final remaining = (_activeTimers[stepIndex] ?? 1) - 1;
+        if (remaining <= 0) {
+          _activeTimers.remove(stepIndex);
+          timer.cancel();
+          _timerObjects.remove(stepIndex);
+          // Vibrate on completion
+          HapticFeedback.heavyImpact();
+          _showTimerDoneAlert(stepIndex);
+        } else {
+          _activeTimers[stepIndex] = remaining;
+        }
+      });
+    });
+  }
+
+  void _showTimerDoneAlert(int stepIndex) {
+    final stepNum = stepIndex + 1;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('⏱ Timer done! Step $stepNum complete'),
+        backgroundColor: IFridgeTheme.freshGreen,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   void _nextStep() {
@@ -81,6 +132,12 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
     );
   }
 
+  String _formatTimer(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.steps.isEmpty) {
@@ -88,12 +145,15 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
         backgroundColor: AppTheme.background,
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: const Center(
-          child: Text(
-            'No steps available for this recipe.',
-            style: TextStyle(color: Colors.white),
-          ),
+          child: Text('No steps available for this recipe.',
+            style: TextStyle(color: Colors.white)),
         ),
       );
+    }
+
+    // Prep notes overlay
+    if (_showPrepNotes) {
+      return _buildPrepNotesScreen();
     }
 
     final totalSteps = widget.steps.length;
@@ -104,18 +164,65 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          widget.title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
+        title: Text(widget.title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // ── Progress Bar ─────────────────────────────────────
+            // ── Persistent Timer Bar ──────────────────────────
+            if (_activeTimers.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: IFridgeTheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: IFridgeTheme.primary.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer, color: IFridgeTheme.primary, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: _activeTimers.entries.map((e) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 14),
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Jump to that step
+                                  _pageController.animateToPage(e.key,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut);
+                                },
+                                child: Text(
+                                  'Step ${e.key + 1}: ${_formatTimer(e.value)}',
+                                  style: TextStyle(
+                                    color: e.value < 30
+                                        ? Colors.orange
+                                        : IFridgeTheme.primary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    fontFeatures: const [FontFeature.tabularFigures()],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // ── Progress Bar ──────────────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: TweenAnimationBuilder<double>(
@@ -125,9 +232,7 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
                     value: value,
                     minHeight: 6,
                     backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      IFridgeTheme.primary,
-                    ),
+                    valueColor: const AlwaysStoppedAnimation<Color>(IFridgeTheme.primary),
                   ),
                 ),
               ),
@@ -136,17 +241,12 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  'Step ${_currentIndex + 1} of $totalSteps',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 13,
-                  ),
-                ),
+                child: Text('Step ${_currentIndex + 1} of $totalSteps',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13)),
               ),
             ),
 
-            // ── Step Carousel ────────────────────────────────────
+            // ── Step Carousel ─────────────────────────────────
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -154,84 +254,155 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
                 onPageChanged: (idx) => setState(() => _currentIndex = idx),
                 itemCount: totalSteps,
                 itemBuilder: (context, index) {
-                  return _CookingStepCard(step: widget.steps[index]);
+                  return _CookingStepCard(
+                    step: widget.steps[index],
+                    stepIndex: index,
+                    timerRemaining: _activeTimers[index],
+                    onStartTimer: (seconds) => _startTimerForStep(index, seconds),
+                  );
                 },
               ),
             ),
 
-            // ── Navigation Controls ──────────────────────────────
+            // ── Navigation Controls ───────────────────────────
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back Button
                   _currentIndex > 0
                       ? TextButton.icon(
                           onPressed: _prevStep,
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            'Back',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          icon: const Icon(Icons.arrow_back_ios, size: 16, color: Colors.white),
+                          label: const Text('Back', style: TextStyle(color: Colors.white)),
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                         )
                       : const SizedBox(width: 80),
-
-                  // Next / Finish Button
                   _currentIndex < totalSteps - 1
                       ? FilledButton.icon(
                           onPressed: _nextStep,
                           icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                          label: const Text(
-                            'Next Step',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          label: const Text('Next Step', style: TextStyle(fontSize: 16)),
                           style: FilledButton.styleFrom(
                             backgroundColor: IFridgeTheme.primary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
                         )
                       : FilledButton.icon(
                           onPressed: _finishCooking,
                           icon: const Icon(Icons.check_circle, size: 20),
-                          label: const Text(
-                            'Finish Cooking',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          label: const Text('Finish Cooking',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           style: FilledButton.styleFrom(
                             backgroundColor: IFridgeTheme.freshGreen,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
                         ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPrepNotesScreen() {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, elevation: 0,
+        title: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Title
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+                ),
+                child: const Row(
+                  children: [
+                    Text('🔪', style: TextStyle(fontSize: 28)),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Prep Before You Start',
+                            style: TextStyle(color: Colors.orange, fontSize: 20, fontWeight: FontWeight.w700)),
+                          SizedBox(height: 4),
+                          Text('Mise en place — prepare everything first!',
+                            style: TextStyle(color: Colors.white54, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Ingredients overview
+              if (widget.ingredients != null && widget.ingredients!.isNotEmpty) ...[
+                Text('📋 Ingredients needed:',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                ...widget.ingredients!.take(8).map((ing) {
+                  final name = ing['display_name_en'] ?? ing['ingredient_name'] ?? '';
+                  final qty = ing['quantity']?.toString() ?? '';
+                  final unit = ing['unit'] ?? '';
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('  • $qty $unit $name',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13)),
+                  );
+                }),
+                if (widget.ingredients!.length > 8)
+                  Text('  ... and ${widget.ingredients!.length - 8} more',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 13)),
+                const SizedBox(height: 16),
+              ],
+
+              // Prep notes
+              if (widget.prepNotes != null)
+                ...widget.prepNotes!.map((note) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('✓ ', style: TextStyle(color: Colors.orange, fontSize: 16)),
+                      Expanded(
+                        child: Text(note,
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 15, height: 1.5)),
+                      ),
+                    ],
+                  ),
+                )),
+
+              const Spacer(),
+
+              // Start button
+              FilledButton.icon(
+                onPressed: () => setState(() => _showPrepNotes = false),
+                icon: const Icon(Icons.restaurant, size: 20),
+                label: const Text('Start Cooking →', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                style: FilledButton.styleFrom(
+                  backgroundColor: IFridgeTheme.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -242,49 +413,55 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
 
 class _CookingStepCard extends StatefulWidget {
   final Map<String, dynamic> step;
+  final int stepIndex;
+  final int? timerRemaining;
+  final void Function(int seconds) onStartTimer;
 
-  const _CookingStepCard({required this.step});
+  const _CookingStepCard({
+    required this.step,
+    required this.stepIndex,
+    this.timerRemaining,
+    required this.onStartTimer,
+  });
 
   @override
   State<_CookingStepCard> createState() => _CookingStepCardState();
 }
 
 class _CookingStepCardState extends State<_CookingStepCard> {
-  int? _timerSeconds;
-  bool _timerRunning = false;
-
-  // AI Tip state
   final ApiService _api = ApiService();
   String? _aiTip;
   bool _aiLoading = false;
+  bool _autoStartTriggered = false;
+
+  int? get _timerSeconds {
+    // Prefer new timer_seconds field, fall back to estimated_seconds or robot_action
+    final ts = widget.step['timer_seconds'];
+    if (ts != null && ts is int && ts > 0) return ts;
+    final est = widget.step['estimated_seconds'];
+    if (est != null && est is int && est > 0) return est;
+    // Try robot_action minutes
+    final robot = widget.step['robot_action'];
+    if (robot is Map && robot['minutes'] != null) {
+      return ((robot['minutes'] as num) * 60).toInt();
+    }
+    return null;
+  }
+
+  bool get _isAutoStart {
+    return widget.step['timer_auto_start'] == true;
+  }
 
   @override
   void initState() {
     super.initState();
-    final est = widget.step['estimated_seconds'];
-    if (est != null && est is int && est > 0) {
-      _timerSeconds = est;
-    }
-  }
-
-  void _startTimer() {
-    if (_timerSeconds == null || _timerSeconds! <= 0 || _timerRunning) return;
-    setState(() => _timerRunning = true);
-    _tick();
-  }
-
-  void _tick() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted || !_timerRunning) return;
-      setState(() {
-        _timerSeconds = (_timerSeconds ?? 1) - 1;
-        if (_timerSeconds! <= 0) {
-          _timerRunning = false;
-        } else {
-          _tick();
-        }
+    // Auto-start timer if flagged
+    if (_isAutoStart && _timerSeconds != null && !_autoStartTriggered) {
+      _autoStartTriggered = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onStartTimer(_timerSeconds!);
       });
-    });
+    }
   }
 
   String _formatTime(int seconds) {
@@ -294,7 +471,6 @@ class _CookingStepCardState extends State<_CookingStepCard> {
     return '${s}s';
   }
 
-  // Choose an icon based on common cooking keywords
   IconData _pickIcon(String text) {
     final lower = text.toLowerCase();
     if (lower.contains('heat') || lower.contains('boil') || lower.contains('simmer')) {
@@ -303,27 +479,32 @@ class _CookingStepCardState extends State<_CookingStepCard> {
     if (lower.contains('cut') || lower.contains('chop') || lower.contains('dice') || lower.contains('slice')) {
       return Icons.content_cut;
     }
-    if (lower.contains('mix') || lower.contains('stir') || lower.contains('whisk')) {
+    if (lower.contains('mix') || lower.contains('stir') || lower.contains('whisk') || lower.contains('knead')) {
       return Icons.blender;
     }
-    if (lower.contains('bake') || lower.contains('oven')) {
+    if (lower.contains('bake') || lower.contains('oven') || lower.contains('preheat')) {
       return Icons.microwave;
     }
-    if (lower.contains('fry') || lower.contains('saute') || lower.contains('pan')) {
+    if (lower.contains('fry') || lower.contains('saute') || lower.contains('sear') || lower.contains('pan')) {
       return Icons.lunch_dining;
     }
     if (lower.contains('serve') || lower.contains('plate') || lower.contains('garnish')) {
       return Icons.room_service;
     }
-    if (lower.contains('wash') || lower.contains('rinse') || lower.contains('clean')) {
+    if (lower.contains('wash') || lower.contains('rinse') || lower.contains('soak') || lower.contains('drain')) {
       return Icons.water_drop;
     }
-    if (lower.contains('season') || lower.contains('salt') || lower.contains('pepper')) {
+    if (lower.contains('season') || lower.contains('salt') || lower.contains('spice')) {
       return Icons.spa;
     }
-    if (lower.contains('cool') || lower.contains('chill') || lower.contains('refrigerat')) {
+    if (lower.contains('cool') || lower.contains('chill') || lower.contains('rest') || lower.contains('proof')) {
       return Icons.ac_unit;
     }
+    if (lower.contains('shape') || lower.contains('roll') || lower.contains('fold') || lower.contains('press')) {
+      return Icons.pan_tool;
+    }
+    if (lower.contains('steam')) return Icons.cloud;
+    if (lower.contains('pour') || lower.contains('add water')) return Icons.local_drink;
     return Icons.restaurant;
   }
 
@@ -354,12 +535,14 @@ class _CookingStepCardState extends State<_CookingStepCard> {
   @override
   Widget build(BuildContext context) {
     final humanText = widget.step['human_text'] ?? '';
-    final estimatedSeconds = widget.step['estimated_seconds'];
     final requiresAttention = widget.step['requires_attention'] == true;
     final icon = _pickIcon(humanText);
+    final tempC = widget.step['temperature_c'];
+    final timerSec = _timerSeconds;
+    final isTimerRunning = widget.timerRemaining != null;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 12),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -376,12 +559,9 @@ class _CookingStepCardState extends State<_CookingStepCard> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      icon,
-                      size: 72,
+                    Icon(icon, size: 72,
                       color: (requiresAttention ? Colors.orange : IFridgeTheme.primary)
-                          .withValues(alpha: 0.3),
-                    ),
+                          .withValues(alpha: 0.3)),
                     if (requiresAttention) ...[
                       const SizedBox(height: 12),
                       Container(
@@ -390,14 +570,20 @@ class _CookingStepCardState extends State<_CookingStepCard> {
                           color: Colors.orange.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
-                          '👀 Needs Your Attention',
-                          style: TextStyle(
-                            color: Colors.orange,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        child: const Text('👀 Needs Your Attention',
+                          style: TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                    if (tempC != null && tempC is int) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                        child: Text('🌡️ $tempC°C',
+                          style: const TextStyle(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ],
@@ -405,59 +591,48 @@ class _CookingStepCardState extends State<_CookingStepCard> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
-
-          // Core Instruction — Big, bold, readable
-          Text(
-            humanText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              height: 1.5,
-            ),
-          ),
           const SizedBox(height: 20),
 
+          // Core Instruction
+          Text(humanText,
+            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.5)),
+          const SizedBox(height: 16),
+
           // Interactive Timer Button
-          if (estimatedSeconds != null && estimatedSeconds is int && estimatedSeconds > 0)
+          if (timerSec != null && timerSec > 0)
             GestureDetector(
-              onTap: _startTimer,
+              onTap: isTimerRunning ? null : () => widget.onStartTimer(timerSec),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 decoration: BoxDecoration(
-                  color: _timerRunning
+                  color: isTimerRunning
                       ? IFridgeTheme.primary.withValues(alpha: 0.15)
                       : Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _timerRunning
+                    color: isTimerRunning
                         ? IFridgeTheme.primary.withValues(alpha: 0.4)
-                        : Colors.white.withValues(alpha: 0.1),
-                  ),
+                        : Colors.white.withValues(alpha: 0.1)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      _timerRunning ? Icons.timer : Icons.play_circle_fill,
-                      color: _timerRunning ? IFridgeTheme.primary : Colors.white70,
-                      size: 24,
-                    ),
+                      isTimerRunning ? Icons.timer : Icons.play_circle_fill,
+                      color: isTimerRunning ? IFridgeTheme.primary : Colors.white70,
+                      size: 24),
                     const SizedBox(width: 12),
                     Text(
-                      _timerRunning
-                          ? _formatTime(_timerSeconds ?? 0)
-                          : 'Start Timer • ${_formatTime(estimatedSeconds)}',
+                      isTimerRunning
+                          ? _formatTime(widget.timerRemaining!)
+                          : '${_isAutoStart ? '⚡ Auto' : 'Start'} Timer • ${_formatTime(timerSec)}',
                       style: TextStyle(
-                        color: _timerRunning ? IFridgeTheme.primary : Colors.white70,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
+                        color: isTimerRunning ? IFridgeTheme.primary : Colors.white70,
+                        fontSize: 18, fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()]),
                     ),
-                    if (_timerSeconds == 0) ...[
+                    if (widget.timerRemaining != null && widget.timerRemaining! <= 0) ...[
                       const SizedBox(width: 12),
                       const Icon(Icons.check_circle, color: IFridgeTheme.freshGreen, size: 22),
                     ],
@@ -474,9 +649,7 @@ class _CookingStepCardState extends State<_CookingStepCard> {
               decoration: BoxDecoration(
                 color: IFridgeTheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: IFridgeTheme.primary.withValues(alpha: 0.2),
-                ),
+                border: Border.all(color: IFridgeTheme.primary.withValues(alpha: 0.2)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,14 +657,8 @@ class _CookingStepCardState extends State<_CookingStepCard> {
                   const Icon(Icons.auto_awesome, color: IFridgeTheme.primary, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      _aiTip!,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
+                    child: Text(_aiTip!,
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, height: 1.5)),
                   ),
                 ],
               ),
@@ -510,44 +677,22 @@ class _CookingStepCardState extends State<_CookingStepCard> {
                   border: Border.all(
                     color: _aiLoading
                         ? IFridgeTheme.primary.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.08),
-                  ),
+                        : Colors.white.withValues(alpha: 0.08)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (_aiLoading) ...[
-                      const SizedBox(
-                        width: 16, height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: IFridgeTheme.primary,
-                        ),
-                      ),
+                      const SizedBox(width: 16, height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: IFridgeTheme.primary)),
                       const SizedBox(width: 10),
-                      Text(
-                        'Thinking...',
-                        style: TextStyle(
-                          color: IFridgeTheme.primary.withValues(alpha: 0.8),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text('Thinking...',
+                        style: TextStyle(color: IFridgeTheme.primary.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600)),
                     ] else ...[
-                      Icon(
-                        Icons.auto_awesome,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        size: 18,
-                      ),
+                      Icon(Icons.auto_awesome, color: Colors.white.withValues(alpha: 0.5), size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        '💡 Ask AI for a tip',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text('💡 Ask AI for a tip',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14, fontWeight: FontWeight.w600)),
                     ],
                   ],
                 ),

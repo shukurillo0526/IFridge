@@ -636,6 +636,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             recipeId: widget.recipeId,
                             title: widget.title,
                             steps: _steps,
+                            ingredients: _ingredients,
                             matchedIngredientsCount:
                                 widget.ownedIngredientIds.length,
                             matchPct: widget.matchPct,
