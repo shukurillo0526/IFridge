@@ -1,0 +1,40 @@
+{
+    "@@locale": "ru",
+    "appTitle": "iFridge",
+    "tabShelf": "Полка",
+    "tabCook": "Готовить",
+    "tabScan": "Сканер",
+    "tabProfile": "Профиль",
+    "profileTitle": "Профиль",
+    "profileGamificationLevel": "Уровень {level}",
+    "@profileGamificationLevel": {
+        "placeholders": { "level": { "type": "int" } }
+    },
+    "profileMealsCooked": "Приготовлено блюд",
+    "profileItemsSaved": "Сохранено продуктов",
+    "profileDayStreak": "Дней подряд",
+    "profileFlavorProfile": "Вкусовой профиль",
+    "profileBadges": "Значки и достижения",
+    "profileShoppingList": "Список покупок",
+    "profileMealPlanner": "Планировщик питания",
+    "actionAdd": "Добавить",
+    "actionCancel": "Отмена",
+    "actionSave": "Сохранить",
+    "actionDelete": "Удалить",
+    "profileLoadError": "Не удалось загрузить профиль",
+    "retry": "Повторить",
+    "refresh": "Обновить",
+    "signOut": "Выйти",
+    "profileLevelProgress": "Прогресс уровня",
+    "profileLevel": "Уровень {level}",
+    "@profileLevel": {
+        "placeholders": { "level": { "type": "int" } }
+    },
+    "profileYourImpact": "Ваш вклад",
+    "addShoppingItem": "Добавить",
+    "shoppingListEmpty": "Список покупок пуст",
+    "mealPlannerEmpty": "Нет запланированных блюд",
+    "planToday": "Запланировать",
+    "today": "Сегодня",
+    "planMeal": "Спланировать..."
+}

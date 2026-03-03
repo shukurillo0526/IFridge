@@ -13,6 +13,7 @@ import 'package:ifridge_app/features/auth/presentation/screens/auth_screen.dart'
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:ifridge_app/core/services/app_settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,11 +21,33 @@ void main() async {
     url: 'https://tquyodwsyppwbpvkaunn.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxdXlvZHdzeXBwd2JwdmthdW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzEzOTAsImV4cCI6MjA4NzE0NzM5MH0.1o6RYfeL_7YlIeUkl4jFsCm2JCQ2mB2F9o5wLv30xWU',
   );
+  await AppSettings().init();
   runApp(const IFridgeApp());
 }
 
-class IFridgeApp extends StatelessWidget {
+class IFridgeApp extends StatefulWidget {
   const IFridgeApp({super.key});
+
+  @override
+  State<IFridgeApp> createState() => _IFridgeAppState();
+}
+
+class _IFridgeAppState extends State<IFridgeApp> {
+  final AppSettings _settings = AppSettings();
+
+  @override
+  void initState() {
+    super.initState();
+    _settings.addListener(_onSettingsChanged);
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_onSettingsChanged);
+    super.dispose();
+  }
+
+  void _onSettingsChanged() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +55,8 @@ class IFridgeApp extends StatelessWidget {
       title: 'iFridge',
       debugShowCheckedModeBanner: false,
       theme: IFridgeTheme.darkTheme,
+      themeMode: _settings.themeMode,
+      locale: _settings.locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -39,8 +64,10 @@ class IFridgeApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''),
-        Locale('ko', ''),
+        Locale('en'),
+        Locale('ko'),
+        Locale('uz'),
+        Locale('ru'),
       ],
       home: const _AuthGate(),
     );

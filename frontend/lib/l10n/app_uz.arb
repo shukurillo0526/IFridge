@@ -1,0 +1,40 @@
+{
+    "@@locale": "uz",
+    "appTitle": "iFridge",
+    "tabShelf": "Javon",
+    "tabCook": "Pishirish",
+    "tabScan": "Skanerlash",
+    "tabProfile": "Profil",
+    "profileTitle": "Profil",
+    "profileGamificationLevel": "{level}-daraja",
+    "@profileGamificationLevel": {
+        "placeholders": { "level": { "type": "int" } }
+    },
+    "profileMealsCooked": "Pishirilgan taomlar",
+    "profileItemsSaved": "Saqlangan mahsulotlar",
+    "profileDayStreak": "Kunlik seriya",
+    "profileFlavorProfile": "Ta'm profili",
+    "profileBadges": "Nishonlar va yutuqlar",
+    "profileShoppingList": "Xaridlar ro'yxati",
+    "profileMealPlanner": "Ovqatlanish rejasi",
+    "actionAdd": "Qo'shish",
+    "actionCancel": "Bekor qilish",
+    "actionSave": "Saqlash",
+    "actionDelete": "O'chirish",
+    "profileLoadError": "Profilni yuklab bo'lmadi",
+    "retry": "Qayta urinish",
+    "refresh": "Yangilash",
+    "signOut": "Chiqish",
+    "profileLevelProgress": "Daraja jarayoni",
+    "profileLevel": "{level}-daraja",
+    "@profileLevel": {
+        "placeholders": { "level": { "type": "int" } }
+    },
+    "profileYourImpact": "Sizning ta'siringiz",
+    "addShoppingItem": "Element qo'shish",
+    "shoppingListEmpty": "Xaridlar ro'yxati bo'sh",
+    "mealPlannerEmpty": "Rejalashtirilgan taomlar yo'q",
+    "planToday": "Bugungi reja",
+    "today": "Bugun",
+    "planMeal": "Taom rejalashtirish..."
+}

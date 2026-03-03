@@ -14,6 +14,7 @@ import 'package:ifridge_app/core/widgets/slide_in_item.dart';
 import 'package:ifridge_app/features/gamification/domain/badges.dart' show levelFromXp;
 import 'package:ifridge_app/core/services/auth_helper.dart';
 import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:ifridge_app/core/services/app_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -770,17 +771,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: Icons.language,
                           label: 'Language',
                           trailing: Text(
-                            Localizations.localeOf(context).languageCode.toUpperCase(),
+                            '${AppSettings().currentLanguageFlag} ${AppSettings().currentLanguageName}',
                             style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13),
                           ),
+                          onTap: () => _showLanguagePicker(),
                         ),
                         _SettingsRow(
                           icon: Icons.dark_mode,
                           label: 'Theme',
                           trailing: Text(
-                            'Dark',
+                            AppSettings().currentThemeName,
                             style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13),
                           ),
+                          onTap: () => _showThemePicker(),
                         ),
                         _SettingsRow(
                           icon: Icons.info_outline,
@@ -1051,6 +1054,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       debugPrint('Error clearing meal: $e');
     }
+  }
+
+  void _showLanguagePicker() {
+    final settings = AppSettings();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('🌐 Language',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              ...AppSettings.supportedLanguages.entries.map((entry) {
+                final code = entry.key;
+                final name = entry.value['name']!;
+                final flag = entry.value['flag']!;
+                final isActive = settings.locale.languageCode == code;
+                return ListTile(
+                  leading: Text(flag, style: const TextStyle(fontSize: 24)),
+                  title: Text(name, style: const TextStyle(color: Colors.white, fontSize: 15)),
+                  trailing: isActive
+                      ? const Icon(Icons.check_circle, color: IFridgeTheme.primary)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  tileColor: isActive ? IFridgeTheme.primary.withValues(alpha: 0.1) : null,
+                  onTap: () {
+                    settings.setLocale(Locale(code));
+                    Navigator.pop(ctx);
+                    setState(() {});
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showThemePicker() {
+    final settings = AppSettings();
+    final options = [
+      {'mode': ThemeMode.dark, 'label': 'Dark', 'icon': Icons.dark_mode, 'emoji': '🌙'},
+      {'mode': ThemeMode.light, 'label': 'Light', 'icon': Icons.light_mode, 'emoji': '☀️'},
+      {'mode': ThemeMode.system, 'label': 'System', 'icon': Icons.settings_suggest, 'emoji': '⚙️'},
+    ];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('🎨 Theme',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              ...options.map((opt) {
+                final isActive = settings.themeMode == opt['mode'];
+                return ListTile(
+                  leading: Text(opt['emoji'] as String, style: const TextStyle(fontSize: 24)),
+                  title: Text(opt['label'] as String,
+                    style: const TextStyle(color: Colors.white, fontSize: 15)),
+                  trailing: isActive
+                      ? const Icon(Icons.check_circle, color: IFridgeTheme.primary)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  tileColor: isActive ? IFridgeTheme.primary.withValues(alpha: 0.1) : null,
+                  onTap: () {
+                    settings.setThemeMode(opt['mode'] as ThemeMode);
+                    Navigator.pop(ctx);
+                    setState(() {});
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
