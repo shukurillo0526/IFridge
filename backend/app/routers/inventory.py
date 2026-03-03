@@ -39,37 +39,64 @@ async def add_inventory_item(req: AddItemRequest):
     db = get_supabase()
 
     try:
-        # 1. Find or create ingredient
+        # 1. Find or create ingredient (fetch full metadata)
         existing = (
             db.table("ingredients")
-            .select("id")
+            .select("*")
             .ilike("display_name_en", req.ingredient_name)
             .limit(1)
             .execute()
         )
 
         if existing.data and len(existing.data) > 0:
-            ingredient_id = existing.data[0]["id"]
+            ingredient = existing.data[0]
+            ingredient_id = ingredient["id"]
         else:
-            # canonical_name is required (NOT NULL UNIQUE)
+            # Try canonical_name match as well
             canonical = req.ingredient_name.strip().lower().replace(" ", "_")
-            inserted = (
+            canonical_match = (
                 db.table("ingredients")
-                .insert({
-                    "canonical_name": canonical,
-                    "display_name_en": req.ingredient_name.strip(),
-                    "category": req.category,
-                    "default_unit": req.unit,
-                })
+                .select("*")
+                .eq("canonical_name", canonical)
+                .limit(1)
                 .execute()
             )
-            ingredient_id = inserted.data[0]["id"]
+            if canonical_match.data and len(canonical_match.data) > 0:
+                ingredient = canonical_match.data[0]
+                ingredient_id = ingredient["id"]
+            else:
+                # Create new ingredient
+                inserted = (
+                    db.table("ingredients")
+                    .insert({
+                        "canonical_name": canonical,
+                        "display_name_en": req.ingredient_name.strip(),
+                        "category": req.category,
+                        "default_unit": req.unit,
+                    })
+                    .execute()
+                )
+                ingredient = inserted.data[0]
+                ingredient_id = ingredient["id"]
 
-        # 2. Upsert inventory item (increment qty if exists)
-        location = req.location.lower()  # normalize for consistency
-        expiry = req.expiry_date or (
-            datetime.now() + timedelta(days=7)
-        ).isoformat()
+        # 2. Auto-compute expiry from ingredient shelf-life data
+        location = req.location.lower()
+        shelf_days = ingredient.get("sealed_shelf_life_days")
+        if req.expiry_date:
+            expiry = req.expiry_date
+        elif shelf_days:
+            expiry = (datetime.now() + timedelta(days=shelf_days)).strftime("%Y-%m-%d")
+        else:
+            # Category-level fallback
+            cat_defaults = {
+                "protein": 5, "seafood": 3, "vegetable": 14, "fruit": 10,
+                "dairy": 30, "grain": 365, "baking": 365, "seasoning": 730,
+                "condiment": 365, "oil": 365, "legume": 365, "nut": 180,
+                "beverage": 30,
+            }
+            cat = (ingredient.get("category") or req.category or "").lower()
+            fallback_days = cat_defaults.get(cat, 14)
+            expiry = (datetime.now() + timedelta(days=fallback_days)).strftime("%Y-%m-%d")
 
         # Check if item already exists for this user+ingredient+location
         existing_inv = (
@@ -95,6 +122,11 @@ async def add_inventory_item(req: AddItemRequest):
             return {
                 "status": "updated",
                 "ingredient_id": ingredient_id,
+                "category": ingredient.get("category"),
+                "default_unit": ingredient.get("default_unit"),
+                "shelf_life_days": shelf_days,
+                "storage_zone": ingredient.get("storage_zone"),
+                "calories_per_100g": ingredient.get("calories_per_100g"),
                 "message": f"Updated {req.ingredient_name} quantity to {new_qty}",
             }
         else:
@@ -112,11 +144,42 @@ async def add_inventory_item(req: AddItemRequest):
             return {
                 "status": "success",
                 "ingredient_id": ingredient_id,
+                "category": ingredient.get("category"),
+                "default_unit": ingredient.get("default_unit"),
+                "shelf_life_days": shelf_days,
+                "storage_zone": ingredient.get("storage_zone"),
+                "calories_per_100g": ingredient.get("calories_per_100g"),
                 "message": f"Added {req.ingredient_name} to shelf",
             }
 
     except Exception as e:
         logger.error(f"[Inventory] Failed to add item: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/api/v1/ingredients/search")
+async def search_ingredients(q: str, limit: int = 8):
+    """
+    Search ingredients by name (EN, KO, canonical).
+    Returns full metadata for auto-fill.
+    """
+    db = get_supabase()
+    try:
+        # Search across multiple name fields
+        results = (
+            db.table("ingredients")
+            .select("*")
+            .or_(
+                f"display_name_en.ilike.%{q}%,"
+                f"display_name_ko.ilike.%{q}%,"
+                f"canonical_name.ilike.%{q}%"
+            )
+            .limit(limit)
+            .execute()
+        )
+        return {"ingredients": results.data}
+    except Exception as e:
+        logger.error(f"[Ingredients] Search failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

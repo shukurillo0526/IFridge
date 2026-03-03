@@ -1143,7 +1143,18 @@ class _ManualEntryBottomSheetState extends State<_ManualEntryBottomSheet> {
                     if (selection['default_unit'] != null && _units.contains(selection['default_unit'])) {
                       _unit = selection['default_unit'];
                     }
-                    _updateExpiryByCategory(_category);
+                    // Use per-ingredient shelf life if available
+                    final shelfDays = selection['sealed_shelf_life_days'];
+                    if (shelfDays != null && shelfDays is int && shelfDays > 0) {
+                      _expiryDate = DateTime.now().add(Duration(days: shelfDays));
+                    } else {
+                      _updateExpiryByCategory(_category);
+                    }
+                    // Auto-set location from storage zone
+                    final zone = selection['storage_zone']?.toString().toLowerCase() ?? '';
+                    if (zone == 'fridge') _location = 'Fridge';
+                    else if (zone == 'freezer') _location = 'Freezer';
+                    else if (zone == 'pantry') _location = 'Pantry';
                   });
                 },
                 fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {

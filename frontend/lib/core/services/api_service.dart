@@ -244,6 +244,16 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  // ── Ingredient Search ───────────────────────────────────────────
+
+  /// Search ingredients by name (EN, KO, canonical) with full metadata.
+  Future<List<Map<String, dynamic>>> searchIngredients(String query, {int limit = 8}) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/ingredients/search?q=${Uri.encodeComponent(query)}&limit=$limit');
+    final response = await _client.get(uri, headers: _headers);
+    final data = _handleResponse(response);
+    return List<Map<String, dynamic>>.from(data['ingredients'] ?? []);
+  }
+
   // ── Health ───────────────────────────────────────────────────────
 
   /// Check backend health status.
