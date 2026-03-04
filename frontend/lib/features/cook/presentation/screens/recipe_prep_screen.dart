@@ -75,6 +75,71 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
   void _incrementServings() => setState(() => _servings = (_servings + 1).clamp(1, 20));
   void _decrementServings() => setState(() => _servings = (_servings - 1).clamp(1, 20));
 
+  Future<void> _editIngredient(int index) async {
+    final ing = widget.ingredients[index];
+    final ingData = ing['ingredients'] as Map<String, dynamic>?;
+    final nameC = TextEditingController(text: ingData?['display_name_en'] ?? '');
+    final qtyC = TextEditingController(text: '${ing['quantity'] ?? ''}');
+    final unitC = TextEditingController(text: ing['unit'] ?? '');
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        title: const Text('Edit Ingredient', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameC, autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Name', labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                filled: true, fillColor: AppTheme.background,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: TextField(
+                  controller: qtyC, keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Qty', labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                    filled: true, fillColor: AppTheme.background,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+                const SizedBox(width: 12),
+                Expanded(child: TextField(
+                  controller: unitC,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Unit', labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                    filled: true, fillColor: AppTheme.background,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)))),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, {
+              'name': nameC.text.trim(),
+              'qty': double.tryParse(qtyC.text) ?? ing['quantity'],
+              'unit': unitC.text.trim(),
+            }),
+            style: FilledButton.styleFrom(backgroundColor: IFridgeTheme.primary),
+            child: const Text('Save')),
+        ],
+      ),
+    );
+    if (result == null) return;
+    setState(() {
+      if (ingData != null) ingData['display_name_en'] = result['name'];
+      ing['quantity'] = result['qty'];
+      ing['unit'] = result['unit'];
+    });
+  }
+
   Future<void> _askSubstitute(int index) async {
     final ing = widget.ingredients[index];
     final ingData = ing['ingredients'] as Map<String, dynamic>?;
@@ -279,7 +344,9 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
                                   ? IFridgeTheme.freshGreen.withValues(alpha: 0.2)
                                   : Colors.orange.withValues(alpha: 0.15)),
                           ),
-                          child: Row(
+                          child: GestureDetector(
+                            onTap: () => _editIngredient(i),
+                            child: Row(
                             children: [
                               Text(emoji, style: const TextStyle(fontSize: 22)),
                               const SizedBox(width: 10),
@@ -312,6 +379,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
                                   ),
                                 ),
                             ],
+                          ),
                           ),
                         ),
                         // Substitution suggestions

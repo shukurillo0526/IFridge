@@ -168,102 +168,28 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   }
 
   Future<void> _adjustWithAi(int newServings) async {
-    if (newServings == widget.servings) return;
+    final originalServings = widget.servings ?? 4;
+    if (newServings == originalServings) return;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Row(
-          children: [
-            Icon(Icons.auto_awesome, color: IFridgeTheme.primary),
-            SizedBox(width: 8),
-            Text('AI Chef', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Scaling recipe to $newServings servings...',
-              style: const TextStyle(color: Colors.white70),
-            ),
-            const SizedBox(height: 16),
-            const LinearProgressIndicator(color: IFridgeTheme.primary),
-          ],
-        ),
-      ),
-    );
+    final ratio = newServings / originalServings;
 
-    try {
-      final ingredientNames = _ingredients.map((ing) {
-        final ingData = ing['ingredients'] as Map<String, dynamic>?;
-        return ingData?['display_name_en'] as String? ?? '';
-      }).where((name) => name.isNotEmpty).toList();
-
-      final api = ApiService();
-      final result = await api.generateRecipe(
-        ingredients: ingredientNames,
-        cuisine: widget.cuisine,
-        servings: newServings,
-      );
-      api.dispose();
-
-      if (!mounted) return;
-      Navigator.pop(context); // close dialog
-
-      if (result['status'] == 'success' && result['recipe'] != null) {
-        final r = result['recipe'];
-        // Show success snackbar and reload the UI state if you want to replace the current display,
-        // but since AI returns a full new recipe (without DB IDs), 
-        // it's easier to just push a new generic RecipeDetail Screen or show a dialog.
-        // For Phase 18, we can just show a modal or update state:
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            backgroundColor: AppTheme.surface,
-            title: Text(r['title'] ?? 'Adjusted Recipe', style: const TextStyle(color: Colors.white)),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Makes $newServings servings', style: TextStyle(color: IFridgeTheme.primary, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  const Text('Ingredients:', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  if (r['ingredients'] != null)
-                    ...(r['ingredients'] as List).map((ing) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text('• ${ing['amount']} ${ing['unit']} ${ing['name']}', style: const TextStyle(color: Colors.white70)),
-                        )),
-                  const SizedBox(height: 16),
-                  const Text('Steps:', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  if (r['instructions'] != null)
-                    ...(r['instructions'] as List).map((step) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text('${step['step_number']}. ${step['instruction_text']}', style: const TextStyle(color: Colors.white70)),
-                        )),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
-            ],
-          ),
-        );
-
-      } else {
-        throw Exception('Failed to parse AI output');
+    setState(() {
+      for (final ing in _ingredients) {
+        final rawQty = ing['quantity'];
+        if (rawQty != null) {
+          final qty = (rawQty is num) ? rawQty.toDouble() : (double.tryParse('$rawQty') ?? 0);
+          ing['quantity'] = (qty * ratio * 100).round() / 100.0; // round to 2 decimals
+        }
       }
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context); // close dialog
+    });
+
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI scaling failed: $e'), backgroundColor: Colors.redAccent),
+        SnackBar(
+          content: Text('Scaled to $newServings servings ✓'),
+          backgroundColor: IFridgeTheme.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
