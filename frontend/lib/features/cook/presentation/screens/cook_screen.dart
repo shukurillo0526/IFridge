@@ -11,6 +11,7 @@ import 'package:ifridge_app/core/widgets/shimmer_loading.dart';
 import 'package:ifridge_app/core/widgets/slide_in_item.dart';
 import 'package:ifridge_app/core/services/api_service.dart';
 import 'package:ifridge_app/features/cook/presentation/screens/recipe_detail_screen.dart';
+import 'package:ifridge_app/features/cook/presentation/screens/recipe_import_screen.dart';
 import 'package:ifridge_app/core/services/auth_helper.dart';
 
 class CookScreen extends StatefulWidget {
@@ -649,6 +650,14 @@ class _CookScreenState extends State<CookScreen>
         ),
       ),
       body: _buildBody(),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: IFridgeTheme.primary,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const RecipeImportScreen()));
+        },
+        icon: const Icon(Icons.content_paste, color: Colors.white),
+        label: const Text('Import Recipe', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 

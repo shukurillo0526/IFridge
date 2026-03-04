@@ -146,6 +146,10 @@ class NormalizeRecipeRequest(BaseModel):
     raw_text: str
     recipe_title: Optional[str] = None
 
+class ParseRawRecipeRequest(BaseModel):
+    raw_text: str
+
+
 
 @router.post("/api/v1/ai/normalize-recipe")
 async def normalize_recipe(req: NormalizeRecipeRequest):
@@ -179,6 +183,54 @@ Return JSON only:
 
     return {
         "status": "success" if "error" not in result else "partial",
+        "source": "ollama-local",
+        "data": result,
+    }
+
+
+@router.post("/api/v1/ai/parse-raw")
+async def parse_raw_recipe(req: ParseRawRecipeRequest):
+    """
+    Parse a completely unstructured chunk of text (e.g. pasted from a website or blog)
+    into a fully structured recipe object with title, ingredients, and steps.
+    """
+    ollama = get_ollama_service()
+    if not await ollama.is_available():
+        raise HTTPException(status_code=503, detail="AI service unavailable. Start Ollama.")
+
+    prompt = f"""Extract and structure the recipe from this raw text.
+
+Raw text:
+{req.raw_text}
+
+Extract the matching recipe title, prep time, cook time, servings, a short description, and an array of ingredients (with name, quantity, unit), and an array of detailed steps.
+
+Return JSON only in this exact format:
+{{
+  "title": "...",
+  "description": "...",
+  "prep_time_minutes": 10,
+  "cook_time_minutes": 20,
+  "servings": 2,
+  "difficulty": 1,
+  "cuisine": "...",
+  "ingredients": [{{"name": "...", "quantity": 1.5, "unit": "cups"}}],
+  "steps": [{{"step": 1, "text": "...", "timer_seconds": null, "timer_auto_start": false}}]
+}}"""
+
+    system = "You are a professional chef and recipe parser. Extract the recipe details precisely. Return only valid JSON."
+
+    result = await ollama.generate_text_json(prompt, system_prompt=system)
+
+    if "error" in result:
+        return {
+            "status": "partial",
+            "message": "AI returned non-JSON. Raw response included.",
+            "data": result,
+        }
+
+    return {
+        "status": "success",
         "source": "ollama-local",
         "data": result,
     }

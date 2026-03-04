@@ -207,6 +207,22 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  /// Parse unstructured raw text into a structured recipe object.
+  Future<Map<String, dynamic>> parseRawRecipe({
+    required String rawText,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/parse-raw');
+    final body = {
+      'raw_text': rawText,
+    };
+    final response = await _client.post(
+      uri,
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    return _handleResponse(response);
+  }
+
   /// Check AI pipeline health (Ollama status + loaded models).
   Future<Map<String, dynamic>> getAiStatus() async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/status');
