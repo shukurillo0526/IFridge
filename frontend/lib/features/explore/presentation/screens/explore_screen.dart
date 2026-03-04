@@ -248,6 +248,145 @@ class _ReelCardState extends State<_ReelCard> {
     } catch (_) {}
   }
 
+  void _showInlineRecipe(BuildContext context, String recipeId, String caption) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          builder: (_, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: FutureBuilder(
+                future: Supabase.instance.client
+                    .from('recipes')
+                    .select('*, recipe_ingredients(*, ingredients(display_name_en, default_unit))')
+                    .eq('id', recipeId)
+                    .maybeSingle(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: IFridgeTheme.primary));
+                  }
+                  if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+                    return const Center(child: Text('Recipe not found', style: TextStyle(color: Colors.white54)));
+                  }
+                  
+                  final recipe = snapshot.data as Map<String, dynamic>;
+                  final ingredients = (recipe['recipe_ingredients'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+                  final rawSteps = recipe['instructions'];
+                  final steps = rawSteps is List ? rawSteps.cast<String>() : 
+                      (rawSteps is String ? rawSteps.split('. ') : []);
+
+                  return Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        width: 40, height: 4,
+                        decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                      ),
+                      
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Text(recipe['title'] ?? 'Recipe', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold))),
+                            IconButton(
+                              icon: const Icon(Icons.open_in_new, color: IFridgeTheme.primary),
+                              tooltip: 'Open Full Recipe',
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (_) => RecipeDetailScreen(
+                                    recipeId: recipeId,
+                                    title: recipe['title'] ?? '',
+                                    tierColor: IFridgeTheme.primary,
+                                    ownedIngredientIds: const {},
+                                  )
+                                ));
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: const EdgeInsets.all(20),
+                          children: [
+                            // Quick stats
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _InfoChip(icon: Icons.timer, label: '${recipe['prep_time_minutes'] ?? 0}m prep'),
+                                _InfoChip(icon: Icons.local_fire_department, label: '${recipe['calories_per_serving'] ?? 0} cal'),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            
+                            // Ingredients
+                            const Text('Ingredients', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 12),
+                            ...ingredients.map((ing) {
+                                final detail = ing['ingredients'] as Map?;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.circle, size: 8, color: IFridgeTheme.primary),
+                                      const SizedBox(width: 12),
+                                      Expanded(child: Text(detail?['display_name_en'] ?? 'Unknown', style: const TextStyle(color: Colors.white, fontSize: 15))),
+                                      Text('${ing['quantity']} ${ing['unit'] ?? detail?['default_unit'] ?? ''}', style: TextStyle(color: Colors.white.withValues(alpha: 0.6))),
+                                    ],
+                                  ),
+                                );
+                            }),
+                            
+                            const SizedBox(height: 24),
+                            // Steps
+                            const Text('Steps', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 12),
+                            ...steps.asMap().entries.map((req) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 24, height: 24,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(color: IFridgeTheme.primary.withValues(alpha: 0.2), shape: BoxShape.circle),
+                                      child: Text('${req.key + 1}', style: const TextStyle(color: IFridgeTheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: Text(req.value, style: TextStyle(color: Colors.white.withValues(alpha: 0.9), height: 1.5))),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final caption = widget.post['caption'] ?? '';
@@ -327,21 +466,12 @@ class _ReelCardState extends State<_ReelCard> {
                   label: _bookmarked ? 'Saved' : 'Save',
                   onTap: _toggleBookmark),
                 const SizedBox(height: 16),
-                // Recipe link
                 if (recipeId != null)
                   _VerticalAction(
                     icon: Icons.restaurant_menu,
                     color: Colors.orange,
                     label: 'Recipe',
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (_) => RecipeDetailScreen(
-                          recipeId: recipeId,
-                          title: caption.length > 30 ? '${caption.substring(0, 30)}...' : caption,
-                          tierColor: IFridgeTheme.primary,
-                          ownedIngredientIds: const {},
-                        )));
-                    }),
+                    onTap: () => _showInlineRecipe(context, recipeId, caption)),
                 if (recipeId != null) const SizedBox(height: 16),
                 // Play video
                 if (isReel)
@@ -655,6 +785,31 @@ class _BookmarksSheetState extends State<_BookmarksSheet> {
                 },
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white54),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );

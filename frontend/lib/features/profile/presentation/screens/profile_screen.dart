@@ -20,6 +20,7 @@ import 'package:ifridge_app/features/profile/presentation/screens/nutrition_trac
 import 'package:ifridge_app/features/profile/presentation/screens/gamification_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/meal_planner_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/shopping_list_page.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/creator_dashboard_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -685,6 +686,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               }),
                             ),
                   ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // ── Creator Studio Section ───────────────────────────────────
+                SlideInItem(
+                  delay: 320,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatorDashboardPage())),
+                    child: _SectionCard(
+                      title: 'Creator Studio',
+                      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: IFridgeTheme.secondary.withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.video_call, color: IFridgeTheme.secondary, size: 28),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Publish & Analyze', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                    const SizedBox(height: 4),
+                                    Text('Upload reels, share recipes, and track your views', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
 
