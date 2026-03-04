@@ -18,6 +18,8 @@ import 'package:ifridge_app/core/services/app_settings.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/flavor_profile_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/nutrition_tracker_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/gamification_page.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/meal_planner_page.dart';
+import 'package:ifridge_app/features/profile/presentation/screens/shopping_list_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -435,8 +437,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // Stats
                 SlideInItem(
                   delay: 100,
-                  child: _SectionCard(
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NutritionTrackerPage())),
+                    child: _SectionCard(
                     title: l10n?.profileYourImpact ?? 'Your Impact',
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white38),
                     child: Row(
                       children: [
                         _AnimatedStatTile(
@@ -459,6 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                     ),
+                  ),
                   ),
                 ),
 
@@ -517,7 +523,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 SlideInItem(
                   delay: 250,
-                  child: Builder(
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShoppingListPage())),
+                    child: Builder(
                     builder: (context) {
                       final checkedCount = _shoppingList.where((i) => i['checked'] == true).length;
                       final totalCount = _shoppingList.length;
@@ -583,6 +591,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -590,7 +599,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // ── Meal Planner Section ───────────────────────────────
                 SlideInItem(
                   delay: 300,
-                  child: _SectionCard(
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MealPlannerPage())),
+                    child: _SectionCard(
                     title: l10n?.profileMealPlanner ?? 'Meal Planner',
                     child: _mealPlan.every((m) => m == null)
                         ? Container(
@@ -673,6 +684,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 );
                               }),
                             ),
+                  ),
                   ),
                 ),
 
