@@ -93,6 +93,29 @@ class UnitConverter {
     return '$whole$fracStr';
   }
 
+  /// Simplify metric units for display (e.g. 2500g -> 2.5kg, 0.5L -> 500ml)
+  static String simplifyMetric(double qty, String unit) {
+    if (qty <= 0) return '';
+    
+    final u = unit.toLowerCase();
+    
+    if (qty >= 1000 && u == 'g') {
+      return '${formatQuantity(qty / 1000)} kg';
+    }
+    if (qty >= 1000 && u == 'ml') {
+      return '${formatQuantity(qty / 1000)} L';
+    }
+    if (qty < 1 && u == 'kg') {
+      return '${formatQuantity(qty * 1000)} g';
+    }
+    if (qty < 1 && u == 'l') {
+      return '${formatQuantity(qty * 1000)} ml';
+    }
+    
+    final displayUnit = (u == 'pcs' || u == 'pack' || u == 'bunch') ? '' : ' $unit';
+    return '${formatQuantity(qty)}$displayUnit'.trim();
+  }
+
   /// Generate a human-readable hint for a quantity.
   /// e.g., "200g onion" → "≈ 1⅓ medium onions"
   String? humanHint(double quantity, String unit) {

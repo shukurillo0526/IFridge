@@ -355,7 +355,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(name, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                                    Text('${UnitConverter.formatQuantity(scaledQty)} $unit',
+                                    Text(UnitConverter.simplifyMetric(scaledQty, unit),
                                       style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
                                   ],
                                 ),

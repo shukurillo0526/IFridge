@@ -54,6 +54,38 @@ class _ScanScreenState extends State<ScanScreen>
     super.dispose();
   }
 
+  Future<void> _enrichItemsWithDb(Map<String, dynamic> data) async {
+    final items = (data['items'] as List?) ?? [];
+    for (var idx = 0; idx < items.length; idx++) {
+      final i = items[idx];
+      if (i is! Map<String, dynamic>) continue;
+      
+      final name = i['canonical_name'] ?? i['item_name'] ?? '';
+      if (name.toString().trim().isEmpty) continue;
+      
+      try {
+        final matches = await _api.searchIngredients(name.toString(), limit: 1);
+        if (matches.isNotEmpty) {
+          final match = matches.first;
+          // Prefer DB category
+          i['category'] = match['category'] ?? i['category'];
+          // Prefer DB unit if none provided
+          i['unit'] = i['unit'] ?? match['default_unit'];
+          
+          // Auto-fill expiry based on DB shelf life if missing
+          if (i['expiry_date'] == null && match['sealed_shelf_life_days'] != null) {
+            final days = match['sealed_shelf_life_days'];
+            if (days is num && days > 0) {
+              i['expiry_date'] = DateTime.now().add(Duration(days: days.toInt())).toIso8601String();
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Enrichment failed for $name: $e');
+      }
+    }
+  }
+
   Future<void> _captureImage(ImageSource source) async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -78,9 +110,12 @@ class _ScanScreenState extends State<ScanScreen>
         filename: image.name,
       );
 
+      final data = (result['data'] as Map<String, dynamic>?) ?? result;
+      await _enrichItemsWithDb(data);
+
       setState(() {
         // Backend wraps in {status, source, data: {store, date, items}}
-        _results = (result['data'] as Map<String, dynamic>?) ?? result;
+        _results = data;
         _scanning = false;
         _addedIndices.clear();
       });
@@ -116,9 +151,12 @@ class _ScanScreenState extends State<ScanScreen>
         filename: image.name,
       );
 
+      final data = (result['data'] as Map<String, dynamic>?) ?? result;
+      await _enrichItemsWithDb(data);
+
       setState(() {
         // Backend wraps in {status, source, data: {items: [...]}}
-        _results = (result['data'] as Map<String, dynamic>?) ?? result;
+        _results = data;
         _scanning = false;
         _addedIndices.clear();
       });
