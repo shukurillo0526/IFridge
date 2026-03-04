@@ -185,10 +185,41 @@ Massively expanded the recipe database and introduced per-ingredient visual iden
 
 ---
 
+## 🌟 Gap Analysis & Deep Refinement (Phases A-E)
+
+Following the initial 16 phases, a comprehensive gap analysis was conducted to refine the core ingredients system, polish recipes, build out deep profile features, and introduce creator capabilities.
+
+### Phase A: Ingredient Foundation & Auto-Fill
+- **DB Expansion**: Seeded over 500+ real-world ingredients into the Supabase database with extensive metadata (shelf life, calories, category).
+- **Auto-Fill Pipeline**: Wired the photo/barcode/receipt scanners to automatically query the core DB. When an ingredient is detected, the app auto-populates its image, category, and expiry date.
+- **Metric Refactor**: Added `UnitConverter.simplifyMetric` to gracefully display quantities (e.g., showing "2 kg" instead of "2000 g"), which is now live in the prep screen.
+
+### Phase B: Recipe System Polish
+- **AI Scaling**: Fixed the AI scaling bug allowing smooth portion control.
+- **Ingredient Metrics**: Added gamified, highly visible ingredient metrics.
+- **Cooking Controls**: Added manual timer toggle support for cooking mode.
+- **Fallback Generation**: Handled empty steps with UI to auto-generate instructions via AI.
+
+### Phase C: Profile Deep Pages
+- **New Screens**: Created full, robust screens for **Meal Planner**, **Nutrition Tracker**, and **Shopping List**.
+- **Navigation**: Wired these deep links from the profile cards.
+- **Flavor Profile**: Enhanced the feature to track prepared foods and consumed calories.
+
+### Phase D: Explore & Creator Enhancements
+- **Creator Studio**: Built a robust creator dashboard inside the Profile page reflecting views, followers, and engagement metrics.
+- **Post Upload Form**: Implemented a comprehensive UI for community chefs to upload reels/videos, attach tags, and link existing recipes.
+- **Inline Recipe Viewer (Reels)**: When a user encounters a cooking reel in the Explore tab, tapping the `Recipe` button now opens an immersive, draggable bottom sheet displaying ingredients & instructions seamlessly over the video instead of breaking navigation.
+
+### Phase E: Raw Recipe Parser
+- **Backend AI Engine**: Deployed a `/api/v1/ai/parse-raw` endpoint in FastAPI. This utilizes the local `gemma3:1b` model to digest raw, unstructured text (e.g., from blogs or books) and return precise JSON recipes.
+- **Frontend Import UI**: Created the `RecipeImportScreen` (accessed via a floating action button in the Cook tab). Users can paste any recipe text, and the AI immediately structures it into prep time, ingredients, and steps.
+- **Auto-Timers Capability**: The dynamic regex step-parser inherently processes these AI-generated steps, successfully creating single-tap automated timers (e.g., "bake for 10 minutes") without requiring backend schema migrations.
+
+---
+
 ## 🚀 The Future
 
 I-Fridge is now a fully functional, AI-powered smart kitchen app with 100 recipes. Future considerations include:
 1. Scaling the database with Kaggle image datasets for visual ingredient matching.
 2. Expanding the `pgvector` similarity search based on user swipe/cook history to further personalize the "For You" feed.
 3. Live integrations with grocery delivery APIs (e.g., Instacart, Coupang) for 1-click restocking of "Missing Ingredients".
-
