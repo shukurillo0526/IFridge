@@ -43,10 +43,10 @@ async def ai_status():
     return {
         "ollama_running": available,
         "models_loaded": models,
-        "gpu": "GTX 1650 Ti (4GB VRAM)",
+        "gpu": "RTX 5070 Ti (16GB VRAM)",
         "recommended": {
-            "vision": "moondream",
-            "text": "gemma3:1b",
+            "vision": "gemma3:12b",
+            "text": "qwen3:8b",
             "embedding": "nomic-embed-text",
         }
     }

@@ -3,14 +3,12 @@ I-Fridge — Photo Ingredient Detection Router
 ==============================================
 Receives a photo of loose ingredients and identifies them.
 
-Two-stage local pipeline:
-  Stage 1: moondream (vision) describes what it sees — emphasis on counting
-  Stage 2: qwen2.5:3b (text LLM) structures the description into JSON
-
-If Stage 1 produces a weak description, it retries with a fallback prompt.
+Single-stage pipeline (RTX 5070 Ti upgrade):
+  gemma3:12b — multimodal model produces structured JSON directly from the image
+  No more fragile moondream→qwen2.5 two-stage pipeline.
 
 Fallback chain:
-  1. Local two-stage pipeline (with retry)
+  1. Local single-stage pipeline (gemma3:12b vision → JSON)
   2. Cloud Gemini Vision
   3. Mock data
 """
@@ -25,43 +23,29 @@ logger = logging.getLogger("ifridge.vision")
 
 router = APIRouter()
 
-# ── Stage 1 prompts (moondream vision) ────────────────────────
+# ── Single-stage vision prompt (gemma3:12b multimodal) ────────
 
-# Primary: detailed counting prompt
-VISION_DESCRIBE_PRIMARY = """Look at this image very carefully.
+VISION_DETECT_PROMPT = """Look at this image very carefully and identify EVERY food item you can see.
 
-1. List EVERY food item you can see.
-2. For each item, state:
-   - What it is (be specific: "brown eggs" not just "food")
-   - How many there are (count carefully — count each individual piece)
-   - Any packaging (carton, bag, box, bunch)
-   - Approximate size or weight if visible
-
-Be thorough. Do not skip any item. Count precisely."""
-
-# Fallback: simpler prompt if primary gives weak results
-VISION_DESCRIBE_FALLBACK = """What food items are in this image? List each one with the quantity you can see."""
-
-# ── Stage 2 prompt (qwen2.5:3b text → JSON) ──────────────────
-
-VISION_STRUCTURE_PROMPT = """You are a food ingredient parser for a kitchen inventory app. Convert this image description into a JSON list of food items.
-
-IMAGE DESCRIPTION:
-{description}
-
-RULES:
-- Extract EVERY food item mentioned in the description
+For each item, determine:
 - item_name: short English name (e.g., "Banana", "Eggs", "Chicken Breast")
-- quantity: the exact count or weight mentioned (e.g., if "3 bananas" → 3, if "a dozen eggs" → 12, if "a carton of 12 eggs" → 12)
+- quantity: exact count or weight visible (e.g., if 3 bananas → 3, if a dozen eggs → 12, if a carton of 12 eggs → 12)
 - unit: one of: pcs, g, kg, oz, lb, ml, L, pack, bunch, dozen
 - category: one of: Produce, Vegetable, Fruit, Meat, Poultry, Seafood, Dairy, Milk, Cheese, Yogurt, Eggs, Bakery, Bread, Pantry, Canned, Dried, Spices, Oil, Sauce, Condiment, Frozen, Beverage, Juice, Snack
 - freshness: fresh, good, aging, or expired (default "fresh")
 - confidence: 0.7 to 1.0
 
-IMPORTANT: Do NOT make up items that were not mentioned. Only include items from the description.
+Count precisely. Do NOT make up items that are not in the image.
 
 Return ONLY valid JSON with no other text:
-{{"items": [{{"item_name": "Banana", "quantity": 3, "unit": "pcs", "category": "Fruit", "freshness": "fresh", "confidence": 0.95}}]}}"""
+{"items": [{"item_name": "Banana", "quantity": 3, "unit": "pcs", "category": "Fruit", "freshness": "fresh", "confidence": 0.95}]}"""
+
+# Fallback: simpler prompt if primary gives weak results
+VISION_DETECT_FALLBACK = """What food items are in this image? For each, give the name, quantity, unit (pcs/g/kg/pack), category, and freshness.
+
+Return ONLY valid JSON:
+{"items": [{"item_name": "...", "quantity": 1, "unit": "pcs", "category": "...", "freshness": "fresh", "confidence": 0.85}]}"""
+
 
 # ── Cloud Gemini (single-stage fallback) ──────────────────────
 
@@ -95,7 +79,7 @@ MOCK_RESPONSE = {
 async def detect_ingredients(file: UploadFile = File(...)):
     """
     Receives a photo of loose food ingredients and identifies them.
-    Two-stage pipeline with retry: moondream → qwen2.5.
+    Single-stage pipeline: gemma3:12b (multimodal) → JSON directly.
     """
     if not file.content_type or not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
@@ -104,59 +88,41 @@ async def detect_ingredients(file: UploadFile = File(...)):
     source = "mock"
     parsed_data = None
 
-    # ── Attempt 1: Local two-stage pipeline ──────────────────────
+    # ── Attempt 1: Local single-stage pipeline (gemma3:12b) ──────
     try:
         ollama = get_ollama_service()
         if await ollama.is_available():
-            description = None
-
-            # Stage 1A: Primary describe prompt
-            logger.info("[Vision] Stage 1A: moondream describing image (primary)...")
+            # Primary attempt: detailed prompt
+            logger.info("[Vision] Analyzing image with multimodal model (primary)...")
             try:
-                desc = await ollama.analyze_image(
+                result = await ollama.analyze_image_json(
                     image_bytes=image_bytes,
-                    prompt=VISION_DESCRIBE_PRIMARY,
-                    model="moondream",
-                    temperature=0.3,
-                    max_tokens=1024,
-                )
-                logger.info(f"[Vision] Stage 1A result ({len(desc)} chars): {desc[:300]}")
-                if desc and len(desc.strip()) > 15:
-                    description = desc
-            except Exception as e:
-                logger.warning(f"[Vision] Stage 1A failed: {e}")
-
-            # Stage 1B: Retry with fallback prompt if primary was weak
-            if not description or len(description.strip()) < 15:
-                logger.info("[Vision] Stage 1B: retrying with fallback prompt...")
-                try:
-                    desc = await ollama.analyze_image(
-                        image_bytes=image_bytes,
-                        prompt=VISION_DESCRIBE_FALLBACK,
-                        model="moondream",
-                        temperature=0.5,
-                        max_tokens=512,
-                    )
-                    logger.info(f"[Vision] Stage 1B result ({len(desc)} chars): {desc[:300]}")
-                    if desc and len(desc.strip()) > 10:
-                        description = desc
-                except Exception as e:
-                    logger.warning(f"[Vision] Stage 1B failed: {e}")
-
-            # Stage 2: Structure with qwen2.5
-            if description:
-                logger.info("[Vision] Stage 2: qwen2.5 structuring into JSON...")
-                structured_prompt = VISION_STRUCTURE_PROMPT.format(description=description)
-                result = await ollama.generate_text_json(
-                    prompt=structured_prompt,
-                    model="qwen2.5:3b",
+                    prompt=VISION_DETECT_PROMPT,
                 )
                 if "error" not in result and result.get("items"):
                     parsed_data = result
-                    source = "ollama-two-stage"
+                    source = "ollama-single-stage"
                     logger.info(f"[Vision] Success: {len(result['items'])} items detected")
                 else:
-                    logger.warning(f"[Vision] Stage 2 parse failed: {result}")
+                    logger.warning(f"[Vision] Primary attempt returned no items: {result}")
+            except Exception as e:
+                logger.warning(f"[Vision] Primary attempt failed: {e}")
+
+            # Fallback attempt with simpler prompt
+            if parsed_data is None:
+                logger.info("[Vision] Retrying with fallback prompt...")
+                try:
+                    result = await ollama.analyze_image_json(
+                        image_bytes=image_bytes,
+                        prompt=VISION_DETECT_FALLBACK,
+                    )
+                    if "error" not in result and result.get("items"):
+                        parsed_data = result
+                        source = "ollama-single-stage"
+                        logger.info(f"[Vision] Fallback success: {len(result['items'])} items detected")
+                except Exception as e:
+                    logger.warning(f"[Vision] Fallback attempt failed: {e}")
+
     except Exception as e:
         logger.warning(f"[Vision] Local pipeline failed: {e}")
 

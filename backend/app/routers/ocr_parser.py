@@ -3,14 +3,12 @@ I-Fridge — Receipt Scanner Router
 ===================================
 Receives a receipt image and extracts structured ingredient data.
 
-Two-stage local pipeline:
-  Stage 1: moondream (vision) reads ALL text from the receipt image
-  Stage 2: qwen2.5:3b (text LLM) parses the raw text into structured JSON
-
-Includes retry with a simpler prompt if Stage 1 produces weak output.
+Single-stage pipeline (RTX 5070 Ti upgrade):
+  gemma3:12b — multimodal model reads the receipt AND produces JSON in one pass.
+  No more fragile moondream→qwen2.5 two-stage pipeline.
 
 Fallback chain:
-  1. Local two-stage pipeline (with retry)
+  1. Local single-stage pipeline (gemma3:12b vision → JSON)
   2. Cloud Gemini Vision
   3. Mock data
 """
@@ -26,29 +24,9 @@ logger = logging.getLogger("ifridge.ocr")
 
 router = APIRouter()
 
-# ── Stage 1 prompts: moondream reads receipt text ─────────────
+# ── Single-stage prompt (gemma3:12b reads + structures) ───────
 
-# Primary: exhaustive OCR prompt
-RECEIPT_OCR_PRIMARY = """This is a photo of a grocery store receipt. Read ALL the text on this receipt carefully.
-
-Read it from top to bottom, line by line. Include:
-- The store name at the top
-- The date
-- Every product name, quantity, and price
-- The total amount
-
-Read the exact text you see. If you see Korean text, read it as-is.
-Do NOT skip any lines. Read everything printed on this receipt."""
-
-# Fallback: simpler prompt
-RECEIPT_OCR_FALLBACK = """What items are listed on this receipt? List the store name, date, and every product with its price."""
-
-# ── Stage 2 prompt: qwen2.5 structures receipt text ──────────
-
-RECEIPT_STRUCTURE_PROMPT = """You are a grocery receipt parser for a kitchen inventory app. Convert this raw receipt text into structured JSON.
-
-RAW RECEIPT TEXT:
-{receipt_text}
+RECEIPT_PARSE_PROMPT = """This is a photo of a grocery store receipt. Read ALL the text on this receipt and extract the structured data.
 
 RULES:
 1. Extract store name (translate Korean to English if needed, e.g. "진안식자재마트" → "Jinan Food Materials Mart")
@@ -56,7 +34,7 @@ RULES:
 3. For EACH food product listed on the receipt:
    - item_name: Generic English name. Translate Korean → English:
      * 갓밀크/우유 → "Milk"
-     * 당근 → "Carrot"  
+     * 당근 → "Carrot"
      * 삼겹살 → "Pork Belly"
      * 계란 → "Eggs"
      * 닭가슴살/Chicken breast → "Chicken Breast"
@@ -72,7 +50,13 @@ RULES:
 IMPORTANT: Extract EVERY food item. If you see 4 items, return 4 items.
 
 Return ONLY valid JSON, no other text:
-{{"store": "Store Name", "date": "2026-02-22", "items": [{{"item_name": "Milk", "quantity": 1, "unit": "L", "category": "Milk", "price": 1980}}, {{"item_name": "Carrot", "quantity": 2, "unit": "pcs", "category": "Vegetable", "price": 1300}}]}}"""
+{"store": "Store Name", "date": "2026-02-22", "items": [{"item_name": "Milk", "quantity": 1, "unit": "L", "category": "Milk", "price": 1980}, {"item_name": "Carrot", "quantity": 2, "unit": "pcs", "category": "Vegetable", "price": 1300}]}"""
+
+# Fallback: simpler prompt
+RECEIPT_PARSE_FALLBACK = """Read this grocery receipt image. List the store name, date, and every food product with its name (in English), quantity, unit, category, and price.
+
+Return ONLY valid JSON:
+{"store": "...", "date": "YYYY-MM-DD", "items": [{"item_name": "...", "quantity": 1, "unit": "pcs", "category": "...", "price": 0}]}"""
 
 # ── Cloud Gemini (single-stage fallback) ──────────────────────
 
@@ -128,7 +112,7 @@ MOCK_RESPONSE = {
 async def scan_receipt(file: UploadFile = File(...)):
     """
     Receives a receipt image and returns structured ingredient data.
-    Two-stage pipeline with retry: moondream (OCR) → qwen2.5 (structuring).
+    Single-stage pipeline: gemma3:12b reads receipt + structures JSON in one pass.
     """
     if not file.content_type or not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
@@ -137,61 +121,41 @@ async def scan_receipt(file: UploadFile = File(...)):
     source = "mock"
     parsed_data = None
 
-    # ── Attempt 1: Local two-stage pipeline ──────────────────────
+    # ── Attempt 1: Local single-stage pipeline (gemma3:12b) ──────
     try:
         ollama = get_ollama_service()
         if await ollama.is_available():
-            receipt_text = None
-
-            # Stage 1A: Primary OCR prompt — thorough text reading
-            logger.info("[OCR] Stage 1A: moondream reading receipt (primary)...")
+            # Primary attempt: detailed prompt
+            logger.info("[OCR] Analyzing receipt with multimodal model (primary)...")
             try:
-                text = await ollama.analyze_image(
+                result = await ollama.analyze_image_json(
                     image_bytes=image_bytes,
-                    prompt=RECEIPT_OCR_PRIMARY,
-                    model="moondream",
-                    temperature=0.2,
-                    max_tokens=2048,  # receipts can be long
-                )
-                logger.info(f"[OCR] Stage 1A result ({len(text)} chars): {text[:400]}")
-                if text and len(text.strip()) > 30:
-                    receipt_text = text
-            except Exception as e:
-                logger.warning(f"[OCR] Stage 1A failed: {e}")
-
-            # Stage 1B: Retry with simpler prompt if primary was weak
-            if not receipt_text or len(receipt_text.strip()) < 30:
-                logger.info("[OCR] Stage 1B: retrying with fallback prompt...")
-                try:
-                    text = await ollama.analyze_image(
-                        image_bytes=image_bytes,
-                        prompt=RECEIPT_OCR_FALLBACK,
-                        model="moondream",
-                        temperature=0.4,
-                        max_tokens=1024,
-                    )
-                    logger.info(f"[OCR] Stage 1B result ({len(text)} chars): {text[:400]}")
-                    if text and len(text.strip()) > 20:
-                        receipt_text = text
-                except Exception as e:
-                    logger.warning(f"[OCR] Stage 1B failed: {e}")
-
-            # Stage 2: Structure with qwen2.5
-            if receipt_text:
-                logger.info("[OCR] Stage 2: qwen2.5 structuring into JSON...")
-                structured_prompt = RECEIPT_STRUCTURE_PROMPT.format(receipt_text=receipt_text)
-                result = await ollama.generate_text_json(
-                    prompt=structured_prompt,
-                    model="qwen2.5:3b",
+                    prompt=RECEIPT_PARSE_PROMPT,
                 )
                 if "error" not in result and result.get("items"):
                     parsed_data = result
-                    source = "ollama-two-stage"
-                    logger.info(f"[OCR] Two-stage success: {len(result['items'])} items found")
+                    source = "ollama-single-stage"
+                    logger.info(f"[OCR] Success: {len(result['items'])} items extracted")
                 else:
-                    logger.warning(f"[OCR] Stage 2 failed to produce items: {result}")
-            else:
-                logger.warning("[OCR] All Stage 1 attempts produced insufficient text")
+                    logger.warning(f"[OCR] Primary attempt returned no items: {result}")
+            except Exception as e:
+                logger.warning(f"[OCR] Primary attempt failed: {e}")
+
+            # Fallback attempt with simpler prompt
+            if parsed_data is None:
+                logger.info("[OCR] Retrying with fallback prompt...")
+                try:
+                    result = await ollama.analyze_image_json(
+                        image_bytes=image_bytes,
+                        prompt=RECEIPT_PARSE_FALLBACK,
+                    )
+                    if "error" not in result and result.get("items"):
+                        parsed_data = result
+                        source = "ollama-single-stage"
+                        logger.info(f"[OCR] Fallback success: {len(result['items'])} items extracted")
+                except Exception as e:
+                    logger.warning(f"[OCR] Fallback attempt failed: {e}")
+
     except Exception as e:
         logger.warning(f"[OCR] Local pipeline failed: {e}")
 

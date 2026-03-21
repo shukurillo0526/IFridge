@@ -1,7 +1,7 @@
 """
 I-Fridge — AI Recipe Assistant Router
 =======================================
-Uses local LLM (gemma3:1b via Ollama) for recipe generation,
+Uses local LLM (qwen3:8b via Ollama) for recipe generation,
 ingredient substitution, and cooking tips.
 """
 
