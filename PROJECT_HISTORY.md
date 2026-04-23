@@ -221,6 +221,15 @@ Following the initial 16 phases, a comprehensive gap analysis was conducted to r
 - **Context-Aware Interactions**: Added "Close" overlays that properly unmount iframes and return scroll control to the user. Implemented interactive "Cook This Recipe" sidebars for cooking context, and "Order/Reserve" localized actions for restaurant context.
 - **Content Bootstrapping via Supabase**: Hand-seeded over 40+ high-quality multi-language (English, Korean, Russian, Uzbek) video shorts directly into a new `video_feeds` schema, completely managed by Supabase, enabling zero-code content pushes.
 
+### Phase G: Security & Algorithm Hardening
+- **SQL Injection Fix**: Eliminated critical vulnerability in `recommendation_engine.py` where raw `.format()` string interpolation was used in SQL queries. Replaced with UUID validation + safe Supabase ORM query builder fallback. No raw SQL is ever built from user input.
+- **Urgent Items Bug Fix**: Fixed `_get_urgent_items()` which was silently returning zero results — the date range filter used `.lte(today)` instead of `.lte(today + 2 days)`, meaning only items expiring *exactly* today were found.
+- **N+1 Query Elimination**: Urgent items previously issued a separate DB query per ingredient to fetch its name. Refactored to a single query with JOIN — O(1) instead of O(N) database calls.
+- **CORS Hardening**: Restricted `allow_origins` from wildcard `*` to only `localhost:8080`, `127.0.0.1:8080`, and `shukurillo0526.github.io`.
+- **Rate Limiting**: Added `slowapi` rate limiting (10 req/min) on expensive AI endpoints (`generate-recipe`, `detect-ingredients`) to prevent GPU abuse.
+- **Dead Code Cleanup**: Removed unused `video_feed_service` import from `cook_screen.dart`.
+- **API Version Bump**: Backend version bumped from `3.2.0` → `3.3.0`.
+
 ---
 
 ## 🚀 The Future

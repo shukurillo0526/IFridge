@@ -15,9 +15,13 @@ Fallback chain:
 
 import json
 import logging
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 
 from app.services.ollama_service import get_ollama_service
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
 
 logger = logging.getLogger("ifridge.vision")
 
@@ -76,7 +80,8 @@ MOCK_RESPONSE = {
 
 
 @router.post("/api/v1/vision/detect-ingredients")
-async def detect_ingredients(file: UploadFile = File(...)):
+@limiter.limit("10/minute")
+async def detect_ingredients(request: Request, file: UploadFile = File(...)):
     """
     Receives a photo of loose food ingredients and identifies them.
     Single-stage pipeline: gemma3:12b (multimodal) → JSON directly.

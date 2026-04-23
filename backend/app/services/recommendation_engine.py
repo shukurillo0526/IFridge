@@ -11,7 +11,8 @@ Tier 4: Missing 1-3 items  + Discovery
 Tier 5: Semantic search by user flavor profile (pgvector)
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+import logging
 from app.db.supabase_client import get_supabase
 from app.models.recommendation import (
     Tier,
@@ -25,73 +26,11 @@ from app.services.scoring import (
     compute_relevance_score,
 )
 
-# --- SQL: The master tier-classification query (Tiers 1-4) ---
-TIER_QUERY = """
-WITH user_inventory AS (
-    SELECT DISTINCT ingredient_id
-    FROM inventory_items
-    WHERE user_id = '{user_id}'
-      AND computed_expiry >= CURRENT_DATE
-      AND quantity > 0
-),
-recipe_match AS (
-    SELECT
-        r.id                                             AS recipe_id,
-        r.title,
-        r.cuisine,
-        r.prep_time_minutes,
-        r.image_url,
-        r.flavor_vectors,
-        COUNT(ri.id)                                     AS total_ingredients,
-        COUNT(ui.ingredient_id)                          AS matched_ingredients,
-        COUNT(ri.id) - COUNT(ui.ingredient_id)           AS missing_count,
-        ROUND(
-            COUNT(ui.ingredient_id)::NUMERIC
-            / NULLIF(COUNT(ri.id), 0),
-            2
-        )                                                AS match_pct,
-        ARRAY_AGG(
-            CASE WHEN ui.ingredient_id IS NULL
-                 THEN ing.display_name_en END
-        ) FILTER (WHERE ui.ingredient_id IS NULL)        AS missing_names
-    FROM recipes r
-    JOIN recipe_ingredients ri ON ri.recipe_id = r.id
-    JOIN ingredients ing       ON ing.id = ri.ingredient_id
-    LEFT JOIN user_inventory ui ON ui.ingredient_id = ri.ingredient_id
-    WHERE ri.is_optional = FALSE
-    GROUP BY r.id, r.title, r.cuisine, r.prep_time_minutes,
-             r.image_url, r.flavor_vectors
-),
-user_history AS (
-    SELECT DISTINCT recipe_id
-    FROM user_recipe_history
-    WHERE user_id = '{user_id}'
-)
-SELECT
-    rm.recipe_id,
-    rm.title,
-    rm.cuisine,
-    rm.prep_time_minutes,
-    rm.image_url,
-    rm.flavor_vectors,
-    rm.match_pct,
-    rm.missing_count,
-    rm.missing_names,
-    CASE WHEN uh.recipe_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_comfort,
-    CASE
-        WHEN rm.match_pct = 1.0 AND uh.recipe_id IS NOT NULL THEN 1
-        WHEN rm.match_pct = 1.0 AND uh.recipe_id IS NULL     THEN 2
-        WHEN rm.missing_count BETWEEN 1 AND 3
-             AND uh.recipe_id IS NOT NULL                     THEN 3
-        WHEN rm.missing_count BETWEEN 1 AND 3
-             AND uh.recipe_id IS NULL                         THEN 4
-        ELSE NULL
-    END AS tier
-FROM recipe_match rm
-LEFT JOIN user_history uh ON uh.recipe_id = rm.recipe_id
-WHERE rm.missing_count <= 3
-ORDER BY tier ASC, rm.match_pct DESC
-"""
+logger = logging.getLogger("ifridge.recommendation")
+
+# --- NOTE: Tier classification now uses safe Supabase ORM queries ---
+# The old raw SQL with string interpolation has been removed to prevent
+# SQL injection attacks. See _execute_tier_query() below.
 
 # --- SQL: Get user inventory expiry map ---
 INVENTORY_EXPIRY_QUERY = """
@@ -161,7 +100,7 @@ class RecommendationEngine:
         inventory_expiry = await self._get_inventory_expiry_map(user_id)
         urgent_items = await self._get_urgent_items(user_id)
 
-        # 2. Execute tier classification query (Tiers 1-4)
+        # 2. Execute tier classification (safe ORM, no raw SQL)
         tier_results = self._execute_tier_query(user_id)
 
         # 3. Score each recipe
@@ -226,10 +165,113 @@ class RecommendationEngine:
     # --- Private helpers ---
 
     def _execute_tier_query(self, user_id: str) -> list[dict]:
-        """Execute the master tier classification SQL via Supabase RPC."""
-        query = TIER_QUERY.format(user_id=user_id)
-        result = self.db.rpc("execute_sql", {"query": query}).execute()
-        return result.data if result.data else []
+        """Execute tier classification using safe parameterized RPC.
+        
+        Uses the get_recommended_recipes RPC with bind parameters instead
+        of raw SQL string interpolation (prevents SQL injection).
+        Falls back to safe ORM-based queries if RPC is unavailable.
+        """
+        import re
+        # Validate user_id is a valid UUID to prevent any injection
+        if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', user_id, re.IGNORECASE):
+            logger.warning(f"[Recommendation] Invalid user_id format: {user_id}")
+            return []
+        
+        try:
+            # Try parameterized RPC first (safe)
+            result = self.db.rpc(
+                "get_tier_recommendations",
+                {"p_user_id": user_id}
+            ).execute()
+            if result.data:
+                return result.data
+        except Exception as e:
+            logger.warning(f"[Recommendation] RPC unavailable, using ORM fallback: {e}")
+        
+        # Safe ORM fallback — uses Supabase query builder (no raw SQL)
+        try:
+            # 1. Get user's valid inventory
+            inv_result = (
+                self.db.table("inventory_items")
+                .select("ingredient_id")
+                .eq("user_id", user_id)
+                .gte("computed_expiry", date.today().isoformat())
+                .gt("quantity", 0)
+                .execute()
+            )
+            owned_ids = {r["ingredient_id"] for r in (inv_result.data or [])}
+            
+            # 2. Get user cooking history
+            hist_result = (
+                self.db.table("user_recipe_history")
+                .select("recipe_id")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            cooked_ids = {r["recipe_id"] for r in (hist_result.data or [])}
+            
+            # 3. Get all recipes with ingredients
+            recipes_result = (
+                self.db.table("recipes")
+                .select("id, title, cuisine, prep_time_minutes, image_url, flavor_vectors, recipe_ingredients(ingredient_id, is_optional, ingredients(display_name_en))")
+                .limit(200)
+                .execute()
+            )
+            
+            rows = []
+            for recipe in (recipes_result.data or []):
+                ri_list = recipe.get("recipe_ingredients") or []
+                required = [r for r in ri_list if not r.get("is_optional", False)]
+                total = len(required)
+                if total == 0:
+                    continue
+                
+                matched = sum(1 for r in required if r["ingredient_id"] in owned_ids)
+                missing = total - matched
+                match_pct = round(matched / total, 2)
+                
+                if missing > 3:
+                    continue  # Skip recipes missing too many ingredients
+                
+                missing_names = [
+                    (r.get("ingredients") or {}).get("display_name_en", "unknown")
+                    for r in required if r["ingredient_id"] not in owned_ids
+                ]
+                
+                is_comfort = recipe["id"] in cooked_ids
+                
+                # Assign tier
+                if match_pct == 1.0 and is_comfort:
+                    tier = 1
+                elif match_pct == 1.0:
+                    tier = 2
+                elif 1 <= missing <= 3 and is_comfort:
+                    tier = 3
+                elif 1 <= missing <= 3:
+                    tier = 4
+                else:
+                    continue
+                
+                rows.append({
+                    "recipe_id": recipe["id"],
+                    "title": recipe["title"],
+                    "cuisine": recipe.get("cuisine"),
+                    "prep_time_minutes": recipe.get("prep_time_minutes"),
+                    "image_url": recipe.get("image_url"),
+                    "flavor_vectors": recipe.get("flavor_vectors"),
+                    "match_pct": match_pct,
+                    "missing_count": missing,
+                    "missing_names": missing_names,
+                    "is_comfort": is_comfort,
+                    "tier": tier,
+                })
+            
+            rows.sort(key=lambda r: (r["tier"], -r["match_pct"]))
+            return rows
+            
+        except Exception as e:
+            logger.error(f"[Recommendation] ORM fallback failed: {e}")
+            return []
 
     def _get_recipe_ingredient_ids(self, recipe_id: str) -> list[str]:
         """Get required ingredient IDs for a specific recipe."""
@@ -262,30 +304,30 @@ class RecommendationEngine:
         return expiry_map
 
     async def _get_urgent_items(self, user_id: str) -> list[UrgentItem]:
-        """Get items expiring within 2 days."""
+        """Get items expiring within 2 days.
+        
+        Fixed: Previously used .lte(today) which only returned items
+        expiring exactly today. Now correctly uses today + 2 days.
+        Fixed: Eliminated N+1 query by joining ingredients table.
+        """
+        two_days_ahead = (date.today() + timedelta(days=2)).isoformat()
         result = (
             self.db.table("inventory_items")
-            .select("ingredient_id, computed_expiry, quantity, unit")
+            .select("ingredient_id, computed_expiry, quantity, unit, ingredients(display_name_en)")
             .eq("user_id", user_id)
             .gte("computed_expiry", date.today().isoformat())
-            .lte("computed_expiry", (date.today()).isoformat())
+            .lte("computed_expiry", two_days_ahead)
             .gt("quantity", 0)
+            .order("computed_expiry", desc=False)
             .execute()
         )
         items: list[UrgentItem] = []
         for row in result.data or []:
-            # Fetch ingredient name
-            ing = (
-                self.db.table("ingredients")
-                .select("display_name_en")
-                .eq("id", row["ingredient_id"])
-                .single()
-                .execute()
-            )
+            ing_data = row.get("ingredients") or {}
             days_rem = (date.fromisoformat(row["computed_expiry"]) - date.today()).days
             items.append(
                 UrgentItem(
-                    ingredient_name=ing.data["display_name_en"] if ing.data else "Unknown",
+                    ingredient_name=ing_data.get("display_name_en", "Unknown"),
                     days_remaining=days_rem,
                     quantity=float(row["quantity"]),
                     unit=row["unit"],

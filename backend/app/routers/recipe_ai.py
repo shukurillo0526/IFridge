@@ -7,11 +7,15 @@ ingredient substitution, and cooking tips.
 
 import json
 import logging
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Optional
 
 from app.services.ollama_service import get_ollama_service
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
 
 logger = logging.getLogger("ifridge.recipe_ai")
 
@@ -40,7 +44,8 @@ class CookingTipRequest(BaseModel):
 # ── Endpoints ────────────────────────────────────────────────────
 
 @router.post("/api/v1/ai/generate-recipe")
-async def generate_recipe(req: GenerateRecipeRequest):
+@limiter.limit("10/minute")
+async def generate_recipe(request: Request, req: GenerateRecipeRequest):
     """
     Generate a recipe from available ingredients using the local LLM.
     """
