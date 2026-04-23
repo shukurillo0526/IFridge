@@ -38,26 +38,6 @@ class ApiService {
 
   ApiService({http.Client? client}) : _client = client ?? http.Client();
 
-  // ── Recommendations ──────────────────────────────────────────────
-
-  /// Fetch 5-tier recipe recommendations for a user.
-  Future<Map<String, dynamic>> getRecommendations({
-    required String userId,
-    int maxPerTier = 10,
-    bool includeTier5 = true,
-  }) async {
-    final uri = Uri.parse(
-      '${ApiConfig.baseUrl}/api/v1/recommendations/recommend',
-    ).replace(queryParameters: {
-      'user_id': userId,
-      'max_per_tier': '$maxPerTier',
-      'include_tier5': '$includeTier5',
-    });
-
-    final response = await _client.get(uri, headers: _headers);
-    return _handleResponse(response);
-  }
-
   // ── Vision ───────────────────────────────────────────────────────
 
   /// Send a grocery receipt image for OCR and AI analysis.

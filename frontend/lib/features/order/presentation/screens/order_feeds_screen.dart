@@ -165,7 +165,8 @@ class _FeedItem {
 
 class _OrderVideoCard extends StatefulWidget {
   final _FeedItem feed;
-  const _OrderVideoCard({required this.feed});
+  final bool isActive;
+  const _OrderVideoCard({required this.feed, this.isActive = true});
 
   @override
   State<_OrderVideoCard> createState() => _OrderVideoCardState();
