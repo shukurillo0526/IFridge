@@ -199,6 +199,15 @@ class _YTReelCardState extends State<_YTReelCard> {
   bool _showRecipe = false;
 
   @override
+  void didUpdateWidget(covariant _YTReelCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Auto-stop playback when scrolled off-screen to free iframe memory
+    if (oldWidget.isActive && !widget.isActive && _playing) {
+      setState(() => _playing = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final v = widget.video;
     const green = Color(0xFF4CAF50);

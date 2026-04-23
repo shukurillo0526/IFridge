@@ -184,6 +184,15 @@ class _OrderVideoCardState extends State<_OrderVideoCard> {
     _registerView();
   }
 
+  @override
+  void didUpdateWidget(covariant _OrderVideoCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Auto-stop playback when scrolled off-screen to free iframe memory
+    if (oldWidget.isActive && !widget.isActive && _playing) {
+      setState(() => _playing = false);
+    }
+  }
+
   void _registerView() {
     try {
       ui_web.platformViewRegistry.registerViewFactory(_viewKey!, (int viewId) {

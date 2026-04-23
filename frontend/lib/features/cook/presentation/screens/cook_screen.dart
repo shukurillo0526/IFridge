@@ -13,6 +13,7 @@ import 'package:ifridge_app/core/services/api_service.dart';
 import 'package:ifridge_app/features/cook/presentation/screens/recipe_detail_screen.dart';
 import 'package:ifridge_app/features/cook/presentation/screens/recipe_import_screen.dart';
 import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CookScreen extends StatefulWidget {
   const CookScreen({super.key});
@@ -991,13 +992,13 @@ class _RecipeCard extends StatelessWidget {
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _tierColor.withValues(alpha: 0.3),
-            width: 1,
+            color: _tierColor.withValues(alpha: matchPct >= 90 ? 0.6 : 0.3),
+            width: matchPct >= 90 ? 1.5 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: _tierColor.withValues(alpha: 0.1),
-              blurRadius: 12,
+              color: _tierColor.withValues(alpha: matchPct >= 90 ? 0.2 : 0.1),
+              blurRadius: matchPct >= 90 ? 20 : 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -1011,7 +1012,7 @@ class _RecipeCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(
+                  image: CachedNetworkImageProvider(
                     _cuisineImageUrl(cuisine),
                   ),
                   fit: BoxFit.cover,
@@ -1061,14 +1062,50 @@ class _RecipeCard extends StatelessWidget {
 
               // Recommendation Reason Badge
               const SizedBox(height: 6),
-              Text(
-                _tierBadge,
-                style: TextStyle(
-                  color: _tierColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _tierBadge,
+                      style: TextStyle(
+                        color: _tierColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  // Relevance score (if available from server scoring)
+                  if (recipe['relevance_score'] != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _tierColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${((recipe['relevance_score'] as num) * 100).toInt()}% fit',
+                        style: TextStyle(
+                          color: _tierColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                ],
               ),
+              // Relevance score bar
+              if (recipe['relevance_score'] != null) ...[
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: (recipe['relevance_score'] as num).toDouble().clamp(0.0, 1.0),
+                    minHeight: 4,
+                    backgroundColor: Colors.white.withValues(alpha: 0.06),
+                    valueColor: AlwaysStoppedAnimation<Color>(_tierColor),
+                  ),
+                ),
+              ],
 
               if (description.isNotEmpty) ...[
                 const SizedBox(height: 6),

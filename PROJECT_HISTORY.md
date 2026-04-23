@@ -239,6 +239,12 @@ Following the initial 16 phases, a comprehensive gap analysis was conducted to r
 - **Ingredient Substitution UI**: Added "🔄 Swap" button on missing ingredients in `RecipeDetailScreen`. Tapping it opens a glassmorphic bottom sheet that calls `/api/v1/ai/substitute` and displays 3 AI-suggested alternatives with swap ratios.
 - **Standardized API Response Envelope**: Created `ApiResponse` model with `success/error/partial` status, `data`, `message`, `error`, and `meta` fields for consistent response shapes across all new endpoints.
 
+### Phase I: UX & Performance Overhaul
+- **Onboarding Flow**: Built animated 3-step onboarding (PageView with elastic emoji animations, gradient backgrounds, skip controls). Shows once for first-time users, persisted via `SharedPreferences`. Wired into `_AuthGate` without modifying existing auth logic.
+- **Recipe Card Redesign**: Enhanced `_RecipeCard` with glowing border for high-match recipes (≥90%), relevance score progress bar (showing the 6-signal composite score), and "% fit" chip. All existing card elements preserved.
+- **Image Caching**: Added `cached_network_image` package. Recipe card hero images now use `CachedNetworkImageProvider` instead of raw `NetworkImage`, preventing redundant downloads during scroll.
+- **iframe Memory Management**: Fixed memory leak in both `ExploreScreen` (Reels) and `OrderFeedsScreen` — added `didUpdateWidget` to auto-stop video playback when cards scroll off-screen. Previously, iframes stayed alive in memory after scrolling away.
+
 ---
 
 ## 🚀 The Future

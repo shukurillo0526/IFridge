@@ -28,7 +28,9 @@ import 'package:ifridge_app/features/auth/presentation/screens/auth_screen.dart'
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:ifridge_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,9 +93,29 @@ class _IFridgeAppState extends State<IFridgeApp> {
   }
 }
 
-/// Auth gate — routes to AuthScreen or AppShell based on session state.
-class _AuthGate extends StatelessWidget {
+/// Auth gate — routes to AuthScreen, OnboardingScreen, or AppShell.
+class _AuthGate extends StatefulWidget {
   const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  bool? _onboardingComplete;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboarding();
+  }
+
+  Future<void> _checkOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +123,16 @@ class _AuthGate extends StatelessWidget {
       stream: Supabase.instance.client.auth.onAuthStateChange,
       builder: (context, snapshot) {
         final session = Supabase.instance.client.auth.currentSession;
-        if (session != null) {
-          return const AppShell();
+        if (session == null) {
+          return const AuthScreen();
         }
-        return const AuthScreen();
+        // Show onboarding for first-time users
+        if (_onboardingComplete == false) {
+          return OnboardingScreen(
+            onComplete: () => setState(() => _onboardingComplete = true),
+          );
+        }
+        return const AppShell();
       },
     );
   }
