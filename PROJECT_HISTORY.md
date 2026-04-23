@@ -230,6 +230,15 @@ Following the initial 16 phases, a comprehensive gap analysis was conducted to r
 - **Dead Code Cleanup**: Removed unused `video_feed_service` import from `cook_screen.dart`.
 - **API Version Bump**: Backend version bumped from `3.2.0` → `3.3.0`.
 
+### Phase H: Algorithm & Intelligence Upgrades
+- **6-Signal Composite Scoring**: Upgraded from 3-signal scoring (expiry, flavor, familiarity) to 6-signal (+ difficulty fit, recency penalty, match coverage). Weights are configurable via environment variables and sum to 1.0.
+- **Difficulty Fit Signal**: Recipes now match against the user's estimated cooking skill level (auto-derived from cooking history count, or explicit `skill_level` column).
+- **Recency Penalty Signal**: Recently cooked recipes are penalized to promote variety. 14-day cooldown window with linear ramp.
+- **Match Coverage Signal**: A power-curve scoring function that rewards high ingredient match percentages (100% match → 1.0, 50% → 0.45).
+- **Server-Side Recommendations API**: New `/api/v1/recommendations/{user_id}` endpoint returns pre-scored, pre-tiered recipes. The Flutter client now tries this first, falling back to client-side scoring if the backend is unreachable. Dramatically reduces data transfer (200 recipes → 50 pre-scored).
+- **Ingredient Substitution UI**: Added "🔄 Swap" button on missing ingredients in `RecipeDetailScreen`. Tapping it opens a glassmorphic bottom sheet that calls `/api/v1/ai/substitute` and displays 3 AI-suggested alternatives with swap ratios.
+- **Standardized API Response Envelope**: Created `ApiResponse` model with `success/error/partial` status, `data`, `message`, `error`, and `meta` fields for consistent response shapes across all new endpoints.
+
 ---
 
 ## 🚀 The Future

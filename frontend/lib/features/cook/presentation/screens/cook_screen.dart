@@ -77,7 +77,62 @@ class _CookScreenState extends State<CookScreen>
           .map((r) => r['ingredient_id'] as String)
           .toSet();
 
-      // 2. Try RPC first, fall back to direct query
+      // 2. Try server-side 6-signal scoring first (fastest, most accurate)
+      bool useServerScoring = false;
+      try {
+        final api = ApiService();
+        final serverResult = await api.getRecommendations(
+          userId: currentUserId(),
+          maxPerTier: 10,
+          cuisineFilter: _cuisineFilter,
+        );
+
+        final data = serverResult['data'] as Map<String, dynamic>?;
+        if (data != null && data['tiers'] != null) {
+          final serverTiers = data['tiers'] as Map<String, dynamic>;
+          final Map<String, List<Map<String, dynamic>>> tiers = {
+            '1': [], '2': [], '3': [], '4': [], '5': [],
+          };
+
+          for (final entry in serverTiers.entries) {
+            final tierKey = entry.key;
+            final recipes = entry.value as List? ?? [];
+            tiers[tierKey] = recipes.map((r) {
+              final recipe = r as Map<String, dynamic>;
+              return {
+                'id': recipe['recipe_id'],
+                'title': recipe['title'],
+                'description': '',
+                'cuisine': recipe['cuisine'] ?? '',
+                'difficulty': 1,
+                'prep_time_minutes': recipe['prep_time_minutes'],
+                'cook_time_minutes': null,
+                'servings': null,
+                'tags': <String>[],
+                'match_pct': recipe['match_percentage'] ?? recipe['relevance_score'] ?? 0.0,
+                'matched': 0,
+                'total': 0,
+                'missing': (recipe['missing_ingredients'] as List?)?.cast<String>() ?? [],
+                'relevance_score': recipe['relevance_score'] ?? 0.0,
+                'image_url': recipe['image_url'],
+              };
+            }).toList();
+          }
+
+          setState(() {
+            _tiers = tiers;
+            _ownedIngredientIds = ownedIds;
+            _loading = false;
+          });
+          useServerScoring = true;
+        }
+      } catch (e) {
+        debugPrint('[Cook] Server scoring unavailable, falling back to client: $e');
+      }
+
+      if (useServerScoring) return;
+
+      // 3. Fallback: Client-side scoring (RPC → direct query)
       List<dynamic> rpcResponse = [];
       bool useDirectQuery = false;
 

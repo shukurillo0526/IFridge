@@ -556,6 +556,43 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  /// Get AI-powered ingredient substitutions
+  Future<Map<String, dynamic>> getSubstitution({
+    required String ingredient,
+    String? recipeContext,
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/substitute'),
+      headers: _headers,
+      body: jsonEncode({
+        'ingredient': ingredient,
+        'recipe_context': recipeContext,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Get server-side computed recipe recommendations (6-signal scoring)
+  Future<Map<String, dynamic>> getRecommendations({
+    required String userId,
+    int maxPerTier = 10,
+    bool includeTier5 = true,
+    String? cuisineFilter,
+  }) async {
+    final params = <String, String>{
+      'max_per_tier': maxPerTier.toString(),
+      'include_tier5': includeTier5.toString(),
+    };
+    if (cuisineFilter != null) params['cuisine_filter'] = cuisineFilter;
+
+    final uri = Uri.parse(
+      '${ApiConfig.baseUrl}/api/v1/recommendations/$userId',
+    ).replace(queryParameters: params);
+
+    final response = await _client.get(uri, headers: _headers);
+    return _handleResponse(response);
+  }
+
   void dispose() => _client.close();
 }
 

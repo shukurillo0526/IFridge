@@ -196,6 +196,209 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   int get _totalTime => (widget.prepTime ?? 0) + (widget.cookTime ?? 0);
 
+  /// Show AI-powered ingredient substitution suggestions
+  void _showSubstitutionSheet(String ingredientName, String recipeTitle) {
+    final api = ApiService();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(ctx).size.height * 0.65,
+        ),
+        decoration: const BoxDecoration(
+          color: IFridgeTheme.bgCard,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: api.getSubstitution(
+            ingredient: ingredientName,
+            recipeContext: recipeTitle,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40, height: 4,
+                    decoration: BoxDecoration(
+                      color: IFridgeTheme.textMuted,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const CircularProgressIndicator(color: IFridgeTheme.primary),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Finding substitutes for $ingredientName...',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.redAccent, size: 40),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Could not find substitutes',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              );
+            }
+
+            final data = snapshot.data ?? {};
+            final substitutes = (data['substitutes'] as List?) ?? [];
+
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40, height: 4,
+                      decoration: BoxDecoration(
+                        color: IFridgeTheme.textMuted,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Header
+                  Row(
+                    children: [
+                      const Icon(Icons.swap_horiz, color: IFridgeTheme.primary, size: 22),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Substitutes for "$ingredientName"',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Substitution cards
+                  if (substitutes.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'No substitutes found for this recipe context.',
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                      ),
+                    )
+                  else
+                    ...substitutes.asMap().entries.map((entry) {
+                      final idx = entry.key;
+                      final sub = entry.value as Map<String, dynamic>;
+                      final subName = sub['name'] ?? sub['substitute'] ?? 'Unknown';
+                      final ratio = sub['ratio'] ?? sub['swap_ratio'] ?? '1:1';
+                      final notes = sub['notes'] ?? sub['reason'] ?? '';
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: IFridgeTheme.bgElevated,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: IFridgeTheme.primary.withValues(alpha: idx == 0 ? 0.4 : 0.1),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            // Rank badge
+                            Container(
+                              width: 28, height: 28,
+                              decoration: BoxDecoration(
+                                color: IFridgeTheme.primary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${idx + 1}',
+                                  style: const TextStyle(
+                                    color: IFridgeTheme.primary,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    subName.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (notes.toString().isNotEmpty)
+                                    Text(
+                                      notes.toString(),
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.5),
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
+                            ),
+                            // Ratio chip
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                ratio.toString(),
+                                style: const TextStyle(
+                                  color: IFridgeTheme.primary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -390,6 +593,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                       prepNote: prepNote,
                       isOptional: isOptional,
                       isOwned: isOwned,
+                      onSubstitute: (!isOwned && !isOptional)
+                          ? () => _showSubstitutionSheet(name, widget.title)
+                          : null,
                     ),
                   );
                 }, childCount: _ingredients.length),
@@ -637,6 +843,7 @@ class _IngredientRow extends StatelessWidget {
   final String prepNote;
   final bool isOptional;
   final bool isOwned;
+  final VoidCallback? onSubstitute;
 
   const _IngredientRow({
     required this.name,
@@ -644,6 +851,7 @@ class _IngredientRow extends StatelessWidget {
     required this.prepNote,
     required this.isOptional,
     required this.isOwned,
+    this.onSubstitute,
   });
 
   @override
@@ -686,12 +894,15 @@ class _IngredientRow extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (isOptional) ...[
@@ -724,6 +935,39 @@ class _IngredientRow extends StatelessWidget {
               ],
             ),
           ),
+          // Swap button for missing ingredients
+          if (!isOwned && !isOptional && onSubstitute != null) ...[
+            InkWell(
+              onTap: onSubstitute,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: IFridgeTheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: IFridgeTheme.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.swap_horiz, size: 14, color: IFridgeTheme.primary),
+                    SizedBox(width: 3),
+                    Text(
+                      'Swap',
+                      style: TextStyle(
+                        color: IFridgeTheme.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           // Quantity
           Text(
             quantity,

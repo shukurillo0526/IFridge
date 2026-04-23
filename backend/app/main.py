@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory, user_data, calorie_analysis
+from app.routers import ocr_parser, barcode_lookup, vision_detect, recipe_ai, embeddings, inventory, user_data, calorie_analysis, recommendations
 from app.services.ollama_service import get_ollama_service
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -43,6 +43,7 @@ app.include_router(embeddings.router)
 app.include_router(inventory.router)
 app.include_router(user_data.router)
 app.include_router(calorie_analysis.router)
+app.include_router(recommendations.router)
 
 @app.get("/")
 async def root():

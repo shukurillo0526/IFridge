@@ -30,10 +30,13 @@ class Settings(BaseSettings):
     VISION_THRESHOLD_AUTO: float = 0.90
     VISION_THRESHOLD_CONFIRM: float = 0.70
 
-    # --- Recommendation engine weights ---
-    WEIGHT_EXPIRY: float = 0.45
-    WEIGHT_FLAVOR: float = 0.35
-    WEIGHT_FAMILIAR: float = 0.20
+    # --- Recommendation engine weights (must sum to ~1.0) ---
+    WEIGHT_EXPIRY: float = 0.25      # Waste reduction urgency
+    WEIGHT_FLAVOR: float = 0.20      # Flavor affinity (cosine)
+    WEIGHT_FAMILIAR: float = 0.10    # Comfort food boost
+    WEIGHT_DIFFICULTY: float = 0.10  # Skill-level match
+    WEIGHT_RECENCY: float = 0.10     # Variety (penalize recent)
+    WEIGHT_COVERAGE: float = 0.25    # Ingredient match %
 
     # --- Server ---
     HOST: str = "0.0.0.0"

@@ -93,17 +93,23 @@ class RecommendationEngine:
         max_per_tier: int = 10,
         include_tier5: bool = True,
     ) -> RecommendationResponse:
-        """Run the full 5-Tier pipeline and return scored results."""
+        """Run the full 5-Tier pipeline with 6-signal scoring."""
 
         # 1. Load user context
         flavor_profile = await self._get_flavor_profile(user_id)
         inventory_expiry = await self._get_inventory_expiry_map(user_id)
         urgent_items = await self._get_urgent_items(user_id)
+        
+        # 1b. Load recency data (last-cooked dates per recipe)
+        recency_map = await self._get_recency_map(user_id)
+        
+        # 1c. Load user skill level (default: 2 = intermediate)
+        user_skill = await self._get_user_skill_level(user_id)
 
         # 2. Execute tier classification (safe ORM, no raw SQL)
         tier_results = self._execute_tier_query(user_id)
 
-        # 3. Score each recipe
+        # 3. Score each recipe with 6-signal composite
         tiers: dict[int, list[ScoredRecipe]] = {1: [], 2: [], 3: [], 4: [], 5: []}
 
         for row in tier_results:
@@ -111,8 +117,10 @@ class RecommendationEngine:
             if tier_num is None:
                 continue
 
+            recipe_id = str(row["recipe_id"])
+
             # Get recipe ingredient IDs for expiry scoring
-            recipe_ing_ids = self._get_recipe_ingredient_ids(row["recipe_id"])
+            recipe_ing_ids = self._get_recipe_ingredient_ids(recipe_id)
 
             # Compute sub-scores
             expiry_urg = compute_expiry_urgency(recipe_ing_ids, inventory_expiry)
@@ -120,12 +128,20 @@ class RecommendationEngine:
                 row.get("flavor_vectors") or {},
                 flavor_profile,
             )
+            
+            # Enhanced: pass all 6 signals to scoring function
             relevance = compute_relevance_score(
-                expiry_urg, flavor_aff, row["is_comfort"]
+                expiry_urgency=expiry_urg,
+                flavor_affinity=flavor_aff,
+                is_comfort=row["is_comfort"],
+                match_percentage=float(row["match_pct"]),
+                recipe_difficulty=row.get("difficulty", 1) or 1,
+                user_skill_level=user_skill,
+                last_cooked_date=recency_map.get(recipe_id),
             )
 
             scored = ScoredRecipe(
-                recipe_id=str(row["recipe_id"]),
+                recipe_id=recipe_id,
                 title=row["title"],
                 tier=Tier(tier_num),
                 relevance_score=relevance,
@@ -355,6 +371,75 @@ class RecommendationEngine:
             }
         # Neutral profile for new users
         return {"sweet": 0.5, "salty": 0.5, "sour": 0.5, "bitter": 0.5, "umami": 0.5, "spicy": 0.5}
+
+    async def _get_recency_map(self, user_id: str) -> dict[str, date]:
+        """Get last-cooked dates per recipe for the recency penalty signal.
+        
+        Returns {recipe_id: last_cooked_date} mapping. Only fetches recipes
+        cooked in the last 30 days (older ones get no penalty anyway).
+        """
+        thirty_days_ago = (date.today() - timedelta(days=30)).isoformat()
+        try:
+            result = (
+                self.db.table("user_recipe_history")
+                .select("recipe_id, cooked_at")
+                .eq("user_id", user_id)
+                .gte("cooked_at", thirty_days_ago)
+                .order("cooked_at", desc=True)
+                .execute()
+            )
+            recency: dict[str, date] = {}
+            for row in result.data or []:
+                rid = str(row["recipe_id"])
+                if rid not in recency:  # Keep the most recent cook date
+                    cooked_str = row["cooked_at"]
+                    # Handle both date-only and datetime strings
+                    recency[rid] = date.fromisoformat(cooked_str[:10])
+            return recency
+        except Exception as e:
+            logger.warning(f"[Recommendation] Recency map fetch failed: {e}")
+            return {}
+
+    async def _get_user_skill_level(self, user_id: str) -> int:
+        """Get user's cooking skill level (1-5, default 2).
+        
+        Reads from user_flavor_profile.skill_level if the column exists,
+        otherwise falls back to estimating from cooking history count.
+        """
+        try:
+            # Try explicit skill_level column first
+            result = (
+                self.db.table("user_flavor_profile")
+                .select("skill_level")
+                .eq("user_id", user_id)
+                .maybe_single()
+                .execute()
+            )
+            if result.data and result.data.get("skill_level") is not None:
+                return int(result.data["skill_level"])
+        except Exception:
+            pass  # Column may not exist yet
+        
+        # Fallback: estimate from cooking history count
+        try:
+            result = (
+                self.db.table("user_recipe_history")
+                .select("id", count="exact")
+                .eq("user_id", user_id)
+                .execute()
+            )
+            cook_count = result.count or 0
+            if cook_count >= 50:
+                return 4  # Experienced
+            elif cook_count >= 20:
+                return 3  # Intermediate
+            elif cook_count >= 5:
+                return 2  # Beginner+
+            else:
+                return 1  # Novice
+        except Exception as e:
+            logger.warning(f"[Recommendation] Skill level fetch failed: {e}")
+            return 2  # Safe default
 
     async def _tier5_search(
         self, flavor_profile: dict[str, float], limit: int
