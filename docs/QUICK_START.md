@@ -70,9 +70,14 @@ flutter run -d Chrome
 
 After all 3 are running, open Chrome and check:
 
-- `http://localhost:8000/` → should return `{"message": "I-Fridge Intelligence API v3.0 is running"}`
-- `http://localhost:8000/api/v1/ai/status` → shows which AI models are loaded
-- The Flutter app should load the Living Shelf
+| URL | Expected |
+|-----|----------|
+| `http://localhost:8000/` | `{"name": "I-Fridge Intelligence API", "version": "3.4.0", ...}` |
+| `http://localhost:8000/api/v1/health/ping` | `{"status": "ok", ...}` |
+| `http://localhost:8000/api/v1/health` | Full dependency health report (Supabase, Ollama) |
+| `http://localhost:8000/api/v1/ai/status` | Shows which AI models are loaded |
+| `http://localhost:8000/docs` | Interactive Swagger API docs |
+| Flutter app | Should load the Living Shelf after login |
 
 ---
 
@@ -110,9 +115,65 @@ The backend uses these local AI models via Ollama:
 | Model | Size | Role |
 |-------|------|------|
 | `qwen2.5vl:7b` | 6.0 GB | Vision (multimodal) — scans receipts, detects ingredients, calorie photos |
-| `qwen3:8b` | 5.2 GB | Text LLM — recipe generation, tips, ingredient subs |
+| `qwen3:8b` | 5.2 GB | Text LLM — recipe generation, tips, ingredient subs, YouTube extraction |
 | `nomic-embed-text` | 274 MB | Embeddings — semantic search (runs on CPU) |
 | `gemma3:12b` | 8.1 GB | Fallback — multimodal backup if qwen2.5vl unavailable |
+
+---
+
+## 🏗️ Backend Architecture (v3.4.0)
+
+```
+Request → CORS → RequestIdMiddleware → InputValidationMiddleware → Router → Response
+                 ↓                      ↓
+           X-Request-ID           Body size check
+           X-Response-Time        UUID validation
+                 ↓
+         Structured JSON logs with request_id correlation
+```
+
+### Middleware Stack
+| Layer | Purpose |
+|-------|---------|
+| `CORSMiddleware` | Allows Flutter origins |
+| `RequestIdMiddleware` | Injects `X-Request-ID`, measures `X-Response-Time` |
+| `InputValidationMiddleware` | 10MB body limit, UUID format validation |
+| `register_error_handlers` | Standardized error envelopes with request IDs |
+
+### Key Services
+| Service | Purpose |
+|---------|---------|
+| `recommendation_engine.py` | 6-signal composite scoring (expiry, flavor, familiarity, difficulty, recency, coverage) |
+| `youtube_intelligence.py` | Extracts structured recipes from YouTube video metadata |
+| `flavor_learning.py` | EMA-based flavor profile auto-learning on cook events |
+| `ollama_service.py` | Local LLM interface (text, vision, embeddings) |
+
+---
+
+## 📡 API Endpoints Overview
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/v1/health` | Deep health check (Supabase + Ollama + latency) |
+| GET | `/api/v1/health/ping` | Lightweight liveness probe |
+| GET | `/api/v1/ai/status` | AI model status |
+| POST | `/api/v1/ai/generate-recipe` | Generate recipe from ingredients |
+| POST | `/api/v1/ai/substitute` | AI ingredient substitution |
+| POST | `/api/v1/ai/cooking-tip` | Get cooking tips for a step |
+| POST | `/api/v1/ai/youtube-recipe` | Extract recipe from YouTube metadata |
+| POST | `/api/v1/ai/shopping-list` | Smart shopping list generation |
+| POST | `/api/v1/ai/parse-raw` | Parse raw recipe text |
+| POST | `/api/v1/ai/normalize-recipe` | Convert terse steps to detailed steps |
+| GET | `/api/v1/recommendations/{user_id}` | Server-side scored recommendations |
+| POST | `/api/v1/user/init` | Initialize new user |
+| GET | `/api/v1/user/{user_id}/dashboard` | Full user profile data |
+| POST | `/api/v1/user/cook` | Record cook event (triggers flavor learning) |
+| POST | `/api/v1/user/engagement` | Track video likes/saves/views |
+| POST | `/api/v1/calories/analyze-image` | Analyze food photo for calories |
+| POST | `/api/v1/calories/analyze` | Estimate calories for food items |
+| GET | `/api/v1/calories/daily/{user_id}` | Daily nutrition summary |
+
+> Full interactive docs at `http://localhost:8000/docs`
 
 ---
 
@@ -127,3 +188,5 @@ The backend uses these local AI models via Ollama:
 | Hot reload not working | Press `R` (capital) in Terminal 3 for hot restart |
 | Flutter `pub get` fails | Enable Developer Mode: `start ms-settings:developers` |
 | Wrong backend URL | Should be automatic now — check `ApiConfig` in `api_service.dart` |
+| Health check returns 503 | Supabase connection issue — check `.env` credentials |
+| `X-Request-ID` missing | Ensure `RequestIdMiddleware` is registered in `main.py` |
