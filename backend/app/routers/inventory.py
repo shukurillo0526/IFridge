@@ -268,3 +268,76 @@ async def consume_inventory_item(req: ConsumeItemRequest):
         logger.error(f"[Inventory] Consume failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ── Smart Expiry Prediction ──────────────────────────────────────
+
+class PredictExpiryRequest(BaseModel):
+    category: str
+    purchase_date: Optional[str] = None  # ISO date
+    storage_location: str = "fridge"
+    packaging: str = "opened"  # "opened" or "sealed"
+
+
+@router.post("/api/v1/inventory/predict-expiry")
+async def predict_expiry_endpoint(req: PredictExpiryRequest):
+    """
+    Predict expiry date using category, storage location, and packaging.
+    
+    Uses smart defaults based on food science data:
+    - Category-based shelf life (e.g., meat=3d, dairy=10d)
+    - Storage multiplier (freezer=6x, pantry=0.5x)
+    - Packaging factor (sealed=+50%)
+    """
+    from app.services.expiry_prediction import predict_expiry
+    from datetime import date
+
+    purchase = None
+    if req.purchase_date:
+        purchase = date.fromisoformat(req.purchase_date)
+
+    result = predict_expiry(
+        category=req.category.lower(),
+        purchase_date=purchase,
+        storage_location=req.storage_location.lower(),
+        packaging=req.packaging.lower(),
+    )
+    return {"status": "success", "data": result}
+
+
+# ── Visual Freshness Detection ───────────────────────────────────
+
+from fastapi import File, UploadFile, Form
+
+@router.post("/api/v1/inventory/assess-freshness")
+async def assess_freshness(
+    image: UploadFile = File(...),
+    ingredient_name: str = Form(...),
+    category: str = Form("other"),
+):
+    """
+    Analyze a photo of an ingredient to assess its freshness.
+    
+    Uses vision AI to detect visual cues (brown spots, wilting,
+    color changes) and return a freshness score (0.0-1.0)
+    with an adjusted expiry recommendation.
+    
+    Returns:
+        freshness_score, visual_cues, recommendation,
+        days_remaining_estimate, adjusted_expiry
+    """
+    from app.services.expiry_prediction import assess_freshness_from_photo
+
+    image_bytes = await image.read()
+    if len(image_bytes) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Image too large (max 10MB)")
+
+    result = await assess_freshness_from_photo(
+        image_bytes=image_bytes,
+        ingredient_name=ingredient_name,
+        category=category.lower(),
+    )
+
+    if "error" in result and "AI unavailable" in str(result.get("error", "")):
+        raise HTTPException(status_code=503, detail="AI service unavailable")
+
+    return {"status": "success", "data": result}

@@ -146,7 +146,8 @@ Request → CORS → RequestIdMiddleware → InputValidationMiddleware → Route
 | `recommendation_engine.py` | 6-signal composite scoring (expiry, flavor, familiarity, difficulty, recency, coverage) |
 | `youtube_intelligence.py` | Extracts structured recipes from YouTube video metadata |
 | `flavor_learning.py` | EMA-based flavor profile auto-learning on cook events |
-| `ollama_service.py` | Local LLM interface (text, vision, embeddings) |
+| `expiry_prediction.py` | Smart expiry with storage/packaging factors + visual freshness |
+| `ollama_service.py` | Local LLM interface (text, vision, embeddings, streaming) |
 
 ---
 
@@ -169,6 +170,9 @@ Request → CORS → RequestIdMiddleware → InputValidationMiddleware → Route
 | GET | `/api/v1/user/{user_id}/dashboard` | Full user profile data |
 | POST | `/api/v1/user/cook` | Record cook event (triggers flavor learning) |
 | POST | `/api/v1/user/engagement` | Track video likes/saves/views |
+| POST | `/api/v1/ai/chat` | Multi-turn kitchen assistant (SSE streaming) |
+| POST | `/api/v1/inventory/predict-expiry` | Smart expiry prediction (category + storage + packaging) |
+| POST | `/api/v1/inventory/assess-freshness` | Visual freshness score from ingredient photo |
 | POST | `/api/v1/calories/analyze-image` | Analyze food photo for calories |
 | POST | `/api/v1/calories/analyze` | Estimate calories for food items |
 | GET | `/api/v1/calories/daily/{user_id}` | Daily nutrition summary |

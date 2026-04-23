@@ -660,6 +660,43 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  /// Send a chat message to the kitchen assistant (non-streaming)
+  Future<Map<String, dynamic>> chatWithAssistant({
+    required List<Map<String, String>> messages,
+    String? context,
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/chat'),
+      headers: _headers,
+      body: jsonEncode({
+        'messages': messages,
+        'stream': false,
+        'context': context,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Predict expiry date for an ingredient
+  Future<Map<String, dynamic>> predictExpiry({
+    required String category,
+    String? purchaseDate,
+    String storageLocation = 'fridge',
+    String packaging = 'opened',
+  }) async {
+    final response = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/v1/inventory/predict-expiry'),
+      headers: _headers,
+      body: jsonEncode({
+        'category': category,
+        'purchase_date': purchaseDate,
+        'storage_location': storageLocation,
+        'packaging': packaging,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
   void dispose() => _client.close();
 }
 

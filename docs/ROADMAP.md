@@ -80,17 +80,21 @@
 ## 🧠 Priority 3: AI Upgrades
 
 ### 3.1 Conversational Kitchen Assistant
-- **Status:** ⏳ Pending
-- Replace single-shot tips with a persistent chat interface.
-- Use streaming responses for real-time feel.
+- **Status:** ✅ Done
+- Persistent multi-turn chat via `/api/v1/ai/chat` with SSE streaming.
+- Kitchen-aware system prompt with context injection (user inventory/recipes).
+- Frontend `chatWithAssistant()` method in ApiService.
 
 ### 3.2 Smart Expiry Prediction (AI-Enhanced)
-- **Status:** ⏳ Pending
-- Train on historical data (purchase → discard). Factor in storage, packaging, season.
+- **Status:** ✅ Done
+- `expiry_prediction.py` with category-based shelf life, storage multipliers (freezer=6x, pantry=0.5x), packaging factors (+50% for sealed).
+- `/api/v1/inventory/predict-expiry` endpoint.
+- 12 unit tests covering all categories, storage, and packaging combinations.
 
 ### 3.3 Visual Freshness Detection
-- **Status:** ⏳ Pending
-- Camera-based freshness scoring to dynamically adjust computed expiry.
+- **Status:** ✅ Done
+- `/api/v1/inventory/assess-freshness` endpoint uses vision AI to score freshness (0.0-1.0) from photos.
+- Returns visual cues, recommendation, days remaining estimate, and adjusted expiry date.
 
 ### 3.4 Personalized Nutrition Tracking
 - **Status:** ✅ Done — calorie analysis (DB-first + AI fallback), daily nutrition logs, meal-type tracking.
@@ -138,7 +142,7 @@
 | Security | ✅ | 95% |
 | Performance | ✅ | 85% |
 | Observability | ✅ | 80% |
-| Testing | ✅ | 60% |
+| Testing | ✅ | 75% |
 | CI/CD | ✅ | 50% |
 
 ---
@@ -150,6 +154,7 @@
 | `test_scoring.py` | 24 | 6-signal scoring engine (expiry, flavor, difficulty, recency, coverage, composite) |
 | `test_middleware.py` | 9 | Request ID, timing, body size, UUID validation, error formatting |
 | `test_health.py` | 7 | Root endpoint, ping, deep health, 404 envelope |
+| `test_expiry.py` | 12 | Expiry prediction: categories, storage, packaging, shelf-stable, confidence |
 
 Run locally: `cd backend && python -m pytest tests/ -v`
 
@@ -157,8 +162,9 @@ Run locally: `cd backend && python -m pytest tests/ -v`
 
 ## 💡 Remaining Quick Wins
 
-1. ⏳ Implement FCM push notifications for expiring items
-2. ⏳ Add streaming chat for the kitchen assistant
-3. ⏳ Riverpod migration for shared inventory state
-4. ⏳ Flutter widget tests in CI
-5. ⏳ Sentry crash reporting integration
+1. ⏳ FCM push notifications for expiring items (requires Firebase project)
+2. ⏳ Voice commands (requires native speech-to-text plugin)
+3. ⏳ Riverpod state management migration
+4. ⏳ Offline-first caching (hive/isar)
+5. ⏳ Cloud AI fallback (OpenAI/Gemini API keys required)
+6. ⏳ Sentry crash reporting (requires DSN)

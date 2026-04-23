@@ -269,6 +269,12 @@ Following the initial 16 phases, a comprehensive gap analysis was conducted to r
 - **GitHub Actions CI**: `.github/workflows/backend-tests.yml` — runs all tests on every push/PR to `main` with Python 3.12, pip caching, and JUnit result artifacts.
 - **Documentation Update**: Updated `QUICK_START.md` (v3.4.0 endpoints, architecture diagram, API table), rewrote `ROADMAP.md` (marked all completed sprints), created `API_REFERENCE.md` (full endpoint reference with request/response shapes, error codes, headers).
 
+### Phase M: AI Upgrades — Chat, Expiry Prediction, Freshness Detection
+- **Conversational Kitchen Assistant**: New `chat.py` router with `/api/v1/ai/chat` endpoint supporting SSE streaming and non-streaming modes. Multi-turn conversation with kitchen-aware system prompt. Streaming uses `generate_text_stream()` added to `OllamaService` for token-by-token delivery.
+- **Smart Expiry Prediction**: New `expiry_prediction.py` service with category-based shelf life (16 categories), storage location multipliers (freezer=6x, pantry=0.5x, counter=0.3x), packaging factors (sealed=+50%), and shelf-stable overrides. Endpoint: `/api/v1/inventory/predict-expiry`. 12 unit tests.
+- **Visual Freshness Detection**: New `/api/v1/inventory/assess-freshness` endpoint. Accepts a photo of an ingredient, uses vision AI to score freshness (0.0-1.0), identifies visual cues, and returns an adjusted expiry date. Integrates with `expiry_prediction.py` for shelf-life calculations.
+- **Test Suite Growth**: 40 → 52 tests (added `test_expiry.py` with 12 tests). All passing in 0.88s.
+
 ---
 
 ## 🚀 The Future

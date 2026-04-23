@@ -226,6 +226,70 @@ class OllamaService:
         data = resp.json()
         return data.get("embeddings", [])
 
+    # ── Streaming Text Generation ─────────────────────────────────
+
+    async def generate_text_stream(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: int = 1024,
+    ):
+        """
+        Stream text generation token-by-token.
+        Yields individual text chunks as they arrive from Ollama.
+        
+        Args:
+            messages: Full chat history [{"role": "user", "content": "..."}]
+            model: Model name (auto-resolved if None)
+            temperature: Sampling temperature
+            max_tokens: Max tokens to generate
+            
+        Yields:
+            str: Individual text chunks
+        """
+        model = model or await self._resolve_model("text")
+
+        # Inject /no_think for qwen3 models
+        if model and "qwen3" in model:
+            if messages and messages[0]["role"] == "system":
+                messages[0]["content"] += "\n/no_think"
+            else:
+                messages.insert(0, {"role": "system", "content": "/no_think"})
+
+        payload = {
+            "model": model,
+            "messages": messages,
+            "stream": True,
+            "options": {
+                "temperature": temperature,
+                "num_predict": max_tokens,
+            },
+        }
+
+        logger.info(f"[Ollama] Streaming text → {model} ({len(messages)} messages)")
+
+        async with self._client.stream(
+            "POST", f"{self.base_url}/api/chat", json=payload
+        ) as resp:
+            resp.raise_for_status()
+            async for line in resp.aiter_lines():
+                if not line.strip():
+                    continue
+                try:
+                    chunk = json.loads(line)
+                    content = chunk.get("message", {}).get("content", "")
+                    if content:
+                        # Strip thinking tags inline
+                        import re
+                        if "<think>" not in content:
+                            yield content
+                    if chunk.get("done", False):
+                        break
+                except json.JSONDecodeError:
+                    continue
+
+
     # ── Response Processing Helpers ────────────────────────────────
 
     @staticmethod
