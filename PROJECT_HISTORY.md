@@ -275,6 +275,13 @@ Following the initial 16 phases, a comprehensive gap analysis was conducted to r
 - **Visual Freshness Detection**: New `/api/v1/inventory/assess-freshness` endpoint. Accepts a photo of an ingredient, uses vision AI to score freshness (0.0-1.0), identifies visual cues, and returns an adjusted expiry date. Integrates with `expiry_prediction.py` for shelf-life calculations.
 - **Test Suite Growth**: 40 → 52 tests (added `test_expiry.py` with 12 tests). All passing in 0.88s.
 
+### Phase N: Voice, Offline, State Management, Cloud AI, Sentry (v3.5.0)
+- **Voice Commands**: `speech_to_text` package with `VoiceCommandService` for intent parsing (recipe requests, shopping list additions, timer, general assistant). `VoiceCommandFab` widget with pulsing mic animation and bottom-sheet AI reply display.
+- **Offline-First Caching**: `hive_flutter` cache service with 5 Hive boxes (inventory, recipes, profile, sync_queue, meta). `connectivity_plus` auto-detects online/offline and flushes queued writes on reconnect. Cache-first strategy with staleness detection.
+- **Cloud AI Fallback**: `cloud_ai_service.py` supports OpenAI GPT-4o-mini and Gemini 2.0 Flash. Automatic fallback chain wired into `OllamaService.generate_text()`: Ollama → Cloud → error. Activate by adding `OPENAI_API_KEY` or `GEMINI_API_KEY` to `.env`.
+- **Sentry Integration**: Backend `main.py` auto-initializes Sentry with FastAPI + Starlette integrations when `SENTRY_DSN` is set. 0.2 trace sample rate, production environment.
+- **Riverpod State Management**: `flutter_riverpod` with `ProviderScope` wrapper. Created `app_providers.dart` with `inventoryProvider` (cache-first async), `userProfileProvider`, `recommendationsProvider`, `shoppingListProvider` (local state), and `isOnlineProvider`. Screens can now gradually migrate from `setState()`.
+
 ---
 
 ## 🚀 The Future

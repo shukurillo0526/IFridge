@@ -170,14 +170,33 @@ class OllamaService:
         }
 
         logger.info(f"[Ollama] Text generation → {model}")
-        resp = await self._client.post(
-            f"{self.base_url}/api/chat",
-            json=payload,
-        )
-        resp.raise_for_status()
-        result = resp.json()
-        msg = result.get("message", {})
-        return self._strip_thinking_tags(msg.get("content", ""))
+        try:
+            resp = await self._client.post(
+                f"{self.base_url}/api/chat",
+                json=payload,
+            )
+            resp.raise_for_status()
+            result = resp.json()
+            msg = result.get("message", {})
+            return self._strip_thinking_tags(msg.get("content", ""))
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            logger.warning(f"[Ollama] Unavailable, trying cloud fallback: {e}")
+            return await self._cloud_fallback(prompt, system_prompt, temperature, max_tokens)
+
+    async def _cloud_fallback(
+        self, prompt: str, system_prompt: Optional[str] = None,
+        temperature: float = 0.7, max_tokens: int = 1024,
+    ) -> str:
+        """Fall back to cloud AI (OpenAI/Gemini) when Ollama is down."""
+        try:
+            from app.services.cloud_ai_service import get_cloud_ai_service
+            cloud = get_cloud_ai_service()
+            if cloud.is_configured:
+                logger.info(f"[Ollama] Cloud fallback → {cloud.provider}")
+                return await cloud.generate_text(prompt, system_prompt, temperature, max_tokens)
+        except Exception as fallback_err:
+            logger.error(f"[Ollama] Cloud fallback also failed: {fallback_err}")
+        raise httpx.ConnectError("Both Ollama and cloud AI are unavailable")
 
     async def generate_text_json(
         self,

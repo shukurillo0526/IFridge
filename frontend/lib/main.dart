@@ -32,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ifridge_app/l10n/app_localizations.dart';
 import 'package:ifridge_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:ifridge_app/core/services/cache_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +49,7 @@ void main() async {
   } catch (e) {
     debugPrint('[Main] Cache init skipped: $e');
   }
-  runApp(const IFridgeApp());
+  runApp(const ProviderScope(child: IFridgeApp()));
 }
 
 class IFridgeApp extends StatefulWidget {

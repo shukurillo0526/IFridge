@@ -33,6 +33,25 @@ import uvicorn
 # Use structured=True for production (JSON logs)
 setup_logging(level="INFO", structured=False)
 
+# ── Sentry (optional — activate by setting SENTRY_DSN in .env) ──
+try:
+    from app.core.config import get_settings
+    _dsn = get_settings().SENTRY_DSN
+    if _dsn:
+        import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.starlette import StarletteIntegration
+        sentry_sdk.init(
+            dsn=_dsn,
+            traces_sample_rate=0.2,
+            integrations=[FastApiIntegration(), StarletteIntegration()],
+            environment="production",
+        )
+        import logging
+        logging.getLogger("ifridge.main").info("[Sentry] Crash reporting enabled")
+except ImportError:
+    pass  # sentry-sdk not installed — skip silently
+
 # ── Rate Limiter ─────────────────────────────────────────────────
 limiter = Limiter(key_func=get_remote_address)
 

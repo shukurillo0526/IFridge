@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
+    # --- Cloud AI Fallback (optional — set to enable auto-fallback) ---
+    OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+
+    # --- Sentry (optional — set to enable crash reporting) ---
+    SENTRY_DSN: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
 
