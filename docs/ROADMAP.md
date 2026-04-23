@@ -52,8 +52,10 @@
 - **Status:** ✅ Done — Supabase Auth with Google OAuth. Demo UUID replaced.
 
 ### 1.4 Expiry Notifications
-- **Status:** ⏳ Pending — requires Supabase Edge Function + FCM push.
-- **Action:** Implement a daily cron that queries items expiring within 2 days, sends push via FCM.
+- **Status:** ✅ Done
+- Firebase project `ifridge-9b737` configured with FCM.
+- Backend: `/api/v1/notifications/expiring/{user_id}` endpoint queries items expiring within N days, classifies urgency (critical/warning/upcoming), generates notification payloads.
+- Frontend: `firebase-messaging-sw.js` service worker for background push, `notification_service.dart` for foreground.
 
 ---
 
@@ -168,8 +170,9 @@ Run locally: `cd backend && python -m pytest tests/ -v`
 
 ## 💡 Remaining Quick Wins
 
-1. ⏳ FCM push notifications for expiring items (requires Firebase project + config)
-2. ⏳ Migrate remaining `setState()` screens to `ConsumerWidget` (Riverpod providers are ready)
-3. ⏳ Add `OPENAI_API_KEY` or `GEMINI_API_KEY` to `.env` to activate cloud AI fallback
-4. ⏳ Add `SENTRY_DSN` to `.env` and `pip install sentry-sdk[fastapi]` to activate crash reporting
+1. ✅ ~~FCM push notifications~~ — Done (Firebase `ifridge-9b737`)
+2. ✅ ~~Gemini API key~~ — Configured in `.env`
+3. ✅ ~~Sentry DSN~~ — Configured in `.env`
+4. ⏳ Migrate remaining `setState()` screens to `ConsumerWidget` (Riverpod providers ready)
 5. ⏳ PostHog/Mixpanel for user behavior analytics
+6. ⏳ Deploy backend to Railway with production `.env`
