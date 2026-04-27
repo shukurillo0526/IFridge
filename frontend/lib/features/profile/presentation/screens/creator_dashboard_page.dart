@@ -119,7 +119,16 @@ class _CreatorDashboardPageState extends State<CreatorDashboardPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Your Content', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      TextButton(onPressed: () {}, child: const Text('View All', style: TextStyle(color: IFridgeTheme.primary))),
+                      TextButton(onPressed: () {
+                        // Already showing all posts — provide feedback
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Showing all ${_posts.length} posts'),
+                          backgroundColor: IFridgeTheme.primary,
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ));
+                      }, child: const Text('View All', style: TextStyle(color: IFridgeTheme.primary))),
                     ],
                   ),
                   const SizedBox(height: 8),

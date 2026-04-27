@@ -36,6 +36,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Global Error Handling ──
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('[Error] ${details.exceptionAsString()}');
+  };
+
   await Supabase.initialize(
     url: 'https://tquyodwsyppwbpvkaunn.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxdXlvZHdzeXBwd2JwdmthdW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzEzOTAsImV4cCI6MjA4NzE0NzM5MH0.1o6RYfeL_7YlIeUkl4jFsCm2JCQ2mB2F9o5wLv30xWU',
@@ -97,6 +104,34 @@ class _IFridgeAppState extends State<IFridgeApp> {
         Locale('uz'),
         Locale('ru'),
       ],
+      builder: (context, child) {
+        // Override ugly red error screen
+        ErrorWidget.builder = (details) => Center(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: IFridgeTheme.bgElevated,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: IFridgeTheme.error.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.warning_amber_rounded, color: IFridgeTheme.error.withValues(alpha: 0.7), size: 40),
+                const SizedBox(height: 12),
+                const Text('Something went wrong',
+                    style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                Text(details.exceptionAsString().split('\n').first,
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 12),
+                    textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        );
+        return child ?? const SizedBox.shrink();
+      },
       home: const _AuthGate(),
     );
   }
