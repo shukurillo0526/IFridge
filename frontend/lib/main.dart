@@ -319,7 +319,7 @@ class _ModeSwitchBar extends StatelessWidget {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(20, topPadding + 8, 20, 8),
+      padding: EdgeInsets.fromLTRB(16, topPadding + 8, 16, 8),
       decoration: BoxDecoration(
         color: isDark ? IFridgeTheme.bgDark : const Color(0xFFF6F8FA),
       ),
@@ -336,9 +336,9 @@ class _ModeSwitchBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // Mode toggle
-          SizedBox(
-            width: 164,
+          // Mode toggle — constrained to fit narrow screens
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 164),
             child: ModeSwitch(
               currentMode: currentMode,
               onModeChanged: onModeChanged,

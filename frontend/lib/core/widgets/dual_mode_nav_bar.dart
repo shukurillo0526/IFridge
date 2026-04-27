@@ -46,8 +46,11 @@ class DualModeNavBar extends StatelessWidget {
     final isOrder = mode == AppMode.order;
     final accentColor = isOrder ? const Color(0xFFFF6D00) : IFridgeTheme.primary;
 
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+    final totalHeight = 88.0 + bottomPad;
+
     return SizedBox(
-      height: 88,
+      height: totalHeight,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -57,7 +60,7 @@ class DualModeNavBar extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: Container(
-              height: 68,
+              height: 68 + bottomPad,
               margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: Column(
                 children: [
@@ -101,7 +104,7 @@ class DualModeNavBar extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 0,
+            bottom: bottomPad,
             height: 88,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
