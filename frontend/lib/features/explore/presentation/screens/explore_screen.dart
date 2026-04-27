@@ -20,6 +20,7 @@ import 'package:ifridge_app/core/widgets/community_post_card.dart';
 import 'package:ifridge_app/core/services/social_service.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/post_upload_form.dart';
 import 'package:ifridge_app/core/widgets/story_ring.dart';
+import 'package:ifridge_app/features/explore/presentation/screens/social_search_page.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -59,6 +60,19 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                   const Text('Explore',
                     style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
                   const Spacer(),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.search, color: Colors.white54),
+                      onPressed: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const SocialSearchPage())),
+                      tooltip: 'Search',
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Container(
                     decoration: BoxDecoration(
                       color: AppTheme.surface,
