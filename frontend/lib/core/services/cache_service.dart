@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:http/http.dart' as http;
+import 'package:ifridge_app/core/services/api_service.dart' show ApiConfig;
 import 'dart:async';
 
 /// Offline-first caching service using Hive.
@@ -160,10 +162,30 @@ class CacheService {
 
     for (final item in queue) {
       try {
-        // The actual HTTP calls would be made here via ApiService
-        // For now, we just log them — the caller should handle this
-        debugPrint('[Cache] Syncing: ${item['method']} ${item['endpoint']}');
-        // TODO: Wire to ApiService.syncOfflineWrite()
+        final endpoint = item['endpoint'] as String;
+        final method = item['method'] as String;
+        final body = item['body'] as Map<String, dynamic>;
+        final url = Uri.parse('${ApiConfig.baseUrl}$endpoint');
+        final headers = {'Content-Type': 'application/json'};
+        final jsonBody = jsonEncode(body);
+        debugPrint('[Cache] Syncing: $method $endpoint');
+
+        http.Response response;
+        if (method == 'POST') {
+          response = await http.post(url, headers: headers, body: jsonBody);
+        } else if (method == 'PUT') {
+          response = await http.put(url, headers: headers, body: jsonBody);
+        } else if (method == 'PATCH') {
+          response = await http.patch(url, headers: headers, body: jsonBody);
+        } else if (method == 'DELETE') {
+          response = await http.delete(url, headers: headers);
+        } else {
+          continue;
+        }
+
+        if (response.statusCode >= 400) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
       } catch (e) {
         debugPrint('[Cache] Sync failed: $e');
         failed.add(item);

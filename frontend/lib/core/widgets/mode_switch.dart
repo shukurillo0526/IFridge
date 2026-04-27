@@ -5,6 +5,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ifridge_app/core/theme/app_theme.dart';
 import 'package:ifridge_app/core/services/app_settings.dart';
 
@@ -107,7 +108,10 @@ class _ModeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.heavyImpact();
+          onTap();
+        },
         behavior: HitTestBehavior.opaque,
         child: Center(
           child: AnimatedDefaultTextStyle(

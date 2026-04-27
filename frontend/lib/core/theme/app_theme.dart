@@ -82,7 +82,7 @@ class IFridgeTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.06)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
         ),
       ),
 
@@ -100,11 +100,11 @@ class IFridgeTheme {
         backgroundColor: bgElevated,
         labelStyle: const TextStyle(color: textPrimary, fontSize: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        side: BorderSide(color: Colors.white.withOpacity(0.08)),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
 
       dividerTheme: DividerThemeData(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         thickness: 1,
       ),
     );
@@ -162,7 +162,7 @@ class IFridgeTheme {
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.black.withOpacity(0.06)),
+          side: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
         ),
       ),
 
@@ -180,11 +180,11 @@ class IFridgeTheme {
         backgroundColor: _bgElevatedLight,
         labelStyle: const TextStyle(color: _textDark, fontSize: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        side: BorderSide(color: Colors.black.withOpacity(0.08)),
+        side: BorderSide(color: Colors.black.withValues(alpha: 0.08)),
       ),
 
       dividerTheme: DividerThemeData(
-        color: Colors.black.withOpacity(0.08),
+        color: Colors.black.withValues(alpha: 0.08),
         thickness: 1,
       ),
     );

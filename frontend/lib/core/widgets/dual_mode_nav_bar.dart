@@ -8,6 +8,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ifridge_app/core/theme/app_theme.dart';
 import 'package:ifridge_app/core/services/app_settings.dart';
 
@@ -181,7 +182,10 @@ class _CenterButtonState extends State<_CenterButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        widget.onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 72,
@@ -273,7 +277,10 @@ class _NavButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 64,
