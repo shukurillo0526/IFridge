@@ -22,6 +22,7 @@ import 'package:ifridge_app/features/profile/presentation/screens/meal_planner_p
 import 'package:ifridge_app/features/profile/presentation/screens/shopping_list_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/creator_dashboard_page.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/restaurant_dashboard_page.dart';
+import 'package:ifridge_app/core/services/social_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -39,6 +40,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _userEmail = '';
   int _totalXp = 0;
   int _level = 1;
+
+  // Social stats
+  int _followerCount = 0;
+  int _followingCount = 0;
+  int _postCount = 0;
 
   // Gamification stats
   int _mealsCooked = 0;
@@ -205,11 +211,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         _loading = false;
       });
+
+      // Load social stats (non-blocking)
+      _loadSocialStats();
     } catch (e) {
       setState(() {
         _error = e.toString();
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _loadSocialStats() async {
+    try {
+      final uid = currentUserId();
+      final followers = await SocialService.getFollowerCount(uid);
+      final following = await SocialService.getFollowingCount(uid);
+      final posts = await Supabase.instance.client
+          .from('posts')
+          .select('id')
+          .eq('author_id', uid);
+      if (mounted) {
+        setState(() {
+          _followerCount = followers;
+          _followingCount = following;
+          _postCount = (posts as List).length;
+        });
+      }
+    } catch (e) {
+      debugPrint('[Profile] social stats error: \$e');
     }
   }
 
@@ -366,6 +396,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // ── Social Stats Row ──
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _SocialStat(value: '$_postCount', label: 'Posts'),
+                          Container(
+                            width: 1, height: 24,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                          _SocialStat(value: '$_followerCount', label: 'Followers'),
+                          Container(
+                            width: 1, height: 24,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                          _SocialStat(value: '$_followingCount', label: 'Following'),
+                        ],
                       ),
                     ],
                   ),
@@ -1655,6 +1707,25 @@ class _SettingsRow extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SocialStat extends StatelessWidget {
+  final String value;
+  final String label;
+  const _SocialStat({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 2),
+        Text(label,
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 12)),
+      ],
     );
   }
 }
