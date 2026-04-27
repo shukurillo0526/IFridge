@@ -108,14 +108,22 @@ class DualModeNavBar extends StatelessWidget {
             bottom: bottomPad,
             height: 88,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(items.length, (i) {
                 final item = items[i];
                 final isActive = i == currentIndex;
 
+                Widget child;
                 if (item.isCenter) {
-                  return _CenterButton(
+                  child = _CenterButton(
+                    icon: isActive ? item.activeIcon : item.icon,
+                    label: item.label,
+                    isActive: isActive,
+                    accentColor: accentColor,
+                    onTap: () => onTap(i),
+                  );
+                } else {
+                  child = _NavButton(
                     icon: isActive ? item.activeIcon : item.icon,
                     label: item.label,
                     isActive: isActive,
@@ -124,13 +132,7 @@ class DualModeNavBar extends StatelessWidget {
                   );
                 }
 
-                return _NavButton(
-                  icon: isActive ? item.activeIcon : item.icon,
-                  label: item.label,
-                  isActive: isActive,
-                  accentColor: accentColor,
-                  onTap: () => onTap(i),
-                );
+                return Expanded(child: child);
               }),
             ),
           ),
@@ -188,7 +190,6 @@ class _CenterButtonState extends State<_CenterButton>
       },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 72,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -282,53 +283,50 @@ class _NavButton extends StatelessWidget {
         onTap();
       },
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8, top: 18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedScale(
-                scale: isActive ? 1.15 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: Icon(
-                  icon,
-                  size: 24,
-                  color: isActive
-                      ? accentColor
-                      : isDark
-                          ? IFridgeTheme.textMuted
-                          : Colors.black38,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8, top: 18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: isActive ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                icon,
+                size: 24,
+                color: isActive
+                    ? accentColor
+                    : isDark
+                        ? IFridgeTheme.textMuted
+                        : Colors.black38,
               ),
-              const SizedBox(height: 4),
-              // Active indicator dot
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: isActive ? 4 : 0,
-                height: isActive ? 4 : 0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: accentColor,
-                ),
+            ),
+            const SizedBox(height: 4),
+            // Active indicator dot
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: isActive ? 4 : 0,
+              height: isActive ? 4 : 0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: accentColor,
               ),
-              const SizedBox(height: 2),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: TextStyle(
-                  fontSize: isActive ? 10 : 9,
-                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
-                  color: isActive
-                      ? accentColor
-                      : isDark
-                          ? IFridgeTheme.textMuted
-                          : Colors.black38,
-                ),
-                child: Text(label),
+            ),
+            const SizedBox(height: 2),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: isActive ? 10 : 9,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+                color: isActive
+                    ? accentColor
+                    : isDark
+                        ? IFridgeTheme.textMuted
+                        : Colors.black38,
               ),
-            ],
-          ),
+              child: Text(label),
+            ),
+          ],
         ),
       ),
     );
