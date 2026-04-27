@@ -4,8 +4,8 @@
 // Each video has AI-extracted recipe data.
 // Tap video → opens YouTube. "Cook" button → recipe overlay with "Cook This" action.
 
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ifridge_app/core/services/video_feed_service.dart';
 
 class CookFeedsScreen extends StatefulWidget {
@@ -179,7 +179,7 @@ class _CookVideoCardState extends State<_CookVideoCard> {
         children: [
           // ── Background: Thumbnail with play overlay ──
           GestureDetector(
-            onTap: () => html.window.open(v.watchUrl, '_blank'),
+            onTap: () => launchUrl(Uri.parse(v.watchUrl), mode: LaunchMode.externalApplication),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -395,7 +395,7 @@ class _RecipeOverlay extends StatelessWidget {
 
           // ── Watch the video button ─────────────────
           GestureDetector(
-            onTap: () => html.window.open(video.watchUrl, '_blank'),
+            onTap: () => launchUrl(Uri.parse(video.watchUrl), mode: LaunchMode.externalApplication),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 14),

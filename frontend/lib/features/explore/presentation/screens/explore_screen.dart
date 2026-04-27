@@ -6,8 +6,7 @@
 // Features: likes, bookmarks, external video links, tags.
 
 import 'dart:ui';
-import 'dart:html' as html;
-import 'dart:ui_web' as ui_web;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,6 +15,7 @@ import 'package:ifridge_app/core/services/video_feed_service.dart';
 import 'package:ifridge_app/core/services/auth_helper.dart';
 import 'package:ifridge_app/features/explore/presentation/screens/creator_page.dart';
 import 'package:ifridge_app/features/cook/presentation/screens/recipe_detail_screen.dart';
+import 'package:ifridge_app/core/widgets/youtube_embed.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -149,20 +149,7 @@ class _ReelsFeedState extends State<_ReelsFeed> {
   }
 
   void _reg(String ytId) {
-    final k = 'yt-reel-$ytId';
-    if (_registered.contains(k)) return;
-    _registered.add(k);
-    try {
-      ui_web.platformViewRegistry.registerViewFactory(k, (int id) {
-        return html.IFrameElement()
-          ..src = 'https://www.youtube.com/embed/$ytId?rel=0&modestbranding=1&playsinline=1'
-          ..style.border = 'none'
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..allow = 'autoplay; encrypted-media; gyroscope; picture-in-picture'
-          ..allowFullscreen = true;
-      });
-    } catch (_) {}
+    registerYouTubeView(ytId);
   }
 
   @override
@@ -220,7 +207,7 @@ class _YTReelCardState extends State<_YTReelCard> {
         children: [
           // ── Video or Thumbnail ──────────────────
           if (_playing && widget.isActive) ...[
-            Builder(builder: (_) { widget.reg(v.youtubeId); return HtmlElementView(viewType: viewKey); }),
+            Builder(builder: (_) { widget.reg(v.youtubeId); return YouTubeEmbed(youtubeId: v.youtubeId); }),
             // Close button to stop video and resume scrolling
             Positioned(top: 12, right: 12, child: GestureDetector(
               onTap: () => setState(() => _playing = false),

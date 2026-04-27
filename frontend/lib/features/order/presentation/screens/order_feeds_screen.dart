@@ -5,13 +5,12 @@
 // Right sidebar: Like, Order/Reserve/Go (context-aware), Share, Save
 // Tap thumbnail → opens YouTube. Buttons navigate to RestaurantDetailPage.
 
-import 'dart:html' as html;
-import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 import 'package:ifridge_app/core/services/video_feed_service.dart';
 import 'package:ifridge_app/core/services/location_service.dart';
 import 'package:ifridge_app/core/services/restaurant_service.dart';
 import 'package:ifridge_app/features/order/presentation/screens/restaurant_detail_page.dart';
+import 'package:ifridge_app/core/widgets/youtube_embed.dart';
 
 class OrderFeedsScreen extends StatefulWidget {
   const OrderFeedsScreen({super.key});
@@ -195,17 +194,7 @@ class _OrderVideoCardState extends State<_OrderVideoCard> {
   }
 
   void _registerView() {
-    try {
-      ui_web.platformViewRegistry.registerViewFactory(_viewKey!, (int viewId) {
-        return html.IFrameElement()
-          ..src = 'https://www.youtube.com/embed/${widget.feed.video.youtubeId}?autoplay=0&rel=0&modestbranding=1&playsinline=1'
-          ..style.border = 'none'
-          ..style.width = '100%'
-          ..style.height = '100%'
-          ..allow = 'autoplay; encrypted-media; gyroscope; picture-in-picture'
-          ..allowFullscreen = true;
-      });
-    } catch (_) {}
+    registerYouTubeView(widget.feed.video.youtubeId);
   }
 
   @override
@@ -225,7 +214,7 @@ class _OrderVideoCardState extends State<_OrderVideoCard> {
         children: [
           // ── Background: thumbnail or video ────────────
           if (_playing) ...[
-            HtmlElementView(viewType: _viewKey!),
+            YouTubeEmbed(youtubeId: widget.feed.video.youtubeId),
             // Close button to resume scrolling
             Positioned(top: 12, right: 12, child: GestureDetector(
               onTap: () => setState(() => _playing = false),

@@ -62,6 +62,10 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```powershell
 cd d:\dev\projects\iFridge\frontend
 flutter run -d Chrome
+
+or
+
+flutter build apk --debug 2>&1 | Select-Object -Last 12
 ```
 
 ---
