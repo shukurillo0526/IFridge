@@ -19,6 +19,7 @@ import 'package:ifridge_app/core/widgets/youtube_embed.dart';
 import 'package:ifridge_app/core/widgets/community_post_card.dart';
 import 'package:ifridge_app/core/services/social_service.dart';
 import 'package:ifridge_app/features/profile/presentation/screens/post_upload_form.dart';
+import 'package:ifridge_app/core/widgets/story_ring.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -807,43 +808,66 @@ class _CommunityFeedState extends State<_CommunityFeed> {
 
     return Stack(
       children: [
-        // Post list or empty state
+        // Main content
         _posts.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('🍽️', style: TextStyle(fontSize: 48)),
-                  const SizedBox(height: 12),
-                  Text('No community posts yet',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Text('Be the first to share!',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 13)),
-                  const SizedBox(height: 20),
-                  FilledButton.icon(
-                    onPressed: _openCreatePost,
-                    icon: const Icon(Icons.add_a_photo, size: 18),
-                    label: const Text('Create Post'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: IFridgeTheme.primary,
-                      foregroundColor: Colors.white,
+          ? Column(
+              children: [
+                // Story ring even when no posts
+                const StoryRing(),
+                const Divider(color: Colors.white12, height: 1),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('\u{1F37D}\u{FE0F}', style: TextStyle(fontSize: 48)),
+                        const SizedBox(height: 12),
+                        Text('No community posts yet',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                        const SizedBox(height: 8),
+                        Text('Be the first to share!',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 13)),
+                        const SizedBox(height: 20),
+                        FilledButton.icon(
+                          onPressed: _openCreatePost,
+                          icon: const Icon(Icons.add_a_photo, size: 18),
+                          label: const Text('Create Post'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: IFridgeTheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             )
           : RefreshIndicator(
               color: IFridgeTheme.primary,
               onRefresh: _loadPosts,
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: _posts.length,
-                itemBuilder: (ctx, i) => CommunityPostCard(post: _posts[i]),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                itemCount: _posts.length + 1, // +1 for story ring
+                itemBuilder: (ctx, i) {
+                  if (i == 0) {
+                    return Column(
+                      children: [
+                        const StoryRing(),
+                        Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CommunityPostCard(post: _posts[i - 1]),
+                  );
+                },
               ),
             ),
 
-        // ── FAB: Create new post ──
+        // \u2500\u2500 FAB: Create new post \u2500\u2500
         Positioned(
           bottom: 16,
           right: 16,
