@@ -311,7 +311,6 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
     final navItems = isCook ? _cookNavItems(l10n) : _orderNavItems(l10n);
 
     return Scaffold(
-      extendBody: true,
       body: Column(
         children: [
           // ── Mode Switch Bar ─────────────────────────

@@ -107,6 +107,12 @@ class IFridgeTheme {
         color: Colors.white.withValues(alpha: 0.06),
         thickness: 1,
       ),
+
+      scrollbarTheme: ScrollbarThemeData(
+        thumbColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.15)),
+        thickness: WidgetStateProperty.all(4),
+        radius: const Radius.circular(4),
+      ),
     );
   }
 
@@ -186,6 +192,12 @@ class IFridgeTheme {
       dividerTheme: DividerThemeData(
         color: Colors.black.withValues(alpha: 0.08),
         thickness: 1,
+      ),
+
+      scrollbarTheme: ScrollbarThemeData(
+        thumbColor: WidgetStateProperty.all(Colors.black.withValues(alpha: 0.15)),
+        thickness: WidgetStateProperty.all(4),
+        radius: const Radius.circular(4),
       ),
     );
   }
