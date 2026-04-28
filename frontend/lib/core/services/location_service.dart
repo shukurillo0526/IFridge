@@ -162,6 +162,7 @@ class LocationService extends ChangeNotifier {
   }
 
   /// Request fresh GPS location and update region.
+  /// Falls back to default location (Tashkent) if GPS fails (e.g. on emulator).
   Future<void> refreshLocation() async {
     _loading = true;
     _error = null;
@@ -171,10 +172,19 @@ class LocationService extends ChangeNotifier {
       // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _error = 'Location services are disabled';
-        _loading = false;
-        notifyListeners();
-        return;
+        // Try to open location settings on the device
+        final opened = await Geolocator.openLocationSettings();
+        if (!opened) {
+          // If settings couldn't open, fall back to default location
+          _applyDefaultLocation('Location services disabled — using default');
+          return;
+        }
+        // Re-check after user potentially enabled it
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          _applyDefaultLocation('Location services still disabled — using default');
+          return;
+        }
       }
 
       // Check / request permissions
@@ -182,16 +192,12 @@ class LocationService extends ChangeNotifier {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          _error = 'Location permission denied';
-          _loading = false;
-          notifyListeners();
+          _applyDefaultLocation('Location permission denied — using default');
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        _error = 'Location permission permanently denied';
-        _loading = false;
-        notifyListeners();
+        _applyDefaultLocation('Location permission permanently denied — using default');
         return;
       }
 
@@ -216,10 +222,37 @@ class LocationService extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     } catch (e) {
-      _error = 'Could not determine location';
-      _loading = false;
-      notifyListeners();
+      // GPS timeout or other failure — use fallback
+      _applyDefaultLocation('Could not get GPS — using default location');
     }
+  }
+
+  /// Apply a hardcoded default location so the app is usable
+  /// even when GPS is unavailable (e.g. Android emulator).
+  void _applyDefaultLocation(String reason) {
+    debugPrint('[LocationService] $reason');
+    // Default: Tashkent, Uzbekistan (41.2995, 69.2401)
+    _currentPosition = Position(
+      latitude: 41.2995,
+      longitude: 69.2401,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+    _regionName = 'Tashkent';
+    _locality = 'Tashkent';
+    _locationGranted = true;
+    _loading = false;
+    _error = null;
+    notifyListeners();
+
+    // Still try to fetch regions in the background
+    fetchNearbyRegions();
   }
 
   /// Fetch regions from Supabase and calculate distance from user.

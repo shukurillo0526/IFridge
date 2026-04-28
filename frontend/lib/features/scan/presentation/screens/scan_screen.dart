@@ -207,9 +207,9 @@ class _ScanScreenState extends State<ScanScreen>
   // ── Capture State (initial) ──────────────────────────────────────
 
   Widget _buildCaptureState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
