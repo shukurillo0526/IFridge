@@ -1,93 +1,103 @@
-# iFridge VISION: Current State & Future Architecture
+# iFridge VISION: The Master Blueprint
 
-This document serves as the master blueprint for the iFridge ecosystem. It details the journey from a personal smart kitchen app to a three-sided food commerce marketplace, encompassing the current technical implementation, the business strategy, and the roadmap for upcoming phases.
-
----
-
-## 1. The Core Vision & Evolution
-
-Originally built to solve the "what's for dinner" problem by tracking physical inventory and providing AI-powered recipes (Cook Mode), iFridge has undergone a strategic pivot. The new **VISION** expands the platform into a comprehensive ecosystem connecting three key stakeholders:
-
-1.  **Consumers (iFridge App):** The demand engine. Users can manage their kitchen inventory, discover recipes, and now, seamlessly order food from local restaurants via mobile order and pickup/delivery.
-2.  **Restaurants (iFridge Business):** The supply side. A digital dashboard allowing restaurants to manage menus, process incoming orders without cashiers, and eventually integrate with self-service kiosk hardware.
-3.  **Drivers (iFridge Fleet - Planned):** The logistics network. A shared delivery fleet that any restaurant on the platform can utilize, reducing overhead and breaking reliance on high-commission third-party apps.
+This document serves as the comprehensive master blueprint for the **iFridge Ecosystem**. It details the journey from a personal smart-kitchen utility to a revolutionary three-sided food commerce marketplace. It encompasses the core philosophy, current technical implementation, business strategy, architecture, and the roadmap for upcoming phases.
 
 ---
 
-## 2. Current State (What We Have Built)
+## 1. Executive Summary & Core Philosophy
 
-The foundation of the marketplace ecosystem (Phase P) is fully implemented and operational.
+**The Problem:** The modern food experience is heavily fragmented. Consumers use one app for grocery tracking, another for finding recipes, a third for ordering delivery, and restaurants use entirely separate, expensive Point-of-Sale (POS) and delivery tablet systems. This fragmentation leads to food waste, high costs for consumers, and punishing 30%+ commission rates for restaurants.
 
-### 2.1 The Consumer App (Frontend - Flutter)
+**The iFridge Solution:** iFridge is a unified ecosystem that bridges the gap between the home kitchen and the commercial restaurant. By owning the "demand engine" (the consumer's daily habit of deciding what to eat), iFridge naturally funnels highly engaged users into a localized, low-commission commerce platform.
 
-The app now features a dual-mode navigation system (Cook vs. Order). The recent expansion heavily focused on the **Order Mode**:
-
-*   **Cart Service (`cart_service.dart`):** A robust in-memory singleton. It handles adding/removing items, managing quantities, and binding the cart to a specific restaurant (auto-clearing if the user attempts to order from a different restaurant simultaneously). It also toggles the order type (pickup vs. delivery).
-*   **Restaurant Discovery & Menu:** Users browse nearby restaurants and view menus. The `+` button natively adds items to the `CartService` and presents a dynamic quantity stepper (`- 1 +`).
-*   **Floating Cart Bar:** Appears persistently across the restaurant's menu when items are in the cart, showing a live summary (item count and total price) and providing a quick link to checkout.
-*   **Checkout Flow (`checkout_screen.dart`):** A comprehensive review screen. Users toggle between Pickup and Delivery, see a detailed price breakdown (subtotal, delivery fee, total), and place the order via the backend API.
-*   **Order Confirmation & Tracking (`order_history_screen.dart`):** Upon success, the system generates a human-readable **Pickup Code** (e.g., `AB742`). The "My Orders" screen (accessible from the Profile/Manage tab) separates active and past orders, featuring a dynamic visual progress bar tracking the order's lifecycle state.
-
-### 2.2 The Restaurant Dashboard (Frontend - Flutter)
-
-Built directly into the existing app for business accounts:
-
-*   **Incoming Orders Page (`incoming_orders_page.dart`):** A dedicated management interface featuring a 3-tab layout: **New**, **Preparing**, and **Ready**.
-*   **Order Management:** Restaurant staff view incoming orders with full details (pickup code, item quantities, special instructions, customer notes) and advance the status with a single tap (e.g., "Start Preparing" moves the order from 'New' to 'Preparing').
-
-### 2.3 The Backend API (FastAPI) & Database (Supabase)
-
-The robust data layer powering the marketplace:
-
-*   **Orders Database Schema (`007_orders.sql`):** A comprehensive PostgreSQL table tracking the full lifecycle (`confirmed` → `preparing` → `ready` → `picked_up` → `delivering` → `completed` → `cancelled`). It uses `JSONB` for flexible item storage, includes delivery coordinate fields, enforces strict Row Level Security (RLS), and features optimized indexes and an RPC function (`get_user_orders`) for efficient history retrieval.
-*   **Orders Router (`orders.py`):** Six RESTful endpoints exposing the necessary CRUD operations:
-    *   `POST /orders`: Creates orders and generates the unique pickup code.
-    *   `GET /orders/{id}`: Fetches a specific order.
-    *   `GET /orders/user/{id}`: Retrieves a user's order history.
-    *   `GET /orders/active/{id}`: Retrieves active orders for real-time tracking.
-    *   `PATCH /orders/{id}/status`: Allows restaurants to advance the order lifecycle.
-    *   `POST /orders/{id}/cancel`: Handles user-initiated cancellations.
-
-### 2.4 Production Hardening
-
-The application has been hardened for release (Phase O):
-*   UI layout fixes (resolving `Expanded` overflow issues).
-*   Location service fallbacks for robust emulator testing.
-*   ProGuard/R8 configuration for Android minification.
-*   Secure `--dart-define` credential injection.
+We are building a **Three-Sided Marketplace**:
+1. **Consumers (iFridge App):** The demand engine. Users manage home inventory, discover AI-tailored recipes, and seamlessly order pickup/delivery from local restaurants using the exact same app.
+2. **Restaurants (iFridge Business):** The supply side. A digital suite allowing restaurants to manage menus, process incoming mobile/kiosk orders without cashiers, and engage with the community.
+3. **Drivers (iFridge Fleet - Planned):** The logistics network. A shared delivery fleet that any restaurant on the platform can utilize, reducing overhead and breaking reliance on high-commission third-party apps.
 
 ---
 
-## 3. The Roadmap (Where We Are Going)
+## 2. Current Implementation Status (What Is Live Today)
 
-The foundation is solid. The next phases will flesh out the remaining pillars of the ecosystem.
+The foundation of the platform is fully implemented, deployed, and operational. The app features a seamless "Dual-Mode" interface, allowing users to toggle between **Cook Mode** and **Order Mode**.
 
-### Phase 2: Payments & Real-Time Sync
-*   **Payment Gateway Integration:** Integrating Stripe, Click, or Payme for secure, in-app transactions prior to order submission.
-*   **Real-Time Subscriptions:** Migrating from pull-to-refresh to Supabase Realtime WebSockets so consumers see their order status change instantly as the restaurant updates it.
-*   **Push Notifications:** Firebase Cloud Messaging (FCM) alerts for order readiness and driver assignment.
+### 2.1 Consumer App: Cook Mode (Home Kitchen Intelligence)
+The original core of iFridge, representing a state-of-the-art smart kitchen assistant:
+* **Smart Inventory Management:** Users can add ingredients via barcode scanning, manual entry, or by taking photos of loose ingredients/grocery receipts. The system utilizes Gemini 1.5 Flash and local Vision models to automatically extract items, sizes, and predict expiry dates based on category algorithms.
+* **Social-Style Recipe Feeds:** A TikTok-style vertical video feed and categorized horizontal feeds ("For You", "Use It Up", "Explore").
+* **6-Signal Recommendation Engine:** Recipes are scored using a highly advanced algorithm factoring in: Expiry Urgency, Flavor Affinity (Cosine Similarity), Difficulty Fit, Recency Penalties, and Inventory Match Coverage.
+* **Local AI Integration:** Powered by an on-device/local Ollama service (`qwen2.5:3b`, `moondream`), the app can generate custom recipes based *only* on what's in the fridge, suggest ingredient substitutions, and offer live cooking tips during the interactive step-by-step cooking tutorial.
 
-### Phase 3: Kiosk Mode (Pillar 2)
-*   **iFridge Kiosk App:** Developing a specialized, full-screen web application intended to run on locked-down Android tablets positioned inside partner restaurants.
-*   **Hardware Integration:** Supporting thermal receipt printers and local network syncing.
+### 2.2 Consumer App: Order Mode (Food Commerce)
+The newest expansion, bringing the "Luckin Coffee" mobile-ordering model to life:
+* **Cart Service (`cart_service.dart`):** A robust in-memory singleton handling item additions, quantity management, special instructions, and restaurant binding (auto-clearing if a user switches restaurants mid-order).
+* **Frictionless Checkout (`checkout_screen.dart`):** A streamlined review screen with dynamic toggles for Pickup vs. Delivery, subtotal calculations, and immediate API submission.
+* **Order Tracking (`order_history_screen.dart`):** Generates human-readable Pickup Codes (e.g., `AB742`). The "My Orders" interface separates active and past orders, featuring dynamic visual progress bars tracking the order's exact lifecycle state.
 
-### Phase 4: Delivery Fleet (Pillar 3)
-*   **iFridge Fleet App:** A new, dedicated Flutter application for gig-economy drivers.
-*   **Dispatch Engine:** A backend service to match "Ready" delivery orders with the nearest available drivers.
-*   **Live Tracking:** GPS integration allowing consumers to watch their delivery arrive on a map.
+### 2.3 Restaurant Suite: iFridge Business
+Built directly into the existing application, unlocked for verified business accounts:
+* **Creator Studio & Analytics:** Restaurants can upload promotional video shorts (reels) directly into the consumer "Explore" feeds, tracking views, likes, and engagement.
+* **Live Order Management (`incoming_orders_page.dart`):** A dedicated 3-tab POS interface (New, Preparing, Ready). Staff view incoming orders with full details and advance the status with a single tap, instantly updating the consumer's tracking screen.
 
-### Phase 5: Business Analytics
-*   **Restaurant Insights:** Enhancing the iFridge Business dashboard with revenue charts, peak hour heatmaps, and menu item performance metrics to help owners optimize operations.
+### 2.4 The Backend & Infrastructure
+A production-hardened API serving the mobile clients:
+* **FastAPI Backend:** Python 3.12 server handling AI routing, OCR parsing, recommendation scoring, and order processing. Features strict rate limiting, input validation, and request-tracing middleware.
+* **Supabase Data Layer:** PostgreSQL database handling Auth, inventory, user data, and the newly implemented `orders` table. Features strict Row Level Security (RLS) policies, JSONB document storage for flexible order items, and optimized RPC functions.
 
 ---
 
-## 4. Technical Architecture Overview
+## 3. Technical Architecture Deep-Dive
 
-*   **Frontend Framework:** Flutter (iOS, Android, Web)
-*   **State Management:** Riverpod + local `setState` (transitioning to fully Riverpod)
-*   **Local Caching:** Hive (Offline-first architecture)
-*   **Backend Framework:** FastAPI (Python 3.12)
-*   **Database & Auth:** Supabase (PostgreSQL, GoTrue)
-*   **AI Intelligence:** Local Ollama (`qwen2.5:3b`, `moondream`, `nomic-embed-text`) with Cloud Fallbacks (Gemini/OpenAI)
-*   **Vision:** FastAPI backend integrating Google Gemini 1.5 Flash (receipts) & Moondream (loose items)
-*   **Hosting:** GitHub Pages (Frontend), Railway (Backend)
+iFridge is built on a modern, highly scalable technology stack designed for both rapid iteration and production stability.
+
+| Layer | Technologies Used | Purpose |
+| :--- | :--- | :--- |
+| **Frontend UI** | Flutter (Dart), Material 3 | Single codebase for iOS, Android, and Web. Highly animated, glassmorphic UI. |
+| **State Management** | Riverpod, setState | Reactive UI updates and dependency injection. |
+| **Local Storage** | Hive (NoSQL) | Offline-first caching for inventory, recipes, and user preferences. |
+| **Backend API** | FastAPI (Python), Uvicorn | High-performance async REST API. Handles complex business logic and AI routing. |
+| **Database & Auth** | Supabase (PostgreSQL) | Primary data store, JWT authentication, and Row Level Security. |
+| **AI (Cloud)** | Google Gemini 1.5 Flash | Heavy-lifting Vision AI (complex receipt OCR). |
+| **AI (Local/Edge)** | Ollama (`qwen3:8b`, `moondream`) | Privacy-first, zero-cost AI for recipe generation, chat, and simple vision tasks. |
+| **Embeddings** | `nomic-embed-text`, `pgvector` | Semantic search and personalized recipe matching based on user flavor profiles. |
+
+---
+
+## 4. Business Strategy & Competitive Advantage
+
+### The Revenue Model
+The ecosystem monetizes through multiple diversified streams:
+1. **Transaction Commissions:** A flat, radically low 3-5% commission on pickup/delivery orders (compared to the industry standard 30%).
+2. **SaaS Subscriptions:** Monthly fees for restaurants to access advanced analytics, automated marketing tools, and Kiosk software licenses.
+3. **Hardware Sales (Future):** One-time sales or leasing of iFridge Kiosk hardware (tablets, stands, thermal printers).
+4. **Delivery Fees (Future):** Flat per-delivery fees charged to restaurants and consumers to pass through to the shared iFridge Fleet drivers.
+
+### The Flywheel Effect (Our Moat)
+iFridge's unique advantage is that it is a **daily utility** (Cook Mode) combined with a **transactional marketplace** (Order Mode).
+* *More consumers* using the app for home cooking builds massive localized demand.
+* *High demand* attracts restaurants eager for a lower-commission platform.
+* *More restaurants* provide more dining choices, keeping consumers inside the app ecosystem.
+* *High order volume* makes the upcoming shared delivery fleet viable, further lowering costs for restaurants.
+
+---
+
+## 5. The Strategic Roadmap
+
+With Phase P (Marketplace Foundation) complete, the following phases are prioritized:
+
+### Phase 2: Payments, Real-Time & Polish (Q3 2026)
+* **Payment Gateway:** Integration with Stripe/Click/Payme for secure in-app checkout and automated restaurant payouts.
+* **Real-Time WebSockets:** Upgrading order tracking to use Supabase Realtime subscriptions, eliminating pull-to-refresh.
+* **Push Notifications:** Firebase Cloud Messaging (FCM) integration to alert users when food is ready and alert restaurants to new orders.
+
+### Phase 3: Hardware & Kiosk Expansion (Q4 2026)
+* **iFridge Kiosk App:** Developing a locked-down, full-screen web/tablet application for in-store self-service ordering.
+* **Hardware Integrations:** Local network integration with standard ESC/POS thermal receipt printers and Kitchen Display Systems (KDS).
+
+### Phase 4: Shared Logistics (Q1 2027)
+* **iFridge Fleet App:** Launching a dedicated Flutter app for delivery drivers.
+* **Dispatch Algorithm:** Building the backend routing engine to match "Ready" orders with the nearest available drivers based on GPS data.
+
+### Phase 5: Advanced Analytics & B2B Scaling (Q2 2027+)
+* **Restaurant Insights:** AI-driven demand forecasting, peak-hour heatmaps, and dynamic menu pricing suggestions.
+* **B2B Expansion:** White-labeling the POS and Kiosk software for franchise adoption.
