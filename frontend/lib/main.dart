@@ -213,7 +213,6 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
     LivingShelfScreen(),   // Inventory
     CookScreen(),          // Recipe
     ScanScreen(),          // Scan (center)
-    ExploreScreen(),       // Feeds
     ProfileScreen(),       // Management
   ];
 
@@ -241,11 +240,6 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
       activeIcon: Icons.center_focus_strong,
       label: l10n?.tabScan ?? 'Scan',
       isCenter: true,
-    ),
-    NavItem(
-      icon: Icons.play_circle_outline,
-      activeIcon: Icons.play_circle_filled,
-      label: 'Feeds',
     ),
     NavItem(
       icon: Icons.grid_view_outlined,
@@ -381,14 +375,7 @@ class _ModeSwitchBar extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // Mode toggle — constrained to fit narrow screens
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 164),
-            child: ModeSwitch(
-              currentMode: currentMode,
-              onModeChanged: onModeChanged,
-            ),
-          ),
+          // Mode toggle hidden for MVP
         ],
       ),
     );
