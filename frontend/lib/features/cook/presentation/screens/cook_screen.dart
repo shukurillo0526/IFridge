@@ -181,21 +181,29 @@ class _CookScreenState extends State<CookScreen>
         } catch (_) {}
       }
 
+      // Pre-fetch ALL recipe_ingredients in ONE query (avoid N+1)
+      final allRiRows = await client
+          .from('recipe_ingredients')
+          .select('recipe_id, ingredient_id, ingredients(display_name_en)');
+
+      // Group by recipe_id
+      final Map<String, List<Map<String, dynamic>>> riByRecipe = {};
+      for (final ri in (allRiRows as List)) {
+        final rid = ri['recipe_id'] as String;
+        riByRecipe.putIfAbsent(rid, () => []);
+        riByRecipe[rid]!.add(ri);
+      }
+
       if (useDirectQuery) {
-        // ── Direct Query Fallback (relational recipe_ingredients) ─────
+        // ── Direct Query Fallback ─────────────────────────────
         final recipeRows = await client
             .from('recipes')
             .select('id, title, description, cuisine, difficulty, prep_time_minutes, cook_time_minutes, servings, tags, image_url')
             .limit(200);
 
         for (final recipe in (recipeRows as List)) {
-          // Fetch this recipe's ingredients via the relational table
-          final riRows = await client
-              .from('recipe_ingredients')
-              .select('ingredient_id, ingredients(display_name_en)')
-              .eq('recipe_id', recipe['id']);
-
-          final totalRequired = (riRows as List).length;
+          final riRows = riByRecipe[recipe['id']] ?? [];
+          final totalRequired = riRows.length;
           final t = translations[recipe['id']];
 
           int matchedCount = 0;
@@ -231,7 +239,7 @@ class _CookScreenState extends State<CookScreen>
           });
         }
       } else {
-        // ── RPC Path (relational recipe_ingredients) ──────────
+        // ── RPC Path ──────────────────────────────────────────
         final recipeIds = rpcResponse.map((r) => r['recipe_id'] as String).toList();
 
         final recipeRows = await client
@@ -255,13 +263,8 @@ class _CookScreenState extends State<CookScreen>
 
           if (recipeDetails == null) continue;
 
-          // Fetch this recipe's ingredients via the relational table
-          final riRows = await client
-              .from('recipe_ingredients')
-              .select('ingredient_id, ingredients(display_name_en)')
-              .eq('recipe_id', recipeId);
-
-          final totalRequired = (riRows as List).length;
+          final riRows = riByRecipe[recipeId] ?? [];
+          final totalRequired = riRows.length;
           final t = translations[recipeDetails['id']];
 
           int matchedCount = 0;

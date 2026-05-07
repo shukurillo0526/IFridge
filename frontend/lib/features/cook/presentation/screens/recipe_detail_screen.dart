@@ -85,22 +85,29 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           .maybeSingle();
 
       // 3. Map relational ingredients to the format the UI expects
+      final locale = Localizations.localeOf(context);
+      final isUzCyrillic = userLanguage == 'uz' && locale.scriptCode == 'Cyrl';
+
       _ingredients = (ingredientData as List).map<Map<String, dynamic>>((ri) {
         final ing = ri['ingredients'] as Map<String, dynamic>? ?? {};
         // Pick the display name for the user's language
         String name;
-        switch (userLanguage) {
-          case 'ko':
-            name = ing['display_name_ko'] ?? ing['display_name_en'] ?? 'Unknown';
-            break;
-          case 'uz':
-            name = ing['display_name_uz'] ?? ing['display_name_en'] ?? 'Unknown';
-            break;
-          case 'ru':
-            name = ing['display_name_ru'] ?? ing['display_name_en'] ?? 'Unknown';
-            break;
-          default:
-            name = ing['display_name_en'] ?? 'Unknown';
+        if (isUzCyrillic) {
+          name = ing['display_name_uz_cyrl'] ?? ing['display_name_uz'] ?? ing['display_name_en'] ?? 'Unknown';
+        } else {
+          switch (userLanguage) {
+            case 'ko':
+              name = ing['display_name_ko'] ?? ing['display_name_en'] ?? 'Unknown';
+              break;
+            case 'uz':
+              name = ing['display_name_uz'] ?? ing['display_name_en'] ?? 'Unknown';
+              break;
+            case 'ru':
+              name = ing['display_name_ru'] ?? ing['display_name_en'] ?? 'Unknown';
+              break;
+            default:
+              name = ing['display_name_en'] ?? 'Unknown';
+          }
         }
         return {
           'name': name,
