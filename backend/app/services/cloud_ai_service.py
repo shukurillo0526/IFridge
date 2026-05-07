@@ -80,19 +80,27 @@ class CloudAIService:
     ) -> str:
         full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
 
-        resp = await self._client.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={self.gemini_key}",
-            json={
-                "contents": [{"parts": [{"text": full_prompt}]}],
-                "generationConfig": {
-                    "temperature": temperature,
-                    "maxOutputTokens": max_tokens,
+        import asyncio
+        max_retries = 3
+        for attempt in range(max_retries):
+            resp = await self._client.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={self.gemini_key}",
+                json={
+                    "contents": [{"parts": [{"text": full_prompt}]}],
+                    "generationConfig": {
+                        "temperature": temperature,
+                        "maxOutputTokens": max_tokens,
+                    },
                 },
-            },
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"]
+            )
+            if resp.status_code == 429 and attempt < max_retries - 1:
+                wait = (attempt + 1) * 5  # 5s, 10s, 15s
+                logger.warning(f"[CloudAI] Gemini rate-limited, retrying in {wait}s (attempt {attempt+1}/{max_retries})")
+                await asyncio.sleep(wait)
+                continue
+            resp.raise_for_status()
+            data = resp.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"]
 
     # ── Public API ───────────────────────────────────────────────
 

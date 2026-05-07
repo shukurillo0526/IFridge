@@ -29,7 +29,8 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 # RTX 5070 Ti (16GB VRAM) — qwen2.5vl is purpose-built for vision+JSON
 MODEL_REGISTRY = {
     "vision": ["qwen2.5vl:7b", "gemma3:12b", "gemma3:4b", "moondream"],
-    "text": ["qwen3:8b", "gemma3:12b", "qwen2.5:3b"],
+    "text": ["qwen3:14b", "qwen3:8b", "gemma3:12b", "qwen2.5:3b"],
+    "translation": ["qwen3:14b", "qwen3:8b", "gemma3:12b"],  # prefer larger model for translation quality
     "embedding": ["nomic-embed-text"],           # embedding models (CPU-safe)
 }
 

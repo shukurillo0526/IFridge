@@ -160,18 +160,22 @@ async def add_inventory_item(req: AddItemRequest):
 @router.get("/api/v1/ingredients/search")
 async def search_ingredients(q: str, limit: int = 8):
     """
-    Search ingredients by name (EN, KO, canonical).
+    Search ingredients by name across all supported languages.
+    Searches: EN, KO, UZ (Latin), UZ (Cyrillic), RU, and canonical_name.
     Returns full metadata for auto-fill.
     """
     db = get_supabase()
     try:
-        # Search across multiple name fields
+        # Search across all language name fields
         results = (
             db.table("ingredients")
             .select("*")
             .or_(
                 f"display_name_en.ilike.%{q}%,"
                 f"display_name_ko.ilike.%{q}%,"
+                f"display_name_uz.ilike.%{q}%,"
+                f"display_name_uz_cyrl.ilike.%{q}%,"
+                f"display_name_ru.ilike.%{q}%,"
                 f"canonical_name.ilike.%{q}%"
             )
             .limit(limit)

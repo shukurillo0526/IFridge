@@ -51,6 +51,7 @@ class RecipeDetailScreen extends StatefulWidget {
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   bool _loading = true;
+  bool _isTranslated = false;
   List<Map<String, dynamic>> _ingredients = [];
   List<Map<String, dynamic>> _steps = [];
   String _displayTitle = '';
@@ -85,22 +86,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       
       final userLanguage = Localizations.localeOf(context).languageCode;
 
-      // If not English, fetch translation from backend (cached in DB)
+      // If not English, try cache first, then trigger background AI translation
       if (userLanguage != 'en') {
         try {
-          final ingText = _ingredients.map((i) {
-            final name = i['name'] ?? 'Unknown';
-            final qty = i['quantity'] ?? '';
-            final unit = i['unit'] ?? '';
-            return "- $qty $unit $name";
-          }).join('\\n');
-
-          final stepsText = _steps.map((s) {
-            final num = s['step_number'] ?? 0;
-            final text = s['text'] ?? '';
-            return "$num. $text";
-          }).join('\\n');
-
+          // Check cache (new enhanced schema)
           final transData = await supabase
               .from('recipe_translations')
               .select('*')
@@ -108,27 +97,23 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               .eq('language_code', userLanguage)
               .maybeSingle();
 
-          if (transData != null) {
-            setState(() {
-              if (transData['title_translated'] != null) _displayTitle = transData['title_translated'];
-              
-              if (transData['ingredients_translated'] != null) {
-                final transIngs = transData['ingredients_translated'] as List;
-                for (int i = 0; i < _ingredients.length && i < transIngs.length; i++) {
-                   _ingredients[i]['translated_name'] = transIngs[i]['name'];
-                }
-              }
-              
-              if (transData['steps_translated'] != null) {
-                final transSteps = transData['steps_translated'] as List;
-                for (int i = 0; i < _steps.length && i < transSteps.length; i++) {
-                   _steps[i]['translated_text'] = transSteps[i]['text'];
-                }
-              }
+          if (transData != null && transData['translation_status'] == 'completed') {
+            // Cache hit — apply immediately
+            _applyTranslation({
+              'title': transData['title'],
+              'description': transData['short_description'],
+              'ingredients': transData['ingredients'],
+              'steps': transData['steps'],
             });
+            _isTranslated = true;
+          } else {
+            // No cache or not completed — trigger background AI translation
+            _triggerBackgroundTranslation(userLanguage);
           }
         } catch (e) {
           debugPrint('DB Translation fetch failed: $e');
+          // Trigger background translation as fallback
+          _triggerBackgroundTranslation(userLanguage);
         }
       }
 
@@ -137,6 +122,44 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       });
     } catch (e) {
       setState(() => _loading = false);
+    }
+  }
+
+  /// Trigger AI translation via backend (runs in background, updates UI when done)
+  Future<void> _triggerBackgroundTranslation(String lang) async {
+    try {
+      final api = ApiService();
+      final ingText = _ingredients.map((i) {
+        final name = i['name'] ?? 'Unknown';
+        final qty = i['quantity'] ?? '';
+        final unit = i['unit'] ?? '';
+        return '- $qty $unit $name';
+      }).join('\n');
+
+      final stepsText = _steps.map((s) {
+        final num = s['step_number'] ?? 0;
+        final text = s['text'] ?? '';
+        return '$num. $text';
+      }).join('\n');
+
+      final result = await api.translateRecipe(
+        recipeId: widget.recipeId,
+        title: widget.title,
+        ingredients: ingText,
+        steps: stepsText,
+        targetLanguage: lang,
+      );
+
+      if (result['status'] == 'success' && mounted) {
+        final data = result['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          _applyTranslation(data);
+          setState(() => _isTranslated = true);
+        }
+      }
+    } catch (e) {
+      debugPrint('Background translation failed: $e');
+      // Silent failure — user sees English, which is acceptable
     }
   }
 

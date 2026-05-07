@@ -332,7 +332,8 @@ class ApiService {
     return _handleResponse(response);
   }
 
-  /// Fast on-the-fly translation using Gemini 1.5 Flash
+  /// Translate a full recipe (cache-first, tier-aware AI pipeline).
+  /// Tier 1 (ru, ko, es): direct AI. Tier 2 (uz): glossary-assisted.
   Future<Map<String, dynamic>> translateRecipe({
     required String recipeId,
     required String title,
@@ -352,6 +353,43 @@ class ApiService {
       uri,
       headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode(body),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Batch-translate recipe titles for list view (single AI call for up to 30).
+  Future<Map<String, dynamic>> translateTitles({
+    required List<String> recipeIds,
+    required String targetLanguage,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/translate-titles');
+    final response = await _client.post(
+      uri,
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'recipe_ids': recipeIds,
+        'target_language': targetLanguage,
+      }),
+    );
+    return _handleResponse(response);
+  }
+
+  /// Rate a translation quality (0.0 = bad, 1.0 = good).
+  /// Low scores trigger automatic re-translation.
+  Future<Map<String, dynamic>> rateTranslation({
+    required String recipeId,
+    required String languageCode,
+    required double score,
+  }) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/rate-translation');
+    final response = await _client.post(
+      uri,
+      headers: {..._headers, 'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'recipe_id': recipeId,
+        'language_code': languageCode,
+        'score': score,
+      }),
     );
     return _handleResponse(response);
   }

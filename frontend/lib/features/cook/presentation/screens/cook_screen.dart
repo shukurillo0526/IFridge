@@ -178,8 +178,9 @@ class _CookScreenState extends State<CookScreen>
         try {
           final transRows = await client
               .from('recipe_translations')
-              .select('recipe_id, title_translated, ingredients_translated')
-              .eq('language_code', currentLang);
+              .select('recipe_id, title, ingredients, translation_status')
+              .eq('language_code', currentLang)
+              .eq('translation_status', 'completed');
           for (final t in transRows) {
             translations[t['recipe_id']] = t;
           }
@@ -198,7 +199,7 @@ class _CookScreenState extends State<CookScreen>
           final totalRequired = jsonIngredients.length;
 
           final t = translations[recipe['id']];
-          final transIngs = t?['ingredients_translated'] as List?;
+          final transIngs = t?['ingredients'] as List?;
 
           // Match by ingredient name (case-insensitive) using English for matching
           int matchedCount = 0;
@@ -222,7 +223,7 @@ class _CookScreenState extends State<CookScreen>
 
           scored.add({
             'id': recipe['id'],
-            'title': t?['title_translated'] ?? recipe['title'],
+            'title': t?['title'] ?? recipe['title'],
             'description': recipe['description'],
             'cuisine': recipe['cuisine'] ?? '',
             'difficulty': recipe['difficulty'] ?? 1,
@@ -265,7 +266,7 @@ class _CookScreenState extends State<CookScreen>
           final jsonIngredients = (recipeDetails['ingredients'] as List?) ?? [];
           final totalRequired = jsonIngredients.length;
           final t = translations[recipeDetails['id']];
-          final transIngs = t?['ingredients_translated'] as List?;
+          final transIngs = t?['ingredients'] as List?;
 
           int matchedCount = 0;
           final List<String> missing = [];
@@ -287,7 +288,7 @@ class _CookScreenState extends State<CookScreen>
 
           scored.add({
             'id': recipeDetails['id'],
-            'title': t?['title_translated'] ?? recipeDetails['title'],
+            'title': t?['title'] ?? recipeDetails['title'],
             'description': recipeDetails['description'],
             'cuisine': recipeDetails['cuisine'] ?? '',
             'difficulty': recipeDetails['difficulty'] ?? 1,
@@ -329,11 +330,59 @@ class _CookScreenState extends State<CookScreen>
         _ownedIngredientIds = ownedIds;
         _loading = false;
       });
+
+      // Trigger batch title translation for non-English users
+      if (currentLang != 'en') {
+        _batchTranslateTitles(currentLang);
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
         _loading = false;
       });
+    }
+  }
+
+  /// Batch-translate recipe titles in background for smooth list view
+  Future<void> _batchTranslateTitles(String lang) async {
+    try {
+      // Collect all recipe IDs that still have English titles
+      final allIds = <String>[];
+      for (final tier in _tiers.values) {
+        for (final r in tier) {
+          allIds.add(r['id'] as String);
+        }
+      }
+      if (allIds.isEmpty) return;
+
+      // Batch up to 20 at a time
+      final api = ApiService();
+      for (int i = 0; i < allIds.length; i += 20) {
+        final batch = allIds.sublist(i, (i + 20).clamp(0, allIds.length));
+        try {
+          final result = await api.translateTitles(
+            recipeIds: batch,
+            targetLanguage: lang,
+          );
+          final data = result['data'] as Map<String, dynamic>?;
+          if (data != null && mounted) {
+            setState(() {
+              for (final tier in _tiers.values) {
+                for (final r in tier) {
+                  final t = data[r['id']];
+                  if (t != null && t['title'] != null) {
+                    r['title'] = t['title'];
+                  }
+                }
+              }
+            });
+          }
+        } catch (e) {
+          debugPrint('[Cook] Batch translate failed: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('[Cook] Batch title translation error: $e');
     }
   }
 
@@ -1101,13 +1150,19 @@ class _RecipeCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
-              Text(
-                title,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
+              // Title — AnimatedSwitcher for smooth translation fade-in
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  title,
+                  key: ValueKey(title),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
 

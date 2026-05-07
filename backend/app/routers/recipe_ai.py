@@ -61,6 +61,15 @@ class TranslateRecipeRequest(BaseModel):
     steps: str
     target_language: str
 
+class TranslateTitlesRequest(BaseModel):
+    recipe_ids: List[str]
+    target_language: str
+
+class RateTranslationRequest(BaseModel):
+    recipe_id: str
+    language_code: str
+    score: float  # 0.0 = bad, 1.0 = good
+
 
 # ── Endpoints ────────────────────────────────────────────────────
 
@@ -328,88 +337,63 @@ async def extract_youtube_recipe(request: Request, req: YouTubeRecipeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-import httpx
-
 @router.post("/api/v1/ai/translate-recipe")
-async def translate_recipe(req: TranslateRecipeRequest):
+async def translate_recipe_endpoint(req: TranslateRecipeRequest):
     """
-    Translate a recipe using the local Ollama LLM.
-    Fast translation, cached in Supabase.
+    Translate a recipe with full cache-first, tier-aware pipeline.
+    - Tier 1 languages (ru, ko, es...): direct AI translation
+    - Tier 2 languages (uz, tg...): glossary-assisted AI translation
+    - Uses Gemini Flash (cloud) for quality, falls back to local Ollama
+    - Results are cached forever in recipe_translations table
     """
-    db = get_supabase()
-    
-    # 1. Check cache in database
-    try:
-        cached = (
-            db.table("recipe_translations")
-            .select("title_translated, ingredients_translated, steps_translated")
-            .eq("recipe_id", req.recipe_id)
-            .eq("language_code", req.target_language)
-            .maybe_single()
-            .execute()
-        )
-        if cached and cached.data:
-            return {
-                "status": "success",
-                "source": "database-cache",
-                "data": {
-                    "title": cached.data["title_translated"],
-                    "ingredients": cached.data["ingredients_translated"],
-                    "steps": cached.data["steps_translated"]
-                }
-            }
-    except Exception as e:
-        logger.warning(f"Failed to check translation cache: {e}")
+    from app.services.translation_service import translate_recipe
 
-    # 2. Not cached, call local Ollama
-    ollama = get_ollama_service()
-    if not await ollama.is_available():
-        raise HTTPException(status_code=503, detail="Local AI service unavailable. Start Ollama.")
+    result = await translate_recipe(
+        recipe_id=req.recipe_id,
+        title=req.title,
+        ingredients=req.ingredients,
+        steps=req.steps,
+        target_language=req.target_language,
+    )
 
-    prompt = f"""Translate the following recipe to {req.target_language} language.
-Keep all measurements exact. Make instructions natural.
+    if result["status"] == "error":
+        raise HTTPException(status_code=503, detail=result.get("message", "Translation failed"))
 
-Title: {req.title}
-Ingredients: {req.ingredients}
-Steps: {req.steps}
+    return result
 
-Return JSON strictly in this format:
-{{
-  "title": "...",
-  "ingredients": [{{"name": "...", "quantity": 1, "unit": "...", "prep_note": "..."}}],
-  "steps": [{{"step_number": 1, "text": "...", "timer_seconds": null}}]
-}}"""
 
-    system = "You are a professional recipe translator. Return only exact JSON structure as requested."
+@router.post("/api/v1/ai/translate-titles")
+async def translate_titles_endpoint(req: TranslateTitlesRequest):
+    """
+    Batch-translate recipe titles for list view.
+    Single AI call for up to 20 recipes — much cheaper than individual calls.
+    Returns cached titles instantly for already-translated recipes.
+    """
+    from app.services.translation_service import translate_titles_batch
 
-    result = await ollama.generate_text_json(prompt, system_prompt=system)
+    if len(req.recipe_ids) > 30:
+        raise HTTPException(status_code=400, detail="Maximum 30 recipe IDs per batch")
 
-    if "error" in result:
-        return {
-            "status": "partial",
-            "message": "AI returned non-JSON. Raw response included.",
-            "data": result,
-        }
+    return await translate_titles_batch(
+        recipe_ids=req.recipe_ids,
+        target_language=req.target_language,
+    )
 
-    parsed = result
 
-    # 3. Save to cache
-    try:
-        db.table("recipe_translations").insert({
-            "recipe_id": req.recipe_id,
-            "language_code": req.target_language,
-            "title_translated": parsed.get("title", req.title),
-            "ingredients_translated": parsed.get("ingredients", []),
-            "steps_translated": parsed.get("steps", [])
-        }).execute()
-    except Exception as e:
-        logger.warning(f"Failed to save translation cache: {e}")
-        
-    return {
-        "status": "success",
-        "source": "ollama-local",
-        "data": parsed
-    }
+@router.post("/api/v1/ai/rate-translation")
+async def rate_translation_endpoint(req: RateTranslationRequest):
+    """
+    Record user quality feedback for a translation.
+    Score 0.0 = bad (triggers re-translation), 1.0 = good.
+    """
+    from app.services.translation_service import rate_translation
+
+    return await rate_translation(
+        recipe_id=req.recipe_id,
+        language_code=req.language_code,
+        score=req.score,
+    )
+
 
 @router.post("/api/v1/ai/shopping-list")
 async def generate_shopping_list(req: ShoppingListRequest):
