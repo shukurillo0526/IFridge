@@ -1,5 +1,5 @@
 """
-I-Fridge — Request Middleware
+Plately — Request Middleware
 ==============================
 Production-grade middleware stack:
 1. Request ID injection (X-Request-ID header for tracing)
@@ -15,7 +15,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 
-logger = logging.getLogger("ifridge.middleware")
+logger = logging.getLogger("plately.middleware")
 
 # Maximum request body size: 10MB (protects against abuse)
 MAX_BODY_SIZE = 10 * 1024 * 1024

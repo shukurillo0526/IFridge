@@ -1,12 +1,12 @@
-// I-Fridge — Inventory Repository
+// Plately — Inventory Repository
 // =================================
 // Centralized data access layer for inventory operations.
 // Reads: direct Supabase (RLS-protected, anon key is fine).
 // Writes: routed through backend API (service role bypasses RLS).
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class InventoryRepository {
   final SupabaseClient _client = Supabase.instance.client;

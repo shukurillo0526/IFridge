@@ -1,11 +1,11 @@
-// I-Fridge — Shopping List Deep Page
+// Plately — Shopping List Deep Page
 // ====================================
 // Full shopping list with categories, check-off, swipe delete.
 // Uses shopping_list table: id, user_id, ingredient_name, quantity, unit, is_purchased
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class ShoppingListPage extends StatefulWidget {
   const ShoppingListPage({super.key});

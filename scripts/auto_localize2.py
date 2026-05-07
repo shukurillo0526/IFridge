@@ -10,12 +10,12 @@ def to_camel_case(text):
 
 def main():
     files_to_localize = [
-        r"d:\dev\projects\iFridge\frontend\lib\features\scan\presentation\screens\scan_screen.dart",
-        r"d:\dev\projects\iFridge\frontend\lib\features\cook\presentation\screens\cook_screen.dart",
-        r"d:\dev\projects\iFridge\frontend\lib\features\shelf\presentation\widgets\inventory_detail_sheet.dart"
+        r"d:\dev\projects\Plately\frontend\lib\features\scan\presentation\screens\scan_screen.dart",
+        r"d:\dev\projects\Plately\frontend\lib\features\cook\presentation\screens\cook_screen.dart",
+        r"d:\dev\projects\Plately\frontend\lib\features\shelf\presentation\widgets\inventory_detail_sheet.dart"
     ]
     
-    l10n_dir = r"d:\dev\projects\iFridge\frontend\lib\l10n"
+    l10n_dir = r"d:\dev\projects\Plately\frontend\lib\l10n"
     
     arbs = {}
     for lang in ['en', 'ko', 'ru', 'uz', 'uz_Cyrl']:
@@ -53,8 +53,8 @@ def main():
             replacements.append((full_match, new_text))
 
         if replacements:
-            if "import 'package:ifridge_app/l10n/app_localizations.dart';" not in content:
-                content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:ifridge_app/l10n/app_localizations.dart';")
+            if "import 'package:plately_app/l10n/app_localizations.dart';" not in content:
+                content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:plately_app/l10n/app_localizations.dart';")
             
             for old, new in replacements:
                 content = content.replace(old, new)

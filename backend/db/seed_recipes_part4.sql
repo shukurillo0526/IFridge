@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Famous World Recipes (Part 4) — R76-R100
+-- Plately — Seed: Famous World Recipes (Part 4) — R76-R100
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION _ensure_ing(p_name TEXT, p_cat TEXT, p_unit TEXT)

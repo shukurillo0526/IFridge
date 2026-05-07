@@ -1,4 +1,4 @@
-// I-Fridge — Onboarding Screen
+// Plately — Onboarding Screen
 // ================================
 // Animated 3-step onboarding shown only once for new users.
 // Uses smooth PageView with gradient backgrounds, animated icons,

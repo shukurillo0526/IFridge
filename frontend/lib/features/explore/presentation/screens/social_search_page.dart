@@ -1,13 +1,13 @@
-// I-Fridge — Social Search Page
+// Plately — Social Search Page
 // ===============================
 // Search users, hashtags, and posts.
 // Shown when tapping search icon in Explore header.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/features/explore/presentation/screens/creator_page.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/features/explore/presentation/screens/creator_page.dart';
 
 class SocialSearchPage extends StatefulWidget {
   const SocialSearchPage({super.key});

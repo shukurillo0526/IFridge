@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 012b: Ingredient Translations (UZ + RU)
+-- Plately — Migration 012b: Ingredient Translations (UZ + RU)
 -- Part 2: Dairy, Grains, Seasonings, Condiments, Baking,
 --         Legumes, Nuts, Seafood, Oils, Beverages
 -- ============================================================

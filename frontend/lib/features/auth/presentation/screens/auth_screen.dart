@@ -1,4 +1,4 @@
-// iFridge — Auth Screen
+// Plately — Auth Screen
 // =====================
 // Beautiful login screen with Google OAuth and Guest login.
 // Uses Supabase Auth for both flows.
@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -113,7 +113,7 @@ class _AuthScreenState extends State<AuthScreen>
       // On web: redirect back to wherever the app is actually running.
       // On mobile: use deep link scheme.
       final redirectUrl = kIsWeb
-          ? Uri.base.toString().replaceAll(RegExp(r'[#?].*'), '')  // preserve /iFridge/ base path
+          ? Uri.base.toString().replaceAll(RegExp(r'[#?].*'), '')  // preserve /Plately/ base path
           : 'io.supabase.flutter://login-callback';
 
       await Supabase.instance.client.auth.signInWithOAuth(
@@ -227,7 +227,7 @@ class _AuthScreenState extends State<AuthScreen>
 
                     // ── Title ──
                     Text(
-                      'iFridge',
+                      'Plately',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 36,

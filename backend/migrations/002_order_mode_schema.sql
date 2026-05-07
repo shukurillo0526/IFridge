@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════
--- I-Fridge — Order Mode Database Schema
+-- Plately — Order Mode Database Schema
 -- ═══════════════════════════════════════════════════════════════════
 -- PostGIS-powered tables for geo-filtered restaurant discovery,
 -- menu items, food orders, seat bookings, and reviews.

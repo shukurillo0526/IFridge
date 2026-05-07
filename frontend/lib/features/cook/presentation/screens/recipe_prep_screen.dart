@@ -1,4 +1,4 @@
-// I-Fridge — Recipe Prep Screen
+// Plately — Recipe Prep Screen
 // ===============================
 // Intermediate screen between recipe detail and cooking.
 // Shows ingredient checklist with have/missing status,
@@ -6,12 +6,12 @@
 // and serving size scaler with proper math.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/utils/unit_converter.dart';
-import 'package:ifridge_app/core/utils/l10n_helper.dart';
-import 'package:ifridge_app/core/utils/ingredient_icons.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/cooking_run_screen.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/utils/unit_converter.dart';
+import 'package:plately_app/core/utils/l10n_helper.dart';
+import 'package:plately_app/core/utils/ingredient_icons.dart';
+import 'package:plately_app/features/cook/presentation/screens/cooking_run_screen.dart';
 
 class RecipePrepScreen extends StatefulWidget {
   final String recipeId;

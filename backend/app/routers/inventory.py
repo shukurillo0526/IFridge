@@ -1,5 +1,5 @@
 """
-I-Fridge — Inventory API Router
+Plately — Inventory API Router
 =================================
 Handles ingredient upsert and inventory item creation.
 Uses the service role key to bypass RLS restrictions.
@@ -13,7 +13,7 @@ from typing import Optional
 
 from app.db.supabase_client import get_supabase
 
-logger = logging.getLogger("ifridge.inventory")
+logger = logging.getLogger("plately.inventory")
 
 router = APIRouter()
 

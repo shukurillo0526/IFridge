@@ -1,4 +1,4 @@
-/// I-Fridge — Inventory Item Domain Model
+/// Plately — Inventory Item Domain Model
 /// ========================================
 library;
 

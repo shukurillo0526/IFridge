@@ -1,7 +1,7 @@
 import sys
 from PIL import Image
 
-src = r"C:\Users\shuku\.gemini\antigravity\brain\1af7e7dd-45e9-4d9e-82d3-b950b8bcbf5b\ifridge_icon_v2_1771778862604.png"
+src = r"C:\Users\shuku\.gemini\antigravity\brain\1af7e7dd-45e9-4d9e-82d3-b950b8bcbf5b\plately_icon_v2_1771778862604.png"
 img = Image.open(src)
 w, h = img.size
 

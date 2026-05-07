@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 011: Ingredient Expansion
+-- Plately — Migration 011: Ingredient Expansion
 -- ============================================================
 -- Phase 1: Data quality fixes
 -- Phase 2: Central Asian essentials (~30 items)

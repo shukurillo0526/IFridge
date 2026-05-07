@@ -1,5 +1,5 @@
 """
-I-Fridge — Cloud AI Fallback Service
+Plately — Cloud AI Fallback Service
 =======================================
 Automatic fallback chain: Ollama (local) → OpenAI/Gemini (cloud) → mock.
 
@@ -19,7 +19,7 @@ from typing import Optional, Dict, List, Any
 
 from app.core.config import get_settings
 
-logger = logging.getLogger("ifridge.cloud_ai")
+logger = logging.getLogger("plately.cloud_ai")
 
 
 class CloudAIService:

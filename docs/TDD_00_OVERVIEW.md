@@ -1,4 +1,4 @@
-# I-Fridge — Technical Design Document
+# Plately — Technical Design Document
 
 > **"Zero-Waste, Maximum Taste."**
 
@@ -6,7 +6,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Project** | I-Fridge: The Intelligent Fridge Ecosystem |
+| **Project** | Plately: The Intelligent Fridge Ecosystem |
 | **Version** | 1.0.0 |
 | **Date** | 2026-02-20 |
 | **Status** | Draft — Architecture Phase |
@@ -16,7 +16,7 @@
 
 ## Executive Summary
 
-I-Fridge is a **Digital Twin** of the user's kitchen — a living, breathing inventory system that knows what you have, when it expires, and exactly what you can cook with it. The architecture is designed from day one to be **robot-ready**: every data structure, every recipe instruction, every action is machine-parseable so that the same backend powering a mobile app today can drive a robotic arm tomorrow.
+Plately is a **Digital Twin** of the user's kitchen — a living, breathing inventory system that knows what you have, when it expires, and exactly what you can cook with it. The architecture is designed from day one to be **robot-ready**: every data structure, every recipe instruction, every action is machine-parseable so that the same backend powering a mobile app today can drive a robotic arm tomorrow.
 
 ---
 

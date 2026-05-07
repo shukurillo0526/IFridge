@@ -1,5 +1,5 @@
 """
-I-Fridge — Standardized API Response Models
+Plately — Standardized API Response Models
 =============================================
 All API endpoints should use these response wrappers for consistent
 response shapes across the entire backend.

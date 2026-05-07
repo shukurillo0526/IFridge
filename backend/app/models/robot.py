@@ -1,5 +1,5 @@
 """
-I-Fridge — Robot Protocol Models
+Plately — Robot Protocol Models
 ==================================
 Pydantic models for robot-ready recipe execution.
 These models define the exact JSON shape sent to a robotic controller.

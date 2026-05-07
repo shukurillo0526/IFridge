@@ -1,4 +1,4 @@
-// I-Fridge — Recipe Detail Screen
+// Plately — Recipe Detail Screen
 // =================================
 // Full recipe view with hero header, ingredient checklist,
 // and step-by-step cooking instructions.
@@ -6,14 +6,14 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/widgets/shimmer_loading.dart';
-import 'package:ifridge_app/core/widgets/slide_in_item.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/recipe_prep_screen.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/utils/l10n_helper.dart';
+import 'package:plately_app/core/widgets/shimmer_loading.dart';
+import 'package:plately_app/core/widgets/slide_in_item.dart';
+import 'package:plately_app/features/cook/presentation/screens/recipe_prep_screen.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/utils/l10n_helper.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final String recipeId;

@@ -1,4 +1,4 @@
-// I-Fridge — Restaurant Service
+// Plately — Restaurant Service
 // ===============================
 // Wraps Supabase PostGIS RPC calls for geo-filtered restaurant discovery.
 // Handles restaurant listing, menu items, orders, and seat bookings.
@@ -9,7 +9,7 @@
 //   has_dine_in     → user can walk in (show on map / navigate)
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/location_service.dart';
+import 'package:plately_app/core/services/location_service.dart';
 
 /// A restaurant returned from the nearby_restaurants RPC.
 class Restaurant {

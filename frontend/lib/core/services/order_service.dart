@@ -1,4 +1,4 @@
-// I-Fridge — Order Service
+// Plately — Order Service
 // =========================
 // Handles all order-related API calls and Supabase operations.
 // Used by: checkout_screen.dart, order_history_screen.dart
@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/api_service.dart';
 
 /// An order from the database.
 class UserOrder {

@@ -1,4 +1,4 @@
-// I-Fridge — Social Service
+// Plately — Social Service
 // ===========================
 // Central service for social interactions:
 // - Follow / Unfollow
@@ -11,7 +11,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class SocialService {
   static final _client = Supabase.instance.client;

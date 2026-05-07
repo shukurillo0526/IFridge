@@ -1,13 +1,13 @@
-// iFridge — Inventory Detail Bottom Sheet
+// Plately — Inventory Detail Bottom Sheet
 // =========================================
 // Premium sheet for viewing & editing a single inventory item.
 // Supports quantity adjustment, location/state changes, and deletion.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/utils/category_images.dart';
-import 'package:ifridge_app/features/shelf/domain/inventory_item.dart';
+import 'package:plately_app/core/utils/category_images.dart';
+import 'package:plately_app/features/shelf/domain/inventory_item.dart';
 
 class InventoryDetailSheet extends StatefulWidget {
   final InventoryItem item;

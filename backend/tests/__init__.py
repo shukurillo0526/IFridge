@@ -1,1 +1,1 @@
-# I-Fridge — Backend Test Suite
+# Plately — Backend Test Suite

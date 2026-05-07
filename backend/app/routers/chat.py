@@ -1,5 +1,5 @@
 """
-I-Fridge — Kitchen Chat Assistant Router
+Plately — Kitchen Chat Assistant Router
 ==========================================
 Persistent conversational AI for cooking help.
 Supports both streaming (SSE) and non-streaming responses.
@@ -22,13 +22,13 @@ from app.services.ollama_service import get_ollama_service
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-logger = logging.getLogger("ifridge.chat")
+logger = logging.getLogger("plately.chat")
 
 limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(tags=["AI"])
 
-KITCHEN_SYSTEM_PROMPT = """You are iFridge AI — a friendly, expert kitchen assistant built into a smart fridge app.
+KITCHEN_SYSTEM_PROMPT = """You are Plately AI — a friendly, expert kitchen assistant built into a smart fridge app.
 
 Your personality:
 - Warm and encouraging, especially to beginners

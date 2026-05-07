@@ -1,11 +1,11 @@
-// I-Fridge — Inventory Item Card Widget
+// Plately — Inventory Item Card Widget
 // A single item on the Living Shelf, with freshness overlay,
 // expiry badge, and swipe-to-action gestures.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/utils/ingredient_icons.dart';
-import 'package:ifridge_app/features/shelf/domain/inventory_item.dart';
-import 'package:ifridge_app/features/shelf/presentation/widgets/freshness_overlay.dart';
+import 'package:plately_app/core/utils/ingredient_icons.dart';
+import 'package:plately_app/features/shelf/domain/inventory_item.dart';
+import 'package:plately_app/features/shelf/presentation/widgets/freshness_overlay.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 

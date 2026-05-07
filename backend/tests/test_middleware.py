@@ -1,5 +1,5 @@
 """
-I-Fridge — Middleware Unit Tests
+Plately — Middleware Unit Tests
 ==================================
 Tests the request middleware and error handlers.
 """

@@ -1,5 +1,5 @@
 """
-I-Fridge — Enhanced Scoring Service (v2)
+Plately — Enhanced Scoring Service (v2)
 ==========================================
 Computes a composite Relevance Score using 6 weighted signals.
 

@@ -1,5 +1,5 @@
 """
-I-Fridge — Vision Service
+Plately — Vision Service
 ===========================
 Orchestrates the Clarifai food recognition pipeline
 with confidence gating, canonical mapping, and correction logging.
@@ -15,7 +15,7 @@ try:
     CLARIFAI_AVAILABLE = True
 except ImportError:
     CLARIFAI_AVAILABLE = False
-    logging.getLogger("ifridge.vision").warning(
+    logging.getLogger("plately.vision").warning(
         "[Vision] clarifai-grpc not installed — Clarifai vision disabled"
     )
 

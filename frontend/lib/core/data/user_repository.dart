@@ -1,12 +1,12 @@
-// I-Fridge — User Repository
+// Plately — User Repository
 // ============================
 // Centralized data access for user-scoped resources:
 // profile, gamification stats, flavor profile, shopping list, meal plan.
 // All writes go through the backend API (service role).
 // Dashboard read is a single backend call replacing 5 parallel queries.
 
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class UserRepository {
   final ApiService _api = ApiService();

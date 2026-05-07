@@ -1,4 +1,4 @@
-/// I-Fridge — Ingredient Icons
+/// Plately — Ingredient Icons
 /// ==============================
 /// Maps ingredient canonical names and categories to emojis.
 /// Provides per-ingredient icons (preferred) with category fallback.

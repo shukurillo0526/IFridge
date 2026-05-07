@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════
--- I-Fridge — Fix Broken Video IDs
+-- Plately — Fix Broken Video IDs
 -- ═══════════════════════════════════════════════════════════════════
 -- Replaces private/unavailable YouTube video IDs with verified public ones.
 -- Run AFTER 004 and 005 migrations.

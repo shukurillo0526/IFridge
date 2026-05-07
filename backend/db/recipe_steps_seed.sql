@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Recipe Steps Seed Data (Phase 6)
+-- Plately — Recipe Steps Seed Data (Phase 6)
 -- ============================================================
 -- Run AFTER additional_seed_data.sql in Supabase SQL Editor.
 -- Adds 3–5 cooking steps for all 15 recipes from Phase 4b.

@@ -1,4 +1,4 @@
-# I-Fridge Backend — Python Dependencies
+# Plately Backend — Python Dependencies
 # ========================================
 
 # --- Core Framework ---

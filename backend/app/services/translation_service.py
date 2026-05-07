@@ -1,5 +1,5 @@
 """
-I-Fridge — Recipe Translation Service
+Plately — Recipe Translation Service
 =======================================
 Multi-tier translation pipeline with cache-first strategy,
 glossary-assisted prompts for low-resource languages (Uzbek),
@@ -17,7 +17,7 @@ from typing import Optional, Dict, Any
 from app.db.supabase_client import get_supabase
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.translation")
+logger = logging.getLogger("plately.translation")
 
 # ── Language Configuration ──────────────────────────────────────────
 

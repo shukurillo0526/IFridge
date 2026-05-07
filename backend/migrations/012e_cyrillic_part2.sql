@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 012e: Full Cyrillic Uzbek (Part 2)
+-- Plately — Migration 012e: Full Cyrillic Uzbek (Part 2)
 -- Grains, Seasonings, Condiments, Baking, Legumes,
 -- Nuts, Seafood, Oils, Beverages
 -- ============================================================

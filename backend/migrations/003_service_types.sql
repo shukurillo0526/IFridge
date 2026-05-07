@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════
--- I-Fridge — Service Types Migration (Addendum)
+-- Plately — Service Types Migration (Addendum)
 -- ═══════════════════════════════════════════════════════════════════
 -- Run this AFTER 002_order_mode_schema.sql to add service types.
 -- Adds has_delivery, has_reservation, has_dine_in columns and

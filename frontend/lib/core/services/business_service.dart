@@ -1,11 +1,11 @@
-// I-Fridge — Business Account Service
+// Plately — Business Account Service
 // =====================================
 // Manages restaurant/business accounts for Order mode content.
 // Only verified businesses can post in Order feeds.
 
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class BusinessAccount {
   final String id;

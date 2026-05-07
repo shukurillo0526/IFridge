@@ -1,5 +1,5 @@
 """
-I-Fridge — Application Entry Point
+Plately — Application Entry Point
 ====================================
 FastAPI application with full production middleware stack:
 - Request ID tracing (X-Request-ID)
@@ -48,7 +48,7 @@ try:
             environment="production",
         )
         import logging
-        logging.getLogger("ifridge.main").info("[Sentry] Crash reporting enabled")
+        logging.getLogger("plately.main").info("[Sentry] Crash reporting enabled")
 except ImportError:
     pass  # sentry-sdk not installed — skip silently
 
@@ -57,9 +57,9 @@ limiter = Limiter(key_func=get_remote_address)
 
 # ── FastAPI App ──────────────────────────────────────────────────
 app = FastAPI(
-    title="I-Fridge AI Backend",
+    title="Plately AI Backend",
     description=(
-        "Vision and Intelligence layer for the I-Fridge consumer app. "
+        "Vision and Intelligence layer for the Plately consumer app. "
         "Local Ollama AI + Supabase DB + vector search.\n\n"
         "## Features\n"
         "- 🔍 **Vision**: OCR receipt scanning, barcode lookup, food image recognition\n"
@@ -130,7 +130,7 @@ app.include_router(orders.router)
 @app.get("/", tags=["Health"])
 async def root():
     return {
-        "name": "I-Fridge Intelligence API",
+        "name": "Plately Intelligence API",
         "version": "3.4.0",
         "docs": "/docs",
         "health": "/api/v1/health",

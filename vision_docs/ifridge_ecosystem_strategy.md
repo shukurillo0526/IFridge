@@ -1,24 +1,24 @@
-# iFridge Ecosystem — Business Strategy
+# Plately Ecosystem — Business Strategy
 
 ## 🎯 Vision
 
-Transform iFridge from a **personal kitchen app** into a **full food commerce ecosystem** with three interconnected platforms:
+Transform Plately from a **personal kitchen app** into a **full food commerce ecosystem** with three interconnected platforms:
 
 ```mermaid
 graph TD
-    subgraph Consumer["🟢 iFridge App (Consumer)"]
+    subgraph Consumer["🟢 Plately App (Consumer)"]
         A[Home Cooking] --> B[Recipe + Inventory]
         C[Mobile Ordering] --> D[Pickup / Delivery]
     end
 
-    subgraph Business["🟠 iFridge Business (Restaurant)"]
+    subgraph Business["🟠 Plately Business (Restaurant)"]
         E[Dashboard] --> F[Menu Management]
         F --> G[Order Processing]
         G --> H[Analytics]
         I[Kiosk Hardware] --> G
     end
 
-    subgraph Driver["🔵 iFridge Fleet (Delivery)"]
+    subgraph Driver["🔵 Plately Fleet (Delivery)"]
         J[Job Feed] --> K[Accept Order]
         K --> L[Navigate + Deliver]
         L --> M[Earnings Dashboard]
@@ -38,14 +38,14 @@ graph TD
 > **Reference:** Luckin Coffee (China), Starbucks Mobile Order, Baemin (Korea)
 
 **How it works:**
-1. Consumer opens iFridge → switches to **Order mode**
+1. Consumer opens Plately → switches to **Order mode**
 2. Selects a nearby restaurant → browses menu
 3. Places order + pays **in-app** (no cashier needed)
 4. Gets a **pickup code / QR code**
 5. Walks to the restaurant → picks up the order
 
 **What the restaurant gets:**
-- Real-time order feed on their **iFridge Business Dashboard**
+- Real-time order feed on their **Plately Business Dashboard**
 - Push notifications for new orders
 - Automatic receipt generation
 - Zero cashier labor for mobile orders
@@ -69,7 +69,7 @@ graph TD
 - **Receipt printers** — thermal printers for order confirmation
 
 **How it integrates:**
-- Kiosk runs a **web app** (iFridge Business Web) on an embedded tablet
+- Kiosk runs a **web app** (Plately Business Web) on an embedded tablet
 - Same backend as the mobile app — orders flow to the same kitchen queue
 - Restaurant manages ONE menu → serves kiosk, mobile app, and delivery
 
@@ -103,16 +103,16 @@ graph TD
 
 ````carousel
 ### 🍕 For Restaurants
-1. Restaurant receives a delivery order (from iFridge app or kiosk)
+1. Restaurant receives a delivery order (from Plately app or kiosk)
 2. Marks order as "Ready for pickup"
-3. System broadcasts to nearby **iFridge Fleet** drivers
+3. System broadcasts to nearby **Plately Fleet** drivers
 4. Driver accepts → picks up → delivers
 5. Restaurant pays a flat fee per delivery ($2–5)
 
 No need to hire, manage, or insure delivery staff.
 <!-- slide -->
 ### 🚗 For Delivery Drivers
-1. Driver opens **iFridge Fleet** app
+1. Driver opens **Plately Fleet** app
 2. Sees live job feed with nearby pickup locations
 3. Accepts a job → navigates to restaurant → picks up
 4. Delivers to customer → confirms delivery
@@ -121,7 +121,7 @@ No need to hire, manage, or insure delivery staff.
 More jobs available because ALL restaurants in the network share drivers.
 <!-- slide -->
 ### 👤 For Consumers
-1. Opens iFridge → Order mode → selects restaurant
+1. Opens Plately → Order mode → selects restaurant
 2. Chooses **Delivery** (instead of Pickup)
 3. Pays in-app (food + delivery fee)
 4. Tracks driver in real-time on map
@@ -146,10 +146,10 @@ Same seamless experience as Uber Eats, but at lower cost to the restaurant.
 
 | App | Platform | Users | Status |
 |-----|----------|-------|--------|
-| **iFridge** | iOS, Android, Web | Consumers | ✅ Exists (v4.0.0) |
-| **iFridge Business** | Web + Tablet | Restaurant owners, staff | 🔲 New |
-| **iFridge Fleet** | iOS, Android | Delivery drivers | 🔲 New |
-| **iFridge Kiosk** | Web (embedded tablet) | Walk-in customers | 🔲 New |
+| **Plately** | iOS, Android, Web | Consumers | ✅ Exists (v4.0.0) |
+| **Plately Business** | Web + Tablet | Restaurant owners, staff | 🔲 New |
+| **Plately Fleet** | iOS, Android | Delivery drivers | 🔲 New |
+| **Plately Kiosk** | Web (embedded tablet) | Walk-in customers | 🔲 New |
 
 ### Backend Services to Add
 
@@ -242,15 +242,15 @@ erDiagram
 
 ## 📊 Competitive Advantage
 
-| vs. Uber Eats / Coupang Eats | iFridge Ecosystem |
+| vs. Uber Eats / Coupang Eats | Plately Ecosystem |
 |-------------------------------|-------------------|
 | 30%+ commission per order | 3–5% + flat delivery fee |
 | Restaurant has NO customer data | Restaurant OWNS customer data |
-| No inventory/kitchen integration | Full AI kitchen integration (iFridge core) |
+| No inventory/kitchen integration | Full AI kitchen integration (Plately core) |
 | Delivery only | Pickup + Delivery + Kiosk |
 | Generic platform | White-label feel — restaurant's brand first |
 
-| vs. Toast / Square POS | iFridge Ecosystem |
+| vs. Toast / Square POS | Plately Ecosystem |
 |------------------------|-------------------|
 | POS only, no consumer app | Full consumer app with 500K+ recipes |
 | No delivery network | Built-in shared delivery fleet |
@@ -262,10 +262,10 @@ erDiagram
 ## 🗺️ Rollout Roadmap
 
 ### Phase 1 — Foundation (Current → Q3 2026)
-- [x] iFridge consumer app v4.0 (Cook + Order modes)
+- [x] Plately consumer app v4.0 (Cook + Order modes)
 - [x] Restaurant discovery + menu viewing
 - [ ] **In-app ordering** (pickup — no payment yet)
-- [ ] **iFridge Business Web Dashboard** (order management)
+- [ ] **Plately Business Web Dashboard** (order management)
 
 ### Phase 2 — Payments & Pickup (Q3–Q4 2026)
 - [ ] Payment integration (Stripe / local gateways)
@@ -274,12 +274,12 @@ erDiagram
 - [ ] Kitchen display system (KDS) web app
 
 ### Phase 3 — Kiosk Hardware (Q1 2027)
-- [ ] iFridge Kiosk web app (full-screen tablet mode)
+- [ ] Plately Kiosk web app (full-screen tablet mode)
 - [ ] Hardware sourcing (Android tablets + receipt printers)
 - [ ] Pilot with 5–10 restaurants
 
 ### Phase 4 — Delivery Network (Q2–Q3 2027)
-- [ ] **iFridge Fleet** driver app (Flutter)
+- [ ] **Plately Fleet** driver app (Flutter)
 - [ ] Dispatch algorithm (driver assignment)
 - [ ] Real-time tracking (consumer ↔ driver)
 - [ ] Driver onboarding + verification
@@ -304,4 +304,4 @@ More drivers → Faster delivery → Better consumer experience
 Better experience → More orders → More revenue for restaurants
 ```
 
-Each side of the marketplace reinforces the others. And the **iFridge consumer app** (which already exists) is the demand engine that powers everything.
+Each side of the marketplace reinforces the others. And the **Plately consumer app** (which already exists) is the demand engine that powers everything.

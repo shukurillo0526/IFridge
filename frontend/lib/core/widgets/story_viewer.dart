@@ -1,4 +1,4 @@
-// I-Fridge — Story Viewer
+// Plately — Story Viewer
 // ========================
 // Full-screen story viewer with:
 // - Auto-advance timer (5s per story)
@@ -11,7 +11,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ifridge_app/core/services/story_service.dart';
+import 'package:plately_app/core/services/story_service.dart';
 
 class StoryViewer extends StatefulWidget {
   final List<StoryGroup> groups;

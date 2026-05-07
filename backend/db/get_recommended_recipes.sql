@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Recipe Recommendation Engine RPC
+-- Plately — Recipe Recommendation Engine RPC
 -- ============================================================
 -- Weighted matching system:
 -- 40% Inventory Match (user owns the ingredient)

@@ -1,5 +1,5 @@
 """
-I-Fridge — Health & API Integration Tests
+Plately — Health & API Integration Tests
 ============================================
 Tests the health check endpoint and root endpoint.
 Uses a minimal test app to avoid importing the full main.py
@@ -39,7 +39,7 @@ def client():
 
         @app.get("/")
         async def root():
-            return {"name": "I-Fridge Intelligence API", "version": "3.4.0", "docs": "/docs"}
+            return {"name": "Plately Intelligence API", "version": "3.4.0", "docs": "/docs"}
 
         yield TestClient(app)
 

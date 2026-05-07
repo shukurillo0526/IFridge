@@ -1,5 +1,5 @@
 import os
-path = r'd:\dev\projects\iFridge\frontend\lib\features\cook\presentation\screens\recipe_detail_screen.dart'
+path = r'd:\dev\projects\Plately\frontend\lib\features\cook\presentation\screens\recipe_detail_screen.dart'
 with open(path, 'r', encoding='utf-8') as f: c = f.read()
 
 reps = {

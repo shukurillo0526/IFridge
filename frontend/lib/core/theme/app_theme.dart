@@ -1,4 +1,4 @@
-/// I-Fridge — Design System & Theme
+/// Plately — Design System & Theme
 /// ==================================
 /// Premium dual-mode theme with Terracotta Orange and Gold accents.
 library;

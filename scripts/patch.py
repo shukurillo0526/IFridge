@@ -1,6 +1,6 @@
 import os
-cook_path = r'd:\dev\projects\iFridge\frontend\lib\features\cook\presentation\screens\cook_screen.dart'
-scan_path = r'd:\dev\projects\iFridge\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
+cook_path = r'd:\dev\projects\Plately\frontend\lib\features\cook\presentation\screens\cook_screen.dart'
+scan_path = r'd:\dev\projects\Plately\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
 
 with open(cook_path, 'r', encoding='utf-8') as f: cook = f.read()
 cook = cook.replace("Text(\n          'What to Cook?',", "Text(\n          AppLocalizations.of(context)?.whatToCook ?? 'What to Cook?',")

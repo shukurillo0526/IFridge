@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 003: Shopping List & Meal Plan
+-- Plately — Migration 003: Shopping List & Meal Plan
 -- ============================================================
 -- Adds the two tables that the Profile Screen queries but
 -- which were never formally migrated.

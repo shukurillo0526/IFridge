@@ -1,11 +1,11 @@
-// I-Fridge — Mode Switch Widget
+// Plately — Mode Switch Widget
 // ==============================
 // A premium pill-shaped toggle for switching between Order and Cook modes.
 // Features glassmorphic styling, sliding animation, and mode icons.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ifridge_app/core/services/app_settings.dart';
+import 'package:plately_app/core/services/app_settings.dart';
 
 class ModeSwitch extends StatelessWidget {
   final AppMode currentMode;

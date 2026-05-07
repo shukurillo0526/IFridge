@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 004: Schema Fixes & Auto-Timestamps
+-- Plately — Migration 004: Schema Fixes & Auto-Timestamps
 -- ============================================================
 -- 1. Reusable `updated_at` trigger function
 -- 2. Apply it to all mutable user-scoped tables

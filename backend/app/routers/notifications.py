@@ -1,5 +1,5 @@
 """
-I-Fridge — Expiry Notification Router
+Plately — Expiry Notification Router
 ========================================
 Checks for ingredients expiring within N days and generates
 notification payloads. Can be called by a cron job or manually.
@@ -18,7 +18,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.db.supabase_client import get_supabase
 
-logger = logging.getLogger("ifridge.notifications")
+logger = logging.getLogger("plately.notifications")
 
 router = APIRouter(tags=["Notifications"])
 

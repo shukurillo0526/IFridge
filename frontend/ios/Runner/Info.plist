@@ -14,13 +14,13 @@
 			</dict>
 		</array>
 		<key>NSCameraUsageDescription</key>
-		<string>I-Fridge needs camera access to scan food items</string>
+		<string>Plately needs camera access to scan food items</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>I-Fridge needs photo access to recognize food items</string>
+		<string>Plately needs photo access to recognize food items</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Ifridge App</string>
+		<string>Plately</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -28,7 +28,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>ifridge_app</string>
+		<string>plately_app</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

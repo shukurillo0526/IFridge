@@ -1,5 +1,5 @@
 """
-I-Fridge — Vision API Routes
+Plately — Vision API Routes
 ==============================
 Endpoints for camera-based ingredient recognition and correction.
 """

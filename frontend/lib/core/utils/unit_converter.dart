@@ -1,4 +1,4 @@
-/// I-Fridge — Unit Converter
+/// Plately — Unit Converter
 /// =============================
 /// Converts between ingredient measurement units using the
 /// `unit_conversions` JSONB data from the ingredients table.

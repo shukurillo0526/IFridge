@@ -1,11 +1,11 @@
-// I-Fridge — Incoming Orders Page (Restaurant Side)
+// Plately — Incoming Orders Page (Restaurant Side)
 // ====================================================
 // Order management for restaurant owners.
 // Shows incoming, preparing, and ready orders with status controls.
 // Restaurant can advance order status: confirmed → preparing → ready → completed.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class IncomingOrdersPage extends StatefulWidget {

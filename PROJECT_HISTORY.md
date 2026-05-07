@@ -1,12 +1,12 @@
-# I-Fridge: Project History & Vision Alignment
+# Plately: Project History & Vision Alignment
 
-This document tracks the development history of **I-Fridge**—an ambitious smart-kitchen ecosystem capable of tracking physical inventory and recommending hyper-personalized recipes.
+This document tracks the development history of **Plately**—an ambitious smart-kitchen ecosystem capable of tracking physical inventory and recommending hyper-personalized recipes.
 
 ## 🌟 The Core Vision & Pivot
 
-Originally conceived with robotic hardware integrations in mind, I-Fridge has **pivoted to focus entirely on a premium consumer app experience**. We realized that before automating physical cooking, the core user experience of managing ingredients and finding the perfect recipe needs to be flawlessly executed.
+Originally conceived with robotic hardware integrations in mind, Plately has **pivoted to focus entirely on a premium consumer app experience**. We realized that before automating physical cooking, the core user experience of managing ingredients and finding the perfect recipe needs to be flawlessly executed.
 
-The master plan for I-Fridge encompasses:
+The master plan for Plately encompasses:
 1. **Living Shelf:** A digital representation of a real shelf/fridge showing available ingredients with freshness tracking.
 2. **Social-Style Recommendations:** Replacing clinical filters with engaging feeds (For You, Use It Up, Explore) powered by intelligent match algorithms.
 3. **Frictionless Ingestion:** Making it incredibly easy to add items via parsing grocery receipts and analyzing photos of loose ingredients using AI Vision.
@@ -87,14 +87,14 @@ Following the consumer pivot, we replaced expensive cloud AI services with local
 ## 🚀 Phase 12-13: Deployment & Branding (Complete)
 
 ### Phase 12: Application Branding
-- Explicitly standardized the application name exactly as **"iFridge"**.
+- Explicitly standardized the application name exactly as **"Plately"**.
 - Generated a custom, ultra-premium 1:1 squircle iOS app icon featuring a glassmorphic 3D rendering of a refrigerator holding vibrant fruits.
 - Spliced, cropped, and embedded this custom icon into the `manifest.json` as `Icon-192`, `Icon-512`, and `favicon.png`.
 
 ### Phase 13: GitHub Monorepo & CI/CD
 - Demolished fractured sub-git folders and consolidated both Flutter Front-end and FastAPI Back-end into a single **Monorepo**.
 - Programmed a `flutter_web_deploy.yml` GitHub Actions Workflow to autonomously trigger on `main` branch pushes.
-- Fixed notorious WASM CanvasKit web-rendering blank screen crashes and Case-Sensitive (`--base-href /iFridge/`) directory routing issues on GitHub Pages.
+- Fixed notorious WASM CanvasKit web-rendering blank screen crashes and Case-Sensitive (`--base-href /Plately/`) directory routing issues on GitHub Pages.
 - Synced the Flutter application directly to the live Railway Production API, cleanly publishing the app to the internet.
 
 ---
@@ -127,7 +127,7 @@ Systematically iterated through each major screen, fixing bugs, adding features,
 - **Animated Stats:** Replaced static stat tiles with `TweenAnimationBuilder` count-up animations and color-coded icon backgrounds (green/teal/orange).
 - **Badge Layout Fix:** Used `LayoutBuilder` to constrain badges to 4 per row, preventing overflow on small screens.
 - **Account Section:** Added email display, Sign Out (with confirmation dialog — moved from AppBar), and Delete Account (with warning).
-- **Settings Section:** Added Language display, Theme indicator, "About iFridge" dialog, and version number.
+- **Settings Section:** Added Language display, Theme indicator, "About Plately" dialog, and version number.
 - **Shopping List Counter:** Title now shows checked vs total count (e.g., "Shopping List (2/5)").
 - **Meal Planner Clear:** Long-press the edit icon on any planned meal to remove it from the schedule.
 
@@ -308,7 +308,7 @@ Systematic preparation of the app for public release:
 
 ## 🛒 Phase P: Marketplace Ecosystem — "VISION" (Complete)
 
-The pivotal phase where iFridge evolved from a personal kitchen app into a **three-sided food commerce marketplace**.
+The pivotal phase where Plately evolved from a personal kitchen app into a **three-sided food commerce marketplace**.
 
 ### Phase P-1: Cart & Checkout System
 - **Cart Service** (`cart_service.dart`): Singleton in-memory cart with quantity management, restaurant binding (auto-clears on restaurant switch), order type toggle (pickup/delivery), special instructions, and JSON serialization for order submission.
@@ -350,18 +350,18 @@ Consumer                           Restaurant
 
 ## 🚀 The VISION — Three-Pillar Marketplace
 
-iFridge is now positioned as a **3-sided food commerce ecosystem**:
+Plately is now positioned as a **3-sided food commerce ecosystem**:
 
 | Side | App | Value |
 |------|-----|-------|
-| **Consumers** | iFridge (existing) | Cook at home + order food (pickup/delivery) |
-| **Restaurants** | iFridge Business (in-app dashboard) | Receive orders, manage menu, no cashier needed |
-| **Drivers** | iFridge Fleet (planned) | Shared delivery fleet, more jobs, lower commission |
+| **Consumers** | Plately (existing) | Cook at home + order food (pickup/delivery) |
+| **Restaurants** | Plately Business (in-app dashboard) | Receive orders, manage menu, no cashier needed |
+| **Drivers** | Plately Fleet (planned) | Shared delivery fleet, more jobs, lower commission |
 
 ### Planned Pillars:
 1. **Mobile Order & Pickup** (Luckin Coffee model) — ✅ Foundation built
 2. **Self-Service Kiosk Hardware** (Korean 무인주문기 model) — 🔲 Planned
-3. **Shared Delivery Network** (iFridge Fleet) — 🔲 Planned
+3. **Shared Delivery Network** (Plately Fleet) — 🔲 Planned
 
 ### Competitive Edge:
 - **3–5% commission** vs 30%+ on Uber Eats/Coupang Eats

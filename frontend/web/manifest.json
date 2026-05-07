@@ -1,11 +1,11 @@
 {
-    "name": "iFridge",
-    "short_name": "iFridge",
+    "name": "Plately",
+    "short_name": "Plately",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "iFridge: The Intelligent Fridge Ecosystem",
+    "description": "Plately: The Intelligent Fridge Ecosystem",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

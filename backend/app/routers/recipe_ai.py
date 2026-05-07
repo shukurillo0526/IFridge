@@ -1,5 +1,5 @@
 """
-I-Fridge — AI Recipe Assistant Router
+Plately — AI Recipe Assistant Router
 =======================================
 Uses local LLM (qwen3:8b via Ollama) for recipe generation,
 ingredient substitution, and cooking tips.
@@ -21,7 +21,7 @@ from slowapi.util import get_remote_address
 
 limiter = Limiter(key_func=get_remote_address)
 
-logger = logging.getLogger("ifridge.recipe_ai")
+logger = logging.getLogger("plately.recipe_ai")
 
 router = APIRouter()
 

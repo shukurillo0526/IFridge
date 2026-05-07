@@ -163,7 +163,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsTheme => 'Тема';
 
   @override
-  String get aboutApp => 'О iFridge';
+  String get aboutApp => 'О Plately';
 
   @override
   String get myFridge => '🧊 Мой холодильник';
@@ -528,12 +528,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Запрошено удаление аккаунта. Свяжитесь со службой поддержки для завершения.';
 
   @override
-  String get auto_ifridge => 'iХолодильник';
+  String get auto_plately => 'iХолодильник';
 
   @override
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
-      'iFridge — это ваша кухонная экосистема на базе искусственного интеллекта. Он автоматически отслеживает ваши ингредиенты, прогнозирует срок годности, создает персонализированные рецепты и позволяет делать заказы в местных ресторанах.';
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
+      'Plately — это ваша кухонная экосистема на базе искусственного интеллекта. Он автоматически отслеживает ваши ингредиенты, прогнозирует срок годности, создает персонализированные рецепты и позволяет делать заказы в местных ресторанах.';
 
   @override
   String get auto_gotIt => 'Понятно';

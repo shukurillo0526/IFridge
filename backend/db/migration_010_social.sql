@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 010: Social / Explore Features
+-- Plately — Migration 010: Social / Explore Features
 -- ============================================================
 -- Posts, likes, bookmarks, and creator profile fields.
 -- ============================================================

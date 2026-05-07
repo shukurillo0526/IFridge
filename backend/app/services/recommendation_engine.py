@@ -1,5 +1,5 @@
 """
-I-Fridge — 5-Tier Recommendation Engine
+Plately — 5-Tier Recommendation Engine
 =========================================
 The heart of the application. Classifies recipes into 5 tiers
 and scores them using the composite Relevance Score.
@@ -26,7 +26,7 @@ from app.services.scoring import (
     compute_relevance_score,
 )
 
-logger = logging.getLogger("ifridge.recommendation")
+logger = logging.getLogger("plately.recommendation")
 
 # --- NOTE: Tier classification now uses safe Supabase ORM queries ---
 # The old raw SQL with string interpolation has been removed to prevent

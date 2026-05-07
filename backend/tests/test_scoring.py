@@ -1,5 +1,5 @@
 """
-I-Fridge — Scoring Service Unit Tests
+Plately — Scoring Service Unit Tests
 =======================================
 Tests the 6-signal composite scoring functions in isolation.
 All tests are pure computation — no database or network calls.

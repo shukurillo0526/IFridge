@@ -1,5 +1,5 @@
 """
-I-Fridge — Embedding & Vector Search Router
+Plately — Embedding & Vector Search Router
 =============================================
 Uses local nomic-embed-text via Ollama to generate embeddings
 for recipes and user preferences, enabling semantic similarity search.
@@ -13,7 +13,7 @@ from typing import List, Optional
 
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.embeddings")
+logger = logging.getLogger("plately.embeddings")
 
 router = APIRouter()
 

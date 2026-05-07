@@ -1,4 +1,4 @@
-// I-Fridge — Restaurant Detail Page
+// Plately — Restaurant Detail Page
 // ====================================
 // Full restaurant page with service-aware sections:
 // - Menu (with optional highlighted item from feed)
@@ -9,10 +9,10 @@
 // Navigation: from feeds (with menuItemId) or from order screen.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/restaurant_service.dart';
-import 'package:ifridge_app/core/services/cart_service.dart';
-import 'package:ifridge_app/features/order/presentation/screens/checkout_screen.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/restaurant_service.dart';
+import 'package:plately_app/core/services/cart_service.dart';
+import 'package:plately_app/features/order/presentation/screens/checkout_screen.dart';
 
 /// Which section to auto-scroll to when opening
 enum RestaurantSection { menu, reserve, location, reviews }

@@ -1,6 +1,6 @@
-# iFridge — Roadmap & Next Steps
+# Plately — Roadmap & Next Steps
 
-> Tracks the evolution of iFridge from MVP to production-ready.
+> Tracks the evolution of Plately from MVP to production-ready.
 > Items marked ✅ have been completed. Remaining items are prioritized for future work.
 
 ---
@@ -53,7 +53,7 @@
 
 ### 1.4 Expiry Notifications
 - **Status:** ✅ Done
-- Firebase project `ifridge-9b737` configured with FCM.
+- Firebase project `plately-9b737` configured with FCM.
 - Backend: `/api/v1/notifications/expiring/{user_id}` endpoint queries items expiring within N days, classifies urgency (critical/warning/upcoming), generates notification payloads.
 - Frontend: `firebase-messaging-sw.js` service worker for background push, `notification_service.dart` for foreground.
 
@@ -170,7 +170,7 @@ Run locally: `cd backend && python -m pytest tests/ -v`
 
 ## 💡 Remaining Quick Wins
 
-1. ✅ ~~FCM push notifications~~ — Done (Firebase `ifridge-9b737`)
+1. ✅ ~~FCM push notifications~~ — Done (Firebase `plately-9b737`)
 2. ✅ ~~Gemini API key~~ — Configured in `.env`
 3. ✅ ~~Sentry DSN~~ — Configured in `.env`
 4. ⏳ Migrate remaining `setState()` screens to `ConsumerWidget` (Riverpod providers ready)

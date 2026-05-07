@@ -53,7 +53,7 @@ def fix(filepath):
     return False
 
 if __name__ == '__main__':
-    base = r'd:\dev\projects\iFridge\frontend\lib'
+    base = r'd:\dev\projects\Plately\frontend\lib'
     fixed = 0
     for root, dirs, files in os.walk(base):
         for f in files:

@@ -1,10 +1,10 @@
-/// I-Fridge — XP Toast Widget
+/// Plately — XP Toast Widget
 /// ============================
 /// Animated floating toast that appears when the user earns XP.
 library;
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/features/gamification/domain/badges.dart';
+import 'package:plately_app/features/gamification/domain/badges.dart';
 
 /// Show a floating XP reward toast.
 void showXpReward(BuildContext context, int xp, {WasteBadge? newBadge}) {

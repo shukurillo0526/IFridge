@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 006: Data Hardening
+-- Plately — Migration 006: Data Hardening
 -- ============================================================
 -- 1. Add updated_at columns + triggers to shopping_list, meal_plan
 -- 2. Tighten ingredients INSERT policy (service role only)

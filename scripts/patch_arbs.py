@@ -52,7 +52,7 @@ def uz_latin_to_cyrillic(text):
 
 translations['uz_Cyrl'] = {k: uz_latin_to_cyrillic(v) for k, v in translations['uz'].items()}
 
-l10n_dir = r'd:\dev\projects\iFridge\frontend\lib\l10n'
+l10n_dir = r'd:\dev\projects\Plately\frontend\lib\l10n'
 for lang, trans in translations.items():
     path = os.path.join(l10n_dir, f'app_{lang}.arb')
     with open(path, 'r', encoding='utf-8') as f: data = json.load(f)

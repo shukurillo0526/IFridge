@@ -1,5 +1,5 @@
 """
-I-Fridge — Receipt Scanner Router
+Plately — Receipt Scanner Router
 ===================================
 Receives a receipt image and extracts structured ingredient data.
 
@@ -20,7 +20,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.services.ocr_service import process_gemini_receipt_json
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.ocr")
+logger = logging.getLogger("plately.ocr")
 
 router = APIRouter()
 
@@ -61,7 +61,7 @@ Return ONLY valid JSON:
 # ── Cloud Gemini (single-stage fallback) ──────────────────────
 
 CLOUD_RECEIPT_PROMPT = """
-You are an expert Korean grocery receipt parser for the I-Fridge smart kitchen app.
+You are an expert Korean grocery receipt parser for the Plately smart kitchen app.
 
 RECEIPT FORMAT (Korean marts like 진안식자재마트, 이마트, 홈플러스, etc.):
 - Store name is on the first line, often prefixed with (주) or (사)

@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 005: Revoke Dev-Only RLS Policies
+-- Plately — Migration 005: Revoke Dev-Only RLS Policies
 -- ============================================================
 -- Removes the open-read policies created by dev_rls_fix.sql.
 -- These allowed ALL authenticated users to read ALL rows,

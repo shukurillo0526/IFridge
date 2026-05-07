@@ -1,4 +1,4 @@
-// I-Fridge — Story Service
+// Plately — Story Service
 // ==========================
 // Handles story CRUD, views tracking, and expiry logic.
 
@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 /// A single story item.
 class StoryItem {

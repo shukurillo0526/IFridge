@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed Data for Testing
+-- Plately — Seed Data for Testing
 -- ============================================================
 -- Run this in the Supabase SQL Editor AFTER migration_001_init.sql.
 -- Creates a demo user, recipes, inventory, and gamification data.
@@ -32,7 +32,7 @@ BEGIN
 -- ── 1. Demo User ──────────────────────────────────────────────
 
 INSERT INTO public.users (id, email, display_name, household_size, onboarding_done)
-VALUES (v_demo_user_id, 'demo@ifridge.app', 'Chef Demo', 2, TRUE)
+VALUES (v_demo_user_id, 'demo@plately.app', 'Chef Demo', 2, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 -- ── 2. Get Ingredient IDs ─────────────────────────────────────

@@ -9,7 +9,7 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get appTitle => 'iFridge (냉장고)';
+  String get appTitle => 'Plately (냉장고)';
 
   @override
   String get tabShelf => '내 냉장고';
@@ -163,7 +163,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsTheme => '테마';
 
   @override
-  String get aboutApp => 'iFridge 정보';
+  String get aboutApp => 'Plately 정보';
 
   @override
   String get myFridge => '🧊 내 냉장고';
@@ -523,12 +523,12 @@ class AppLocalizationsKo extends AppLocalizations {
       '계정 삭제를 요청했습니다. 마무리하려면 지원팀에 문의하세요.';
 
   @override
-  String get auto_ifridge => '아이냉장고';
+  String get auto_plately => '아이냉장고';
 
   @override
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
-      'iFridge는 AI 기반 주방 생태계입니다. 자동으로 재료를 추적하고, 유통기한을 예측하고, 맞춤형 레시피를 생성하고, 현지 레스토랑에서 주문할 수 있습니다.';
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
+      'Plately는 AI 기반 주방 생태계입니다. 자동으로 재료를 추적하고, 유통기한을 예측하고, 맞춤형 레시피를 생성하고, 현지 레스토랑에서 주문할 수 있습니다.';
 
   @override
   String get auto_gotIt => '알았어요';

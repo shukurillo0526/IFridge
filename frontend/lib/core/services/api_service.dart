@@ -1,4 +1,4 @@
-// I-Fridge — API Service
+// Plately — API Service
 // ======================
 // Shared HTTP client for all Flutter ↔ backend communication.
 // Auto-detects environment: localhost → local backend, GitHub Pages → Railway.

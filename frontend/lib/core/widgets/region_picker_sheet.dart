@@ -1,4 +1,4 @@
-// I-Fridge — Region Picker Sheet (Karrot-style, Redesigned)
+// Plately — Region Picker Sheet (Karrot-style, Redesigned)
 // ============================================================
 // Clean, modern bottom sheet for choosing your area:
 // - Shows your detected GPS location at the top
@@ -8,7 +8,7 @@
 // - Smooth animations and premium feel
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/location_service.dart';
+import 'package:plately_app/core/services/location_service.dart';
 
 class RegionPickerSheet extends StatefulWidget {
   final LocationService location;

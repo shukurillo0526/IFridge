@@ -1,4 +1,4 @@
-// I-Fridge — App Settings Provider
+// Plately — App Settings Provider
 // ==================================
 // Manages language, theme, and app mode preferences with persistence
 // using SharedPreferences. Notifies the widget tree of changes.

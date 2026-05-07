@@ -1,21 +1,21 @@
-// I-Fridge — Living Shelf Screen
+// Plately — Living Shelf Screen
 // The Digital Twin of the user's kitchen — a reactive grid of inventory items
 // organized by storage zone (fridge, freezer, pantry).
 // Connected to Supabase with Realtime for live updates.
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/widgets/shimmer_loading.dart';
-import 'package:ifridge_app/core/widgets/empty_state_illustration.dart';
-import 'package:ifridge_app/core/widgets/slide_in_item.dart';
-import 'package:ifridge_app/features/shelf/domain/inventory_item.dart';
-import 'package:ifridge_app/features/shelf/presentation/widgets/inventory_item_card.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/cook_screen.dart';
-import 'package:ifridge_app/features/scan/presentation/screens/scan_screen.dart';
-import 'package:ifridge_app/features/shelf/presentation/widgets/inventory_detail_sheet.dart';
-import 'package:ifridge_app/core/utils/category_images.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/widgets/shimmer_loading.dart';
+import 'package:plately_app/core/widgets/empty_state_illustration.dart';
+import 'package:plately_app/core/widgets/slide_in_item.dart';
+import 'package:plately_app/features/shelf/domain/inventory_item.dart';
+import 'package:plately_app/features/shelf/presentation/widgets/inventory_item_card.dart';
+import 'package:plately_app/features/cook/presentation/screens/cook_screen.dart';
+import 'package:plately_app/features/scan/presentation/screens/scan_screen.dart';
+import 'package:plately_app/features/shelf/presentation/widgets/inventory_detail_sheet.dart';
+import 'package:plately_app/core/utils/category_images.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 
 class LivingShelfScreen extends StatefulWidget {
   const LivingShelfScreen({super.key});

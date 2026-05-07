@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Recipes (Part 1 of 2) — 25 Recipes
+-- Plately — Seed: Recipes (Part 1 of 2) — 25 Recipes
 -- ============================================================
 -- Run seed_ingredients.sql FIRST.
 -- Uses a DO block to reference ingredient IDs by canonical_name.

@@ -1,5 +1,5 @@
 """
-iFridge Theme Enforcer Script
+Plately Theme Enforcer Script
 ================================
 Run this script to ensure that no hardcoded colors break the Dual-Mode (Light/Dark) design system.
 This script checks all .dart files in the lib/ folder (except app_theme.dart and painters).

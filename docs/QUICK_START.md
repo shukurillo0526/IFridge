@@ -1,4 +1,4 @@
-# iFridge v0.0.2 — Quick Start Guide
+# Plately v0.0.2 — Quick Start Guide
 
 > **The Intelligent Fridge Ecosystem** — AI-powered kitchen management, recipe recommendations,
 > community cooking feeds, and restaurant ordering.
@@ -24,8 +24,8 @@
 ### 1. Clone the Repository
 
 ```powershell
-git clone https://github.com/shukurillo0526/iFridge.git
-cd iFridge
+git clone https://github.com/shukurillo0526/Plately.git
+cd Plately
 ```
 
 ### 2. Backend Dependencies
@@ -74,7 +74,7 @@ ollama serve
 ### Terminal 2 — Backend (FastAPI)
 
 ```powershell
-cd d:\dev\projects\iFridge\backend
+cd d:\dev\projects\Plately\backend
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
@@ -85,7 +85,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 Pick your target platform:
 
 ```powershell
-cd d:\dev\projects\iFridge\frontend
+cd d:\dev\projects\Plately\frontend
 
 # ── Web (Chrome) ─────────────────────────────
 flutter run -d chrome
@@ -110,7 +110,7 @@ flutter run -d <device-id>           # get id from: flutter devices
 The backend has a test suite covering scoring, middleware, health checks, and expiry prediction.
 
 ```powershell
-cd d:\dev\projects\iFridge\backend
+cd d:\dev\projects\Plately\backend
 
 # Run all tests
 python -m pytest tests/ -v
@@ -141,7 +141,7 @@ python -m pytest tests/ -v --tb=short --junitxml=test-results.xml
 ### B. Frontend Widget Tests (Flutter)
 
 ```powershell
-cd d:\dev\projects\iFridge\frontend
+cd d:\dev\projects\Plately\frontend
 
 # Run all widget tests
 flutter test
@@ -248,7 +248,7 @@ After all 3 terminals are running:
 
 | URL | Expected |
 |-----|----------|
-| `http://localhost:8000/` | `{"name": "I-Fridge Intelligence API", "version": "3.4.0", ...}` |
+| `http://localhost:8000/` | `{"name": "Plately Intelligence API", "version": "3.4.0", ...}` |
 | `http://localhost:8000/api/v1/health/ping` | `{"status": "ok", ...}` |
 | `http://localhost:8000/api/v1/health` | Full dependency health report (Supabase, Ollama) |
 | `http://localhost:8000/api/v1/ai/status` | Shows which AI models are loaded |
@@ -262,7 +262,7 @@ After all 3 terminals are running:
 ### Debug APK (fast, for testing)
 
 ```powershell
-cd d:\dev\projects\iFridge\frontend
+cd d:\dev\projects\Plately\frontend
 flutter build apk --debug
 ```
 
@@ -287,7 +287,7 @@ flutter build appbundle \
 ### Web Build (GitHub Pages)
 
 ```powershell
-flutter build web --base-href /iFridge/
+flutter build web --base-href /Plately/
 ```
 
 > Auto-deployed on push to `main` via GitHub Actions.

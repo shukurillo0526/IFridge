@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Inventory Consumption RPC
+-- Plately — Inventory Consumption RPC
 -- ============================================================
 -- Safely decrements the quantity of an inventory item.
 -- If the quantity reaches 0, the item is deleted.

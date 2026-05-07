@@ -1,11 +1,11 @@
-// I-Fridge — Comment Bottom Sheet
+// Plately — Comment Bottom Sheet
 // ==================================
 // Slides up from bottom when tapping 💬 on a post.
 // Shows threaded comments with real-time feel.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/social_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class CommentSheet extends StatefulWidget {
   final String postId;

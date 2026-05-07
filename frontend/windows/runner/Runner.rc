@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.ifridge" "\0"
-            VALUE "FileDescription", "ifridge_app" "\0"
+            VALUE "CompanyName", "com.plately" "\0"
+            VALUE "FileDescription", "plately_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "ifridge_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.ifridge. All rights reserved." "\0"
-            VALUE "OriginalFilename", "ifridge_app.exe" "\0"
-            VALUE "ProductName", "ifridge_app" "\0"
+            VALUE "InternalName", "plately_app" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.plately. All rights reserved." "\0"
+            VALUE "OriginalFilename", "plately_app.exe" "\0"
+            VALUE "ProductName", "plately_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

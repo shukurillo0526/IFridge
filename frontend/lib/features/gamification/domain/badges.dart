@@ -1,4 +1,4 @@
-/// I-Fridge — Gamification Badges Domain
+/// Plately — Gamification Badges Domain
 /// =======================================
 library;
 

@@ -1,4 +1,4 @@
-// I-Fridge — Gamification Repository
+// Plately — Gamification Repository
 // ===================================
 // Handles all updates to user stats (XP, meals cooked, items saved)
 // and recipe history logging when completing a meal.

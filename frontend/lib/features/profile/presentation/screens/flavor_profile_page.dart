@@ -1,12 +1,12 @@
-// I-Fridge — Flavor Profile Deep Page
+// Plately — Flavor Profile Deep Page
 // =====================================
 // Full-screen view of the user's flavor preferences.
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/theme/app_theme.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/theme/app_theme.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class FlavorProfilePage extends StatefulWidget {
   const FlavorProfilePage({super.key});

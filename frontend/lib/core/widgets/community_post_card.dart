@@ -1,4 +1,4 @@
-// I-Fridge — Community Post Card (Instagram-style)
+// Plately — Community Post Card (Instagram-style)
 // ===================================================
 // Rich post card with:
 // - Author header with avatar, name, timestamp
@@ -11,9 +11,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
-import 'package:ifridge_app/core/widgets/comment_sheet.dart';
-import 'package:ifridge_app/features/explore/presentation/screens/creator_page.dart';
+import 'package:plately_app/core/services/social_service.dart';
+import 'package:plately_app/core/widgets/comment_sheet.dart';
+import 'package:plately_app/features/explore/presentation/screens/creator_page.dart';
 
 class CommunityPostCard extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -97,7 +97,7 @@ class _CommunityPostCardState extends State<CommunityPostCard> {
   void _sharePost() {
     final caption = widget.post['caption'] ?? '';
     SharePlus.instance.share(
-      ShareParams(text: '🍽️ Check this out on iFridge!\n\n$caption'),
+      ShareParams(text: '🍽️ Check this out on Plately!\n\n$caption'),
     );
   }
 

@@ -22,7 +22,7 @@ new_keys = {
     'deleteAccount': 'Delete Account'
 }
 
-l10n_dir = r'd:\dev\projects\iFridge\frontend\lib\l10n'
+l10n_dir = r'd:\dev\projects\Plately\frontend\lib\l10n'
 en_path = os.path.join(l10n_dir, 'app_en.arb')
 
 with open(en_path, 'r', encoding='utf-8') as f: data = json.load(f)

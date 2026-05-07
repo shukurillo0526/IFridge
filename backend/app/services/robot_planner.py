@@ -1,5 +1,5 @@
 """
-I-Fridge — Robot Planner Service
+Plately — Robot Planner Service
 ==================================
 Transforms a recipe's structured steps into a full RobotExecutionPlan
 that can be streamed to a robotic controller via WebSocket.

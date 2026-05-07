@@ -1,5 +1,5 @@
 """
-I-Fridge — Smart Expiry Prediction Service
+Plately — Smart Expiry Prediction Service
 =============================================
 AI-enhanced expiry prediction that goes beyond static category lookups.
 
@@ -18,7 +18,7 @@ from datetime import date, timedelta
 from typing import Optional
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.expiry")
+logger = logging.getLogger("plately.expiry")
 
 # Category-based default shelf life (days)
 # These are baseline values for refrigerated storage

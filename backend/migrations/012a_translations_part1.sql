@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 012: Ingredient Translations (UZ + RU)
+-- Plately — Migration 012: Ingredient Translations (UZ + RU)
 -- Part 1: Vegetables, Fruits, Proteins
 -- ============================================================
 

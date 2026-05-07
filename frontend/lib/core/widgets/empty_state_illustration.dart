@@ -1,4 +1,4 @@
-// I-Fridge — Empty State Widget
+// Plately — Empty State Widget
 // Displays beautiful SVG/Icon-based empty states for inventories and lists.
 
 import 'package:flutter/material.dart';

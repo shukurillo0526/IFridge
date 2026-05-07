@@ -1,11 +1,11 @@
-// iFridge — Auth Helper
+// Plately — Auth Helper
 // =====================
 // Centralized user ID resolution and profile initialization.
 // No fallback UUID — guests use Supabase anonymous auth.
 
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/api_service.dart';
 
 /// Returns the current authenticated user's UUID.
 /// Throws if called without an auth session (should never happen
@@ -57,7 +57,7 @@ Future<void> ensureUserInitialized() async {
     final api = ApiService();
     await api.initUser(
       userId: user.id,
-      email: user.email ?? '${user.id}@anon.ifridge.local',
+      email: user.email ?? '${user.id}@anon.plately.local',
       displayName: user.userMetadata?['full_name'] as String? ??
           user.userMetadata?['name'] as String?,
     );

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/voice_command_service.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/voice_command_service.dart';
+import 'package:plately_app/core/services/api_service.dart';
 
 /// Floating microphone button for voice commands.
 ///
@@ -141,7 +141,7 @@ class _VoiceCommandFabState extends State<VoiceCommandFab>
                 Icon(Icons.smart_toy, color: Color(0xFF4FC3F7), size: 20),
                 SizedBox(width: 8),
                 Text(
-                  'iFridge AI',
+                  'Plately AI',
                   style: TextStyle(
                     color: Color(0xFF4FC3F7),
                     fontWeight: FontWeight.w600,

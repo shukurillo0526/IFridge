@@ -6,8 +6,8 @@ import httpx
 from dotenv import load_dotenv
 
 # Ensure we can import the backend modules
-sys.path.insert(0, r'd:\dev\projects\iFridge\backend')
-load_dotenv(r'd:\dev\projects\iFridge\backend\.env')
+sys.path.insert(0, r'd:\dev\projects\Plately\backend')
+load_dotenv(r'd:\dev\projects\Plately\backend\.env')
 
 from app.db.supabase_client import get_supabase
 

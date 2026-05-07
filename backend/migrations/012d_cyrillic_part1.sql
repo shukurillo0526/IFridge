@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 012d: Full Cyrillic Uzbek Translations
+-- Plately — Migration 012d: Full Cyrillic Uzbek Translations
 -- All 278 ingredients
 -- ============================================================
 

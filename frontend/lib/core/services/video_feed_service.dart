@@ -1,4 +1,4 @@
-// I-Fridge — Video Feed Service
+// Plately — Video Feed Service
 // ================================
 // Fetches video feed data from Supabase (video_feeds table).
 // Provides VideoFeed model with YouTube embed URLs and recipe data.

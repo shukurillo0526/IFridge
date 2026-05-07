@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Supabase Database Migration
+-- Plately — Supabase Database Migration
 -- ============================================================
 -- Run this in the Supabase SQL Editor to create all tables.
 -- Version: 1.0.0

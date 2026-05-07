@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Cleanup: Remove duplicate inventory items
+-- Plately — Cleanup: Remove duplicate inventory items
 -- ============================================================
 -- Run this ONCE if you have duplicate entries from before the
 -- upsert fix. Keeps the row with the highest quantity.

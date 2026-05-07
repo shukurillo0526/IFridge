@@ -10,7 +10,7 @@ def to_camel_case(text):
     return words[0].lower() + ''.join(w.capitalize() for w in words[1:])
 
 def main():
-    base_dir = r"d:\dev\projects\iFridge\frontend\lib"
+    base_dir = r"d:\dev\projects\Plately\frontend\lib"
     l10n_dir = os.path.join(base_dir, "l10n")
     
     # Load ARB files
@@ -71,9 +71,9 @@ def main():
 
             if replacements:
                 # Add import if needed
-                if "import 'package:ifridge_app/l10n/app_localizations.dart';" not in content:
+                if "import 'package:plately_app/l10n/app_localizations.dart';" not in content:
                     # insert after first import
-                    content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:ifridge_app/l10n/app_localizations.dart';")
+                    content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:plately_app/l10n/app_localizations.dart';")
                 
                 for old, new in replacements:
                     content = content.replace(old, new)

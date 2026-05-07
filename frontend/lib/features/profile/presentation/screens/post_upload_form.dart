@@ -1,4 +1,4 @@
-// I-Fridge — Enhanced Post Upload Form
+// Plately — Enhanced Post Upload Form
 // =======================================
 // Real post creation with:
 // - Multi-image picker (camera/gallery)
@@ -11,9 +11,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
-import 'package:ifridge_app/core/widgets/recipe_attachment_widget.dart';
-import 'package:ifridge_app/core/services/recipe_monetization_service.dart';
+import 'package:plately_app/core/services/social_service.dart';
+import 'package:plately_app/core/widgets/recipe_attachment_widget.dart';
+import 'package:plately_app/core/services/recipe_monetization_service.dart';
 
 class EnhancedPostUploadForm extends StatefulWidget {
   const EnhancedPostUploadForm({super.key});

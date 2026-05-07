@@ -1,5 +1,5 @@
 """
-I-Fridge — Global Error Handlers
+Plately — Global Error Handlers
 ==================================
 Standardized exception handling across all endpoints.
 Every error returns the same envelope shape:
@@ -13,7 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-logger = logging.getLogger("ifridge.errors")
+logger = logging.getLogger("plately.errors")
 
 # Error code mapping for common HTTP status codes
 ERROR_CODES = {

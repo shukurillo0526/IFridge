@@ -1,4 +1,4 @@
-// I-Fridge — Order Feeds Screen (Restaurant-linked, YouTube-backed)
+// Plately — Order Feeds Screen (Restaurant-linked, YouTube-backed)
 // ===================================================================
 // TikTok-style vertical food video feed.
 // Videos are linked to nearby restaurants.
@@ -6,12 +6,12 @@
 // Tap thumbnail → opens YouTube. Buttons navigate to RestaurantDetailPage.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/video_feed_service.dart';
-import 'package:ifridge_app/core/services/location_service.dart';
-import 'package:ifridge_app/core/services/restaurant_service.dart';
-import 'package:ifridge_app/features/order/presentation/screens/restaurant_detail_page.dart';
-import 'package:ifridge_app/core/widgets/youtube_embed.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/video_feed_service.dart';
+import 'package:plately_app/core/services/location_service.dart';
+import 'package:plately_app/core/services/restaurant_service.dart';
+import 'package:plately_app/features/order/presentation/screens/restaurant_detail_page.dart';
+import 'package:plately_app/core/widgets/youtube_embed.dart';
 import 'package:share_plus/share_plus.dart';
 
 class OrderFeedsScreen extends StatefulWidget {

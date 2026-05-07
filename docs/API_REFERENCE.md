@@ -1,4 +1,4 @@
-# iFridge — API Reference (v3.4.0)
+# Plately — API Reference (v3.4.0)
 
 > Complete reference for all backend API endpoints.
 > Interactive docs available at `http://localhost:8000/docs` (Swagger UI).

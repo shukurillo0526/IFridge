@@ -1,4 +1,4 @@
-// I-Fridge — Staggered Slide-In Animation
+// Plately — Staggered Slide-In Animation
 // Wraps child widgets to slide up and fade in with a staggered delay.
 
 import 'package:flutter/material.dart';

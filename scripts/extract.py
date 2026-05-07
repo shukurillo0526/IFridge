@@ -1,6 +1,6 @@
 import os, re
-scan_path = r'd:\dev\projects\iFridge\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
-shelf_path = r'd:\dev\projects\iFridge\frontend\lib\features\shelf\presentation\screens\living_shelf_screen.dart'
+scan_path = r'd:\dev\projects\Plately\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
+shelf_path = r'd:\dev\projects\Plately\frontend\lib\features\shelf\presentation\screens\living_shelf_screen.dart'
 
 def extract(path):
     with open(path, 'r', encoding='utf-8') as f: c = f.read()

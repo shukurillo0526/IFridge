@@ -1,4 +1,4 @@
-// I-Fridge — Location Service
+// Plately — Location Service
 // =============================
 // Singleton service for GPS location, reverse geocoding, and region management.
 // Implements the Karrot-style hyperlocal region system:

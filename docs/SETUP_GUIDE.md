@@ -1,6 +1,6 @@
-# iFridge — Full Setup & Testing Guide
+# Plately — Full Setup & Testing Guide
 
-> Everything you need to run, test, and develop iFridge locally with full AI features enabled.
+> Everything you need to run, test, and develop Plately locally with full AI features enabled.
 
 ---
 
@@ -21,7 +21,7 @@
 ## 🗂️ Project Structure
 
 ```
-iFridge/
+Plately/
 ├── frontend/          # Flutter app (Dart)
 │   ├── lib/
 │   │   ├── core/      # Theme, services (ApiService, Supabase config)
@@ -263,14 +263,14 @@ This UUID is seeded in `seed_data.sql` and referenced throughout the Flutter app
 The app auto-deploys to GitHub Pages on every push to `main` via `.github/workflows/flutter_web_deploy.yml`.
 
 ### Key Configuration:
-- **Base href** must exactly match your repository name case: `--base-href /iFridge/`
+- **Base href** must exactly match your repository name case: `--base-href /Plately/`
 - **API URL** must point to the production Railway backend (not localhost)
 - The workflow uses `peaceiris/actions-gh-pages@v3` to publish `frontend/build/web` to the `gh-pages` branch
 
 ### Manual Deploy:
 ```powershell
 cd frontend
-flutter build web --base-href /iFridge/
+flutter build web --base-href /Plately/
 # Then push the build/web contents to gh-pages branch
 ```
 
@@ -281,7 +281,7 @@ flutter build web --base-href /iFridge/
 | Issue | Cause | Fix |
 |-------|-------|-----|
 | **"Couldn't load inventory"** | Supabase query error (wrong column name, RLS blocking) | Check Supabase SQL logs; run `dev_rls_fix.sql` |
-| **Blank white page on GH Pages** | `--base-href` casing mismatch with repo URL | Ensure exact match: `/iFridge/` |
+| **Blank white page on GH Pages** | `--base-href` casing mismatch with repo URL | Ensure exact match: `/Plately/` |
 | **AI features return mock data** | Ollama not running or models not pulled | Run `ollama serve` and `ollama pull qwen2.5:3b` |
 | **Slow AI responses** | Large model loaded, offloading to RAM | Use `qwen2.5:3b` instead of `qwen3:8b` |
 | **Receipt scan says "unknown store"** | Photo mode is needed, not receipt mode | Toggle to "Photo" mode in Scan screen |

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/post_upload_form.dart' show EnhancedPostUploadForm;
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/features/profile/presentation/screens/post_upload_form.dart' show EnhancedPostUploadForm;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreatorDashboardPage extends StatefulWidget {

@@ -1,4 +1,4 @@
-// I-Fridge — Order Screen (Geo-Filtered)
+// Plately — Order Screen (Geo-Filtered)
 // ========================================
 // Karrot-style hyperlocal food ordering with:
 // - GPS-based region detection and neighborhood display
@@ -8,12 +8,12 @@
 // - Category filtering, search, and deals section
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:ifridge_app/core/services/location_service.dart';
-import 'package:ifridge_app/core/services/restaurant_service.dart';
-import 'package:ifridge_app/core/widgets/region_picker_sheet.dart';
-import 'package:ifridge_app/features/order/presentation/screens/restaurant_detail_page.dart';
+import 'package:plately_app/core/services/location_service.dart';
+import 'package:plately_app/core/services/restaurant_service.dart';
+import 'package:plately_app/core/widgets/region_picker_sheet.dart';
+import 'package:plately_app/features/order/presentation/screens/restaurant_detail_page.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});

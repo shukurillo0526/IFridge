@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Development RLS Fix
+-- Plately — Development RLS Fix
 -- ============================================================
 -- Run this in Supabase SQL Editor to allow the app to read
 -- inventory data without authentication (for development only).

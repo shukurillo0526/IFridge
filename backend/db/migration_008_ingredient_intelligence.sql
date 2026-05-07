@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 008: Ingredient Intelligence
+-- Plately — Migration 008: Ingredient Intelligence
 -- ============================================================
 -- Adds unit conversions, calorie data, and multilingual names
 -- to the ingredients table for the Ingredient Intelligence Engine.

@@ -1,4 +1,4 @@
-// I-Fridge — Scan Screen
+// Plately — Scan Screen
 // =======================
 // Camera-based ingredient scanning with AI recognition.
 // Captures an image, sends to the backend vision API,
@@ -7,13 +7,13 @@
 import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/core/utils/category_images.dart';
-import 'package:ifridge_app/features/scan/presentation/screens/audit_screen.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/utils/category_images.dart';
+import 'package:plately_app/features/scan/presentation/screens/audit_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});

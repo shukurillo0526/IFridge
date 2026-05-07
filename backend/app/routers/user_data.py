@@ -1,5 +1,5 @@
 """
-I-Fridge — User Data API Router
+Plately — User Data API Router
 =================================
 Centralized backend for all user-scoped data operations.
 Uses the service role key to bypass RLS for writes.
@@ -12,7 +12,7 @@ from typing import Optional, List
 
 from app.db.supabase_client import get_supabase
 
-logger = logging.getLogger("ifridge.user_data")
+logger = logging.getLogger("plately.user_data")
 
 router = APIRouter(prefix="/api/v1/user", tags=["User Data"])
 

@@ -1,5 +1,5 @@
 """
-I-Fridge — Server-Side Recipe Recommendation Router
+Plately — Server-Side Recipe Recommendation Router
 =====================================================
 Provides a single endpoint that returns pre-scored, pre-tiered recipes.
 Replaces the client-side scoring logic in cook_screen.dart with a
@@ -13,7 +13,7 @@ from typing import Optional
 
 from app.services.recommendation_engine import RecommendationEngine
 
-logger = logging.getLogger("ifridge.recommendations")
+logger = logging.getLogger("plately.recommendations")
 
 router = APIRouter()
 

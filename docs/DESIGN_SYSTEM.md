@@ -1,6 +1,6 @@
-# iFridge Design System
+# Plately Design System
 
-This document outlines the master design system and color rules for the iFridge application. It must be adhered to whenever adding new features or modifying the UI.
+This document outlines the master design system and color rules for the Plately application. It must be adhered to whenever adding new features or modifying the UI.
 
 ## 🎨 Color Palette
 

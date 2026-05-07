@@ -1,5 +1,5 @@
 """
-I-Fridge Backend — Application Configuration
+Plately Backend — Application Configuration
 =============================================
 All settings are loaded from environment variables via pydantic-settings.
 Create a `.env` file in the backend root with these keys.
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment / .env file."""
 
     # --- App ---
-    APP_NAME: str = "I-Fridge API"
+    APP_NAME: str = "Plately API"
     APP_VERSION: str = "3.4.0"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"

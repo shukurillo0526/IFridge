@@ -1,5 +1,5 @@
 """
-I-Fridge — Calorie Analysis Router
+Plately — Calorie Analysis Router
 ====================================
 Analyzes food images to estimate calories and macros.
 Uses local LLM (Ollama) for food identification + ingredient DB for calorie data.
@@ -16,7 +16,7 @@ from typing import Optional, List
 from app.db.supabase_client import get_supabase
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.calories")
+logger = logging.getLogger("plately.calories")
 
 router = APIRouter()
 

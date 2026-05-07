@@ -1,4 +1,4 @@
-// iFridge — Category Image Mapping
+// Plately — Category Image Mapping
 // =================================
 // Maps ingredient categories to representative stock images.
 // Used as a fallback when an ingredient has no individual image_url.

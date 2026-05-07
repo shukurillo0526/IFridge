@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'iFridge';
+  String get appTitle => 'Plately';
 
   @override
   String get tabShelf => 'Shelf';
@@ -163,7 +163,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTheme => 'Theme';
 
   @override
-  String get aboutApp => 'About iFridge';
+  String get aboutApp => 'About Plately';
 
   @override
   String get myFridge => '🧊 My Fridge';
@@ -525,12 +525,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Account deletion requested. Contact support to finalize.';
 
   @override
-  String get auto_ifridge => 'iFridge';
+  String get auto_plately => 'Plately';
 
   @override
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
-      'iFridge is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.';
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
+      'Plately is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.';
 
   @override
   String get auto_gotIt => 'Got it';

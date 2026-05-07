@@ -1,11 +1,11 @@
-// I-Fridge — Recipe Monetization Service
+// Plately — Recipe Monetization Service
 // =========================================
 // Manages recipe creation, premium pricing, copies, and access control.
 // Supports: create, attach to post, copy (free/paid), check access.
 
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class RecipeModel {
   final String id;

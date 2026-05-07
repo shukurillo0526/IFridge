@@ -1,7 +1,7 @@
--- I-Fridge — Phase 1: Orders Table
+-- Plately — Phase 1: Orders Table
 -- ===================================
 -- Supports mobile ordering (pickup + delivery).
--- Used by: iFridge consumer app, future iFridge Business dashboard.
+-- Used by: Plately consumer app, future Plately Business dashboard.
 --
 -- Run in Supabase SQL Editor or via migration tool.
 

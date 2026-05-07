@@ -1,14 +1,14 @@
-// I-Fridge — Checkout Screen
+// Plately — Checkout Screen
 // ============================
 // Order review, order type selection (pickup/delivery),
 // and confirmation with pickup code generation.
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/cart_service.dart';
-import 'package:ifridge_app/core/services/order_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/cart_service.dart';
+import 'package:plately_app/core/services/order_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});

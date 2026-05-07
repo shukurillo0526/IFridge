@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 007: Ingredient Images
+-- Plately — Migration 007: Ingredient Images
 -- ============================================================
 -- Adds an image_url column to the ingredients table so each
 -- ingredient can have its own photo instead of a generic icon.

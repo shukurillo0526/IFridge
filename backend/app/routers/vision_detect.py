@@ -1,5 +1,5 @@
 """
-I-Fridge — Photo Ingredient Detection Router
+Plately — Photo Ingredient Detection Router
 ==============================================
 Receives a photo of loose ingredients and identifies them.
 
@@ -23,7 +23,7 @@ from slowapi.util import get_remote_address
 
 limiter = Limiter(key_func=get_remote_address)
 
-logger = logging.getLogger("ifridge.vision")
+logger = logging.getLogger("plately.vision")
 
 router = APIRouter()
 
@@ -54,7 +54,7 @@ Return ONLY valid JSON:
 # ── Cloud Gemini (single-stage fallback) ──────────────────────
 
 CLOUD_VISION_PROMPT = """
-You are an expert food ingredient identifier for the I-Fridge smart kitchen app.
+You are an expert food ingredient identifier for the Plately smart kitchen app.
 
 Look at this photo and identify every visible food ingredient. Count carefully.
 For each item provide:

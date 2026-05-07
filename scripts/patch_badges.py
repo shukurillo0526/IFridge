@@ -1,13 +1,13 @@
 import os
 import re
 
-path = r'd:\dev\projects\iFridge\frontend\lib\features\profile\presentation\screens\profile_screen.dart'
+path = r'd:\dev\projects\Plately\frontend\lib\features\profile\presentation\screens\profile_screen.dart'
 with open(path, 'r', encoding='utf-8') as f: content = f.read()
 
 # 1. Update import
 content = content.replace(
-    "import 'package:ifridge_app/features/gamification/domain/badges.dart' show levelFromXp;",
-    "import 'package:ifridge_app/features/gamification/domain/badges.dart' show levelFromXp, WasteBadge, computeEarnedBadges;"
+    "import 'package:plately_app/features/gamification/domain/badges.dart' show levelFromXp;",
+    "import 'package:plately_app/features/gamification/domain/badges.dart' show levelFromXp, WasteBadge, computeEarnedBadges;"
 )
 
 # 2. Update state variables

@@ -1,11 +1,11 @@
-// I-Fridge — Cooking Reward Screen
+// Plately — Cooking Reward Screen
 // ==================================
 // Celebratory screen shown after completing a recipe.
 // Awards XP, updates user history, and provides a return to the dashboard.
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/features/gamification/data/gamification_repository.dart';
+import 'package:plately_app/features/gamification/data/gamification_repository.dart';
 
 class CookingRewardScreen extends StatefulWidget {
   final String recipeId;

@@ -1,8 +1,8 @@
-# iFridge Ecosystem — Implementation Progress
+# Plately Ecosystem — Implementation Progress
 
 ## Phase 1: Mobile Ordering Foundation ✅
 
-### Consumer Side (iFridge App)
+### Consumer Side (Plately App)
 | Component | Status | File |
 |-----------|--------|------|
 | Cart Service (singleton, quantities, restaurant binding) | ✅ Done | `cart_service.dart` |
@@ -14,7 +14,7 @@
 | Order History screen (active/past, status progress) | ✅ Done | `order_history_screen.dart` |
 | "My Orders" card in Profile/Manage | ✅ Done | `profile_screen.dart` |
 
-### Restaurant Side (iFridge Business)
+### Restaurant Side (Plately Business)
 | Component | Status | File |
 |-----------|--------|------|
 | Incoming Orders page (3-tab: New/Preparing/Ready) | ✅ Done | `incoming_orders_page.dart` |
@@ -71,7 +71,7 @@ Consumer                          Restaurant
 - [ ] Auto-print order tickets
 
 ### Delivery Fleet (Pillar 3)
-- [ ] iFridge Fleet app scaffold
+- [ ] Plately Fleet app scaffold
 - [ ] Driver registration & onboarding
 - [ ] Order dispatch & assignment
 - [ ] Real-time driver location tracking

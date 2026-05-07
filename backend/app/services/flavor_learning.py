@@ -1,5 +1,5 @@
 """
-I-Fridge — Flavor Profile Auto-Learning Service
+Plately — Flavor Profile Auto-Learning Service
 =================================================
 Automatically updates the user's flavor profile based on their
 cooking history. When a user cooks a recipe, the system extracts
@@ -14,7 +14,7 @@ import logging
 from datetime import date
 from app.db.supabase_client import get_supabase
 
-logger = logging.getLogger("ifridge.flavor_learning")
+logger = logging.getLogger("plately.flavor_learning")
 
 # EMA decay factor: 0.15 means new cook shifts profile by 15%
 # Higher = more reactive to recent cooks, lower = more stable

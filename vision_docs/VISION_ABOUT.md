@@ -1,4 +1,4 @@
-# 🧊 iFridge: The Master Blueprint & Vision Document
+# 🧊 Plately: The Master Blueprint & Vision Document
 
 > **Mission Statement:** To eliminate food waste, democratize smart cooking, and revolutionize local food commerce through a unified, AI-driven, three-sided marketplace ecosystem.
 
@@ -8,7 +8,7 @@
 
 The modern food landscape is broken and highly fragmented. Consumers bounce between disjointed applications: one for tracking groceries, a browser for searching recipes, and exorbitant third-party apps for ordering delivery. Meanwhile, restaurants are trapped by these very same delivery platforms, surrendering 30%+ in commission margins just to reach their customers, while juggling multiple closed-ecosystem Point-of-Sale (POS) tablets.
 
-**iFridge is the unified solution.** 
+**Plately is the unified solution.** 
 
 We are building a comprehensive **Three-Sided Food Commerce Ecosystem**. By providing users with a world-class, AI-powered smart kitchen assistant (The Demand Engine), we naturally capture their daily food decision-making process. We then funnel this highly engaged user base directly into a localized, low-commission commerce platform serving local restaurants (The Supply Engine), supported by an independent, shared delivery network (The Logistics Engine).
 
@@ -16,14 +16,14 @@ We are building a comprehensive **Three-Sided Food Commerce Ecosystem**. By prov
 
 ## 2. The Three Pillars of the Ecosystem
 
-### Pillar I: The Consumer Demand Engine (iFridge App)
+### Pillar I: The Consumer Demand Engine (Plately App)
 *The daily utility that makes the ecosystem indispensable.*
 
-iFridge began as an advanced smart kitchen app and maintains this DNA through its dual-mode interface. 
+Plately began as an advanced smart kitchen app and maintains this DNA through its dual-mode interface. 
 
 #### A. Cook Mode (Home Kitchen Intelligence)
 *   **Frictionless Ingestion:** Users digitize their kitchen via OCR grocery receipt parsing (Gemini 1.5 Flash) and loose-ingredient photo recognition (local Vision models). The app automatically categorizes items, extracts metrics, and assigns algorithmic shelf-life estimates.
-*   **6-Signal Recommendation Engine:** iFridge doesn't use simple filters. It uses a hyper-personalized scoring algorithm combining six weighted vectors:
+*   **6-Signal Recommendation Engine:** Plately doesn't use simple filters. It uses a hyper-personalized scoring algorithm combining six weighted vectors:
     1. *Expiry Urgency* (Saves money, prevents waste)
     2. *Flavor Affinity* (Cosine similarity based on the user's historical tastes via embeddings)
     3. *Difficulty Fit* (Matches recipe complexity to user skill level)
@@ -38,34 +38,34 @@ iFridge began as an advanced smart kitchen app and maintains this DNA through it
 *   **Frictionless Checkout:** Dynamic toggles for Pickup or Delivery. Orders are placed directly through the app, bypassing third-party delivery monopolies.
 *   **Real-Time Tracking & Pickup Codes:** Upon checkout, users receive a highly visible, alphanumeric Pickup Code (e.g., `AB742`) and can track their order through a visual, multi-stage progress bar (`Confirmed` → `Preparing` → `Ready` → `Completed`).
 
-### Pillar II: The Restaurant Supply Hub (iFridge Business)
+### Pillar II: The Restaurant Supply Hub (Plately Business)
 *The digital suite that empowers local food businesses.*
 
-Accessed via verified Business Accounts natively within the iFridge ecosystem.
+Accessed via verified Business Accounts natively within the Plately ecosystem.
 
 *   **Live POS & Order Management:** A dedicated "Incoming Orders" dashboard featuring a robust 3-tab layout (New, Preparing, Ready). Kitchen staff view precise order details (quantities, notes) and advance the order state with a single tap, which immediately updates the consumer's tracking UI.
 *   **Creator Studio & Marketing:** Restaurants don't just exist as static menus. They can upload promotional video shorts directly into the consumer's "Explore" feed. Users watching a video of a burger being made can tap "Order Now" to instantly add it to their cart.
-*   **The Kiosk Vision (Phase 3):** Transitioning the digital dashboard into a physical presence. The iFridge Business app will power low-cost, self-service Android touchscreen kiosks inside partner restaurants, completely eliminating cashier labor costs while integrating directly into the unified kitchen queue.
+*   **The Kiosk Vision (Phase 3):** Transitioning the digital dashboard into a physical presence. The Plately Business app will power low-cost, self-service Android touchscreen kiosks inside partner restaurants, completely eliminating cashier labor costs while integrating directly into the unified kitchen queue.
 
-### Pillar III: The Shared Logistics Network (iFridge Fleet - Planned)
+### Pillar III: The Shared Logistics Network (Plately Fleet - Planned)
 *The connective tissue breaking the delivery monopoly.*
 
 *   **The Fleet App:** A standalone, lightweight application for gig-economy drivers.
-*   **Shared Infrastructure:** Unlike independent restaurants struggling to hire drivers, iFridge Fleet provides a shared pool of drivers accessible to *any* restaurant on the platform.
+*   **Shared Infrastructure:** Unlike independent restaurants struggling to hire drivers, Plately Fleet provides a shared pool of drivers accessible to *any* restaurant on the platform.
 *   **Flat-Fee Dispatch:** Restaurants pay a nominal, flat dispatch fee (e.g., $2-3) rather than a 30% margin cut, while drivers receive optimized, batched routes maximizing their hourly earnings.
 
 ---
 
 ## 3. Technical Architecture & Infrastructure
 
-iFridge is built on a highly scalable, decoupled, modern technology stack designed for production readiness and rapid iteration.
+Plately is built on a highly scalable, decoupled, modern technology stack designed for production readiness and rapid iteration.
 
 ```mermaid
 graph TD
     subgraph Client Apps
-        App[iFridge Consumer App<br>Flutter / Riverpod / Hive]
-        Biz[iFridge Business POS<br>Flutter / Tablet UI]
-        Fleet[iFridge Fleet App<br>Flutter / Maps API]
+        App[Plately Consumer App<br>Flutter / Riverpod / Hive]
+        Biz[Plately Business POS<br>Flutter / Tablet UI]
+        Fleet[Plately Fleet App<br>Flutter / Maps API]
     end
 
     subgraph API Gateway / Backend
@@ -150,8 +150,8 @@ erDiagram
 3.  **Hardware Sales (Future):** One-time hardware sales or leasing of physical self-service ordering kiosks and thermal printers.
 4.  **Priority Placements:** Native, non-intrusive promoted listings within the semantic search and Explore feeds.
 
-### 4.2 The iFridge Flywheel (Our Moat)
-The true power of iFridge lies in its interconnected nature, creating an impenetrable moat:
+### 4.2 The Plately Flywheel (Our Moat)
+The true power of Plately lies in its interconnected nature, creating an impenetrable moat:
 
 ```mermaid
 graph LR
@@ -180,18 +180,18 @@ We have officially completed **Phase 1 (The Foundation)** and **Phase P (Marketp
 *   **Push Notification Engine:** Integrating Firebase Cloud Messaging (FCM) to deliver background alerts for order lifecycle changes and marketing campaigns.
 
 ### Phase 3: The Kiosk & Hardware Expansion (Q4 2026)
-*   **iFridge Kiosk App:** Developing a locked-down, specialized web UI optimized for 10-inch to 15-inch Android tablets.
+*   **Plately Kiosk App:** Developing a locked-down, specialized web UI optimized for 10-inch to 15-inch Android tablets.
 *   **Hardware APIs:** Building local network bridges to support ESC/POS thermal receipt printers and Kitchen Display Systems (KDS).
 *   **Pilot Program:** Deploying the first physical kiosks into 5-10 partner restaurants.
 
 ### Phase 4: Logistics & The Fleet Engine (Q1 2027)
-*   **iFridge Fleet Application:** Designing the UX and Flutter architecture for the standalone driver application.
+*   **Plately Fleet Application:** Designing the UX and Flutter architecture for the standalone driver application.
 *   **Dispatch AI:** Building the geospatial backend service to calculate optimal routing, driver matching, and accurate ETA predictions.
 *   **Live Tracking UI:** Enhancing the consumer order screen with a real-time map displaying the driver's GPS location.
 
 ### Phase 5: Enterprise Scaling & Analytics (Q2 2027+)
 *   **Predictive Analytics:** Utilizing the massive datasets generated by the ecosystem to offer restaurants AI-driven demand forecasting, dynamic pricing models, and ingredient procurement suggestions.
-*   **Franchise White-labeling:** Allowing enterprise chains to utilize the iFridge infrastructure under their own brand presence within the ecosystem.
+*   **Franchise White-labeling:** Allowing enterprise chains to utilize the Plately infrastructure under their own brand presence within the ecosystem.
 *   **Global Localization:** Expanding NLP and metric parsing to support scaling across the EU and Asian markets seamlessly.
 
 ---

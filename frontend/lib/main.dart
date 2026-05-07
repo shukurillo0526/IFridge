@@ -1,35 +1,35 @@
-// I-Fridge — Application Entry Point
+// Plately — Application Entry Point
 // "Zero-Waste, Maximum Taste."
 //
 // Dual-mode app: ORDER (eat out) and COOK (cook at home).
 // The bottom navigation changes dynamically based on the active mode.
 
-import 'package:ifridge_app/core/services/location_service.dart';
+import 'package:plately_app/core/services/location_service.dart';
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/theme/app_theme.dart';
-import 'package:ifridge_app/core/services/app_settings.dart';
-import 'package:ifridge_app/core/widgets/dual_mode_nav_bar.dart';
+import 'package:plately_app/core/theme/app_theme.dart';
+import 'package:plately_app/core/services/app_settings.dart';
+import 'package:plately_app/core/widgets/dual_mode_nav_bar.dart';
 
 // ── Screens ──────────────────────────────────────────────
 // Cook mode screens (existing)
-import 'package:ifridge_app/features/shelf/presentation/screens/living_shelf_screen.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/cook_screen.dart';
-import 'package:ifridge_app/features/scan/presentation/screens/scan_screen.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:plately_app/features/shelf/presentation/screens/living_shelf_screen.dart';
+import 'package:plately_app/features/cook/presentation/screens/cook_screen.dart';
+import 'package:plately_app/features/scan/presentation/screens/scan_screen.dart';
+import 'package:plately_app/features/profile/presentation/screens/profile_screen.dart';
 
 // Order mode screens (new)
-import 'package:ifridge_app/features/order/presentation/screens/order_screen.dart';
-import 'package:ifridge_app/features/order/presentation/screens/order_feeds_screen.dart';
+import 'package:plately_app/features/order/presentation/screens/order_screen.dart';
+import 'package:plately_app/features/order/presentation/screens/order_feeds_screen.dart';
 
 // Auth
-import 'package:ifridge_app/features/auth/presentation/screens/auth_screen.dart';
+import 'package:plately_app/features/auth/presentation/screens/auth_screen.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/features/onboarding/presentation/screens/onboarding_screen.dart';
-import 'package:ifridge_app/core/services/cache_service.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:plately_app/core/services/cache_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
@@ -65,17 +65,17 @@ void main() async {
   } catch (e) {
     debugPrint('[Main] Cache init skipped: $e');
   }
-  runApp(const ProviderScope(child: IFridgeApp()));
+  runApp(const ProviderScope(child: PlatelyApp()));
 }
 
-class IFridgeApp extends StatefulWidget {
-  const IFridgeApp({super.key});
+class PlatelyApp extends StatefulWidget {
+  const PlatelyApp({super.key});
 
   @override
-  State<IFridgeApp> createState() => _IFridgeAppState();
+  State<PlatelyApp> createState() => _PlatelyAppState();
 }
 
-class _IFridgeAppState extends State<IFridgeApp> {
+class _PlatelyAppState extends State<PlatelyApp> {
   final AppSettings _settings = AppSettings();
 
   @override
@@ -95,7 +95,7 @@ class _IFridgeAppState extends State<IFridgeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'iFridge',
+      title: 'Plately',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
@@ -359,7 +359,7 @@ class _ModeSwitchBar extends StatelessWidget {
         children: [
           // App name
           Text(
-            'iFridge',
+            'Plately',
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 22,

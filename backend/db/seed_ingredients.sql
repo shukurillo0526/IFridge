@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Common Ingredients
+-- Plately — Seed: Common Ingredients
 -- ============================================================
 -- 25 everyday ingredients with proper shelf life data.
 -- Uses ON CONFLICT to be safely re-runnable.

@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Gamification Stats Increment RPC
+-- Plately — Gamification Stats Increment RPC
 -- ============================================================
 -- Called by GamificationRepository.completeCookingSession()
 -- Atomically increments XP, meals cooked, items saved,

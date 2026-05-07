@@ -2,16 +2,16 @@ import asyncio
 import sys
 import json
 
-sys.path.insert(0, r'd:\dev\projects\iFridge\backend')
+sys.path.insert(0, r'd:\dev\projects\Plately\backend')
 from dotenv import load_dotenv
-load_dotenv(r'd:\dev\projects\iFridge\backend\.env')
+load_dotenv(r'd:\dev\projects\Plately\backend\.env')
 
 from app.db.supabase_client import get_supabase
 from app.services.ollama_service import get_ollama_service
 
 async def main():
     print("==========================================================")
-    print("  iFridge - Automated Recipe Re-Generator (Local Ollama)  ")
+    print("  Plately - Automated Recipe Re-Generator (Local Ollama)  ")
     print("==========================================================")
     
     db = get_supabase()

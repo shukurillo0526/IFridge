@@ -1,5 +1,5 @@
 """
-I-Fridge — Local AI Service Layer (Ollama)
+Plately — Local AI Service Layer (Ollama)
 ==========================================
 Manages all interactions with the local Ollama server.
 Supports vision (qwen2.5vl:7b), text generation (qwen3:8b),
@@ -20,7 +20,7 @@ import json
 import logging
 from typing import Optional, Dict, List, Any
 
-logger = logging.getLogger("ifridge.ollama")
+logger = logging.getLogger("plately.ollama")
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 

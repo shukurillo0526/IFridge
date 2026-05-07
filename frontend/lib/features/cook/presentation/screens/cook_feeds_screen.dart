@@ -1,4 +1,4 @@
-// I-Fridge — Cook Feeds Screen (YouTube-backed)
+// Plately — Cook Feeds Screen (YouTube-backed)
 // =================================================
 // TikTok-style vertical cooking video feed backed by real YouTube videos.
 // Each video has AI-extracted recipe data.
@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:ifridge_app/core/services/video_feed_service.dart';
+import 'package:plately_app/core/services/video_feed_service.dart';
 
 class CookFeedsScreen extends StatefulWidget {
   const CookFeedsScreen({super.key});

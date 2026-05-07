@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 013: Restore Relational Recipe-Ingredients
+-- Plately — Migration 013: Restore Relational Recipe-Ingredients
 -- ============================================================
 -- Phase 1: Add 41 missing canonical ingredients
 -- Phase 2: Recreate recipe_ingredients relational table

@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- iFridge Social Media Tables — Migration
+-- Plately Social Media Tables — Migration
 -- Run this in Supabase SQL Editor (https://supabase.com/dashboard)
 -- ═══════════════════════════════════════════════════════════════
 

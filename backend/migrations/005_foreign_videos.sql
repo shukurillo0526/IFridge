@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════
--- I-Fridge — Foreign Video Feeds (Addendum)
+-- Plately — Foreign Video Feeds (Addendum)
 -- ═══════════════════════════════════════════════════════════════════
 -- Adds 20 more videos (10 cook + 10 order) in 3 languages:
 -- 6 English, 2 Korean, 2 Russian per tab.

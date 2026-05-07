@@ -4,33 +4,33 @@ import re
 # Dictionary mapping static theme calls to context-aware theme calls
 REPLACEMENTS = {
     # Backgrounds
-    r'IFridgeTheme\.bgDark': r'Theme.of(context).scaffoldBackgroundColor',
+    r'PlatelyTheme\.bgDark': r'Theme.of(context).scaffoldBackgroundColor',
     r'AppTheme\.background': r'Theme.of(context).scaffoldBackgroundColor',
-    r'IFridgeTheme\.bgCard': r'Theme.of(context).colorScheme.surface',
+    r'PlatelyTheme\.bgCard': r'Theme.of(context).colorScheme.surface',
     r'AppTheme\.surface': r'Theme.of(context).colorScheme.surface',
-    r'IFridgeTheme\.bgElevated': r'Theme.of(context).colorScheme.surfaceContainerHighest',
-    r'IFridgeTheme\.bgGlass': r'Theme.of(context).colorScheme.surface.withOpacity(0.1)',
+    r'PlatelyTheme\.bgElevated': r'Theme.of(context).colorScheme.surfaceContainerHighest',
+    r'PlatelyTheme\.bgGlass': r'Theme.of(context).colorScheme.surface.withOpacity(0.1)',
     
     # Brand Colors
-    r'IFridgeTheme\.primary': r'Theme.of(context).colorScheme.primary',
-    r'IFridgeTheme\.accent': r'Theme.of(context).colorScheme.secondary',
-    r'IFridgeTheme\.secondary': r'Theme.of(context).colorScheme.secondary',
+    r'PlatelyTheme\.primary': r'Theme.of(context).colorScheme.primary',
+    r'PlatelyTheme\.accent': r'Theme.of(context).colorScheme.secondary',
+    r'PlatelyTheme\.secondary': r'Theme.of(context).colorScheme.secondary',
     r'AppTheme\.accent': r'Theme.of(context).colorScheme.primary',
     
     # Text
-    r'IFridgeTheme\.textPrimary': r'Theme.of(context).colorScheme.onSurface',
-    r'IFridgeTheme\.textSecondary': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFA1A8B8) : const Color(0xFF5B6370))',
-    r'IFridgeTheme\.textMuted': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5B6370) : const Color(0xFF8B949E))',
+    r'PlatelyTheme\.textPrimary': r'Theme.of(context).colorScheme.onSurface',
+    r'PlatelyTheme\.textSecondary': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFA1A8B8) : const Color(0xFF5B6370))',
+    r'PlatelyTheme\.textMuted': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5B6370) : const Color(0xFF8B949E))',
     
     # Status / Tier
-    r'IFridgeTheme\.success': r'Theme.of(context).colorScheme.tertiary',
-    r'IFridgeTheme\.freshGreen': r'Theme.of(context).colorScheme.tertiary',
+    r'PlatelyTheme\.success': r'Theme.of(context).colorScheme.tertiary',
+    r'PlatelyTheme\.freshGreen': r'Theme.of(context).colorScheme.tertiary',
     r'AppTheme\.freshGreen': r'Theme.of(context).colorScheme.tertiary',
-    r'IFridgeTheme\.error': r'Theme.of(context).colorScheme.error',
-    r'IFridgeTheme\.criticalRed': r'Theme.of(context).colorScheme.error',
-    r'IFridgeTheme\.urgentOrange': r'Theme.of(context).colorScheme.primary',
-    r'IFridgeTheme\.agingAmber': r'Theme.of(context).colorScheme.secondary',
-    r'IFridgeTheme\.expiredGrey': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFA1A8B8) : const Color(0xFF5B6370))',
+    r'PlatelyTheme\.error': r'Theme.of(context).colorScheme.error',
+    r'PlatelyTheme\.criticalRed': r'Theme.of(context).colorScheme.error',
+    r'PlatelyTheme\.urgentOrange': r'Theme.of(context).colorScheme.primary',
+    r'PlatelyTheme\.agingAmber': r'Theme.of(context).colorScheme.secondary',
+    r'PlatelyTheme\.expiredGrey': r'(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFA1A8B8) : const Color(0xFF5B6370))',
 }
 
 def remove_invalid_consts(content):
@@ -63,7 +63,7 @@ def process_file(filepath):
     return False
 
 if __name__ == '__main__':
-    base_dir = r'd:\dev\projects\iFridge\frontend\lib'
+    base_dir = r'd:\dev\projects\Plately\frontend\lib'
     changed_files = 0
     
     for root, dirs, files in os.walk(base_dir):

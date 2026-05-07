@@ -1,12 +1,12 @@
-// I-Fridge — Nutrition Tracker Deep Page
+// Plately — Nutrition Tracker Deep Page
 // ========================================
 // Daily calorie ring, macro bars, and meal log history.
 
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:ifridge_app/core/theme/app_theme.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/theme/app_theme.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class NutritionTrackerPage extends StatefulWidget {
   const NutritionTrackerPage({super.key});

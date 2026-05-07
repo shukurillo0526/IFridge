@@ -1,5 +1,5 @@
 """
-I-Fridge — Recommendation Models
+Plately — Recommendation Models
 ==================================
 Pydantic models for the 5-Tier recommendation engine.
 """

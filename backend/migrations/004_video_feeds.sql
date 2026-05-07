@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════
--- I-Fridge — Video Feeds Schema
+-- Plately — Video Feeds Schema
 -- ═══════════════════════════════════════════════════════════════════
 -- Stores YouTube video metadata for Cook and Order feed tabs.
 -- Each video has an embedded YouTube link, AI-extracted recipe (cook),

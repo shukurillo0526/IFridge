@@ -1,4 +1,4 @@
--- I-Fridge Phase 3: pgvector configuration
+-- Plately Phase 3: pgvector configuration
 
 -- 1. Enable the pgvector extension to work with embedding vectors
 CREATE EXTENSION IF NOT EXISTS vector;

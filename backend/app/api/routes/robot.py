@@ -1,5 +1,5 @@
 """
-I-Fridge — Robot API Routes
+Plately — Robot API Routes
 ==============================
 Endpoints for robot execution plan generation and WebSocket control.
 """

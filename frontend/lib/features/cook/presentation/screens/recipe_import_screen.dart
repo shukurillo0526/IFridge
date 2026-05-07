@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RecipeImportScreen extends StatefulWidget {

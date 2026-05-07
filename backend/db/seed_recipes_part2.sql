@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Recipes (Part 2 of 2) — Recipes 26-50
+-- Plately — Seed: Recipes (Part 2 of 2) — Recipes 26-50
 -- ============================================================
 -- Run seed_ingredients.sql and seed_recipes_part1.sql FIRST.
 -- ============================================================

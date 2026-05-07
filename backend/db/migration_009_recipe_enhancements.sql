@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 009: Recipe Enhancements
+-- Plately — Migration 009: Recipe Enhancements
 -- ============================================================
 -- Adds timer data, tools, and temperature to recipe steps.
 -- Adds calorie and prep note fields to recipes.

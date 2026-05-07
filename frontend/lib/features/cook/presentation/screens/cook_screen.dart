@@ -1,21 +1,21 @@
-// I-Fridge — Cook Screen
+// Plately — Cook Screen
 // =======================
 // Displays recipe recommendations sorted into 5 tiers by ingredient match %.
 // Queries recipes + recipe_ingredients from Supabase, compares against the
 // user's inventory, and computes a match score.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/theme/app_theme.dart';
-import 'package:ifridge_app/core/widgets/shimmer_loading.dart';
-import 'package:ifridge_app/core/widgets/slide_in_item.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/utils/l10n_helper.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/recipe_detail_screen.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/recipe_import_screen.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/core/services/app_settings.dart';
+import 'package:plately_app/core/theme/app_theme.dart';
+import 'package:plately_app/core/widgets/shimmer_loading.dart';
+import 'package:plately_app/core/widgets/slide_in_item.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/utils/l10n_helper.dart';
+import 'package:plately_app/features/cook/presentation/screens/recipe_detail_screen.dart';
+import 'package:plately_app/features/cook/presentation/screens/recipe_import_screen.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class CookScreen extends StatefulWidget {

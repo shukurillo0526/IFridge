@@ -1,4 +1,4 @@
-// I-Fridge — Profile Screen
+// Plately — Profile Screen
 // ==========================
 // User profile with gamification stats, XP progress,
 // earned badges, flavor profile visualization, and settings.
@@ -8,20 +8,20 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/theme/app_theme.dart';
-import 'package:ifridge_app/core/constants/app_info.dart';
-import 'package:ifridge_app/core/widgets/shimmer_loading.dart';
-import 'package:ifridge_app/core/widgets/slide_in_item.dart';
-import 'package:ifridge_app/features/gamification/domain/badges.dart' show levelFromXp, WasteBadge, computeEarnedBadges;
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/app_settings.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/flavor_profile_page.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/nutrition_tracker_page.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/gamification_page.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/meal_planner_page.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/shopping_list_page.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
+import 'package:plately_app/core/theme/app_theme.dart';
+import 'package:plately_app/core/constants/app_info.dart';
+import 'package:plately_app/core/widgets/shimmer_loading.dart';
+import 'package:plately_app/core/widgets/slide_in_item.dart';
+import 'package:plately_app/features/gamification/domain/badges.dart' show levelFromXp, WasteBadge, computeEarnedBadges;
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/app_settings.dart';
+import 'package:plately_app/features/profile/presentation/screens/flavor_profile_page.dart';
+import 'package:plately_app/features/profile/presentation/screens/nutrition_tracker_page.dart';
+import 'package:plately_app/features/profile/presentation/screens/gamification_page.dart';
+import 'package:plately_app/features/profile/presentation/screens/meal_planner_page.dart';
+import 'package:plately_app/features/profile/presentation/screens/shopping_list_page.dart';
+import 'package:plately_app/core/services/social_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -117,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // App-level Self-Healing Fallback for User Initialization
       // If the backend SQL trigger hasn't fired or is missing, we create default rows here.
       if (userData == null) {
-        final email = client.auth.currentUser?.email ?? 'chef@ifridge.local';
+        final email = client.auth.currentUser?.email ?? 'chef@plately.local';
         final defaultName = email.split('@')[0];
         try {
           await client.from('users').insert({
@@ -840,7 +840,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         _SettingsRow(
                           icon: Icons.info_outline,
-                            label: AppLocalizations.of(context)?.aboutApp ?? 'About iFridge',
+                            label: AppLocalizations.of(context)?.aboutApp ?? 'About Plately',
                           onTap: () {
                             showDialog(
                               context: context,
@@ -851,7 +851,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     Text('🧊', style: TextStyle(fontSize: 32)),
                                     SizedBox(width: 12),
-                                    Text(AppLocalizations.of(context)?.auto_ifridge ?? 'iFridge', style: TextStyle(fontWeight: FontWeight.w800)),
+                                    Text(AppLocalizations.of(context)?.auto_plately ?? 'Plately', style: TextStyle(fontWeight: FontWeight.w800)),
                                   ],
                                 ),
                                 content: Column(
@@ -860,7 +860,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     Text('Version ${AppInfo.version} — The Intelligent Kitchen', style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)),
                                     SizedBox(height: 12),
-                                    Text(AppLocalizations.of(context)?.auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants ?? 'iFridge is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.', style: TextStyle(height: 1.5, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8))),
+                                    Text(AppLocalizations.of(context)?.auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants ?? 'Plately is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.', style: TextStyle(height: 1.5, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8))),
                                   ],
                                 ),
                                 actions: [

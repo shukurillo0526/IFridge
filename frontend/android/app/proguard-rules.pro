@@ -1,4 +1,4 @@
-# ── iFridge ProGuard Rules ──────────────────────────────
+# ── Plately ProGuard Rules ──────────────────────────────
 # Keep Flutter engine
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }

@@ -1,4 +1,4 @@
-// I-Fridge — Freshness Overlay Widget
+// Plately — Freshness Overlay Widget
 // Renders a color overlay that modulates based on an item's freshness state.
 // Items glow green when fresh, darken when aging, and pulse red when critical.
 

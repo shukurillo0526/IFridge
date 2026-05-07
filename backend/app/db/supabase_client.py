@@ -1,5 +1,5 @@
 """
-I-Fridge Backend — Supabase Client
+Plately Backend — Supabase Client
 ===================================
 Provides an async-compatible Supabase client singleton.
 """

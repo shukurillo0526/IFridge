@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Migration 012c: Fill Remaining Translations
+-- Plately — Migration 012c: Fill Remaining Translations
 -- Covers: 66 missing UZ/RU + 3 missing KO
 -- Also adds display_name_uz_cyrl column for Cyrillic Uzbek
 -- ============================================================

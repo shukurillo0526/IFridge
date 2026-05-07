@@ -1,5 +1,5 @@
 """
-I-Fridge — Recommendation API Routes
+Plately — Recommendation API Routes
 ======================================
 Endpoints for the 5-Tier recipe recommendation engine.
 """

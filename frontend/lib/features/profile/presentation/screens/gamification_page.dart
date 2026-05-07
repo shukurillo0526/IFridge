@@ -1,11 +1,11 @@
-// I-Fridge — Gamification Deep Page
+// Plately — Gamification Deep Page
 // ====================================
 // Full badge gallery, XP history, level milestones.
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/features/gamification/domain/badges.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/features/gamification/domain/badges.dart';
 
 class GamificationPage extends StatefulWidget {
   const GamificationPage({super.key});

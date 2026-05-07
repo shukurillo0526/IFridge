@@ -1,7 +1,7 @@
 import os
 import re
 
-path = r'd:\dev\projects\iFridge\backend\app\routers\recipe_ai.py'
+path = r'd:\dev\projects\Plately\backend\app\routers\recipe_ai.py'
 with open(path, 'r', encoding='utf-8') as f: content = f.read()
 
 endpoint = """@router.post("/api/v1/ai/translate-recipe")

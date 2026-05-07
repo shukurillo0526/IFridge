@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/utils/category_images.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/utils/category_images.dart';
 
 class AuditItem {
   final String id;

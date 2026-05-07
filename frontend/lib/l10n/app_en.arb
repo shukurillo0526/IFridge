@@ -1,6 +1,6 @@
 {
     "@@locale": "en",
-    "appTitle": "iFridge",
+    "appTitle": "Plately",
     "@appTitle": {
         "description": "The title of the application"
     },
@@ -67,7 +67,7 @@
     "settings": "Settings",
     "settingsLanguage": "Language",
     "settingsTheme": "Theme",
-    "aboutApp": "About iFridge",
+    "aboutApp": "About Plately",
     "myFridge": "🧊 My Fridge",
     "expiryAlerts": "Expiry alerts",
     "errorLoadInventory": "Couldn't load inventory",
@@ -217,8 +217,8 @@
     "auto_deleteAccount": "Delete Account?",
     "auto_deleteForever": "Delete Forever",
     "auto_accountDeletionRequestedContactSupportToFinalize": "Account deletion requested. Contact support to finalize.",
-    "auto_ifridge": "iFridge",
-    "auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants": "iFridge is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.",
+    "auto_plately": "Plately",
+    "auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants": "Plately is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.",
     "auto_gotIt": "Got it",
     "auto_editDisplayName": "Edit Display Name",
     "auto_save": "Save",

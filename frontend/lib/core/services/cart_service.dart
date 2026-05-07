@@ -1,11 +1,11 @@
-// I-Fridge — Cart Service
+// Plately — Cart Service
 // ========================
 // In-memory shopping cart for restaurant ordering.
 // Singleton pattern ensures cart persists across screens.
 // Binds to a single restaurant — clears if user switches.
 
 import 'package:flutter/foundation.dart';
-import 'package:ifridge_app/core/services/restaurant_service.dart';
+import 'package:plately_app/core/services/restaurant_service.dart';
 
 /// A single item in the cart with quantity.
 class CartItem {

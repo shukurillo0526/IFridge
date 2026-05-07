@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Extended Ingredient Seed (Part 2: Grains, Baking, Spices, Condiments)
+-- Plately — Extended Ingredient Seed (Part 2: Grains, Baking, Spices, Condiments)
 -- ============================================================
 
 -- ── GRAINS & PASTA ──────────────────────────────────────────

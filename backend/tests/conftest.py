@@ -1,5 +1,5 @@
 """
-I-Fridge — Test Configuration
+Plately — Test Configuration
 ================================
 Shared fixtures for the backend test suite.
 """

@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Additional Seed Data (Phase 4b)
+-- Plately — Additional Seed Data (Phase 4b)
 -- ============================================================
 -- Run AFTER seed_data.sql in Supabase SQL Editor.
 -- Adds 12 new ingredients and 15 recipes designed to produce

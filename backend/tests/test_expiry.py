@@ -1,5 +1,5 @@
 """
-I-Fridge — Expiry Prediction Unit Tests
+Plately — Expiry Prediction Unit Tests
 ==========================================
 Tests smart expiry prediction logic with storage location,
 packaging, and category factors.

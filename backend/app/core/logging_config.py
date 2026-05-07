@@ -1,5 +1,5 @@
 """
-I-Fridge — Structured Logging Configuration
+Plately — Structured Logging Configuration
 =============================================
 JSON-structured logging for production environments.
 All log entries include: timestamp, level, logger, message, and request_id.

@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Extended Ingredient Seed (Part 1: Vegetables, Protein, Dairy)
+-- Plately — Extended Ingredient Seed (Part 1: Vegetables, Protein, Dairy)
 -- ============================================================
 -- Uses ON CONFLICT to be re-runnable safely.
 -- Run migration_008 first!

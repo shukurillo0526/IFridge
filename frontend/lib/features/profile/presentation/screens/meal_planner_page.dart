@@ -1,11 +1,11 @@
-// I-Fridge — Meal Planner Deep Page
+// Plately — Meal Planner Deep Page
 // ====================================
 // Full calendar view with date-recipe assignments, monthly overview.
 // Uses meal_plan table: id, user_id, recipe_id, planned_date, meal_type, notes
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class MealPlannerPage extends StatefulWidget {
   const MealPlannerPage({super.key});

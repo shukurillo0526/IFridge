@@ -1,5 +1,5 @@
 """
-I-Fridge — YouTube Recipe Intelligence Service
+Plately — YouTube Recipe Intelligence Service
 ================================================
 Extracts structured recipe data from YouTube video descriptions
 and titles using the local LLM. Works without YouTube Data API
@@ -11,7 +11,7 @@ import re
 from typing import Optional
 from app.services.ollama_service import get_ollama_service
 
-logger = logging.getLogger("ifridge.youtube_intelligence")
+logger = logging.getLogger("plately.youtube_intelligence")
 
 
 async def extract_recipe_from_youtube(

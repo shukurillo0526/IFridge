@@ -1,4 +1,4 @@
-// I-Fridge — UI Utilities
+// Plately — UI Utilities
 // ========================
 // Shared helpers for haptic feedback, smooth transitions, and formatting.
 

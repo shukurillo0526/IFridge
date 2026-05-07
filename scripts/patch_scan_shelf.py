@@ -1,7 +1,7 @@
 import os
 
-scan_path = r'd:\dev\projects\iFridge\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
-shelf_path = r'd:\dev\projects\iFridge\frontend\lib\features\shelf\presentation\screens\living_shelf_screen.dart'
+scan_path = r'd:\dev\projects\Plately\frontend\lib\features\scan\presentation\screens\scan_screen.dart'
+shelf_path = r'd:\dev\projects\Plately\frontend\lib\features\shelf\presentation\screens\living_shelf_screen.dart'
 
 with open(scan_path, 'r', encoding='utf-8') as f: scan = f.read()
 with open(shelf_path, 'r', encoding='utf-8') as f: shelf = f.read()

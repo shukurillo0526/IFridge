@@ -2,9 +2,9 @@ import json
 import asyncio
 import sys
 
-sys.path.insert(0, r'd:\dev\projects\iFridge\backend')
+sys.path.insert(0, r'd:\dev\projects\Plately\backend')
 from dotenv import load_dotenv
-load_dotenv(r'd:\dev\projects\iFridge\backend\.env')
+load_dotenv(r'd:\dev\projects\Plately\backend\.env')
 from app.db.supabase_client import get_supabase
 
 async def main():

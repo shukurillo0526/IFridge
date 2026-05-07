@@ -1,4 +1,4 @@
-// I-Fridge — Shimmer / Skeleton Loading Widget
+// Plately — Shimmer / Skeleton Loading Widget
 // Used across all screens as a premium loading placeholder.
 
 import 'package:flutter/material.dart';

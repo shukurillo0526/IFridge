@@ -9,7 +9,7 @@ class AppLocalizationsUz extends AppLocalizations {
   AppLocalizationsUz([String locale = 'uz']) : super(locale);
 
   @override
-  String get appTitle => 'iFridge';
+  String get appTitle => 'Plately';
 
   @override
   String get tabShelf => 'Javon';
@@ -163,7 +163,7 @@ class AppLocalizationsUz extends AppLocalizations {
   String get settingsTheme => 'Mavzu';
 
   @override
-  String get aboutApp => 'iFridge haqida';
+  String get aboutApp => 'Plately haqida';
 
   @override
   String get myFridge => '🧊 Mening muzlatgichim';
@@ -530,12 +530,12 @@ class AppLocalizationsUz extends AppLocalizations {
       'Hisobni oʻchirish soʻraldi. Tugatish uchun qo‘llab-quvvatlash xizmatiga murojaat qiling.';
 
   @override
-  String get auto_ifridge => 'iFridge';
+  String get auto_plately => 'Plately';
 
   @override
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
-      'iFridge sizning sun\'iy intellekt asosida ishlaydigan oshxona ekotizimidir. U avtomatik ravishda ingredientlaringizni kuzatib boradi, amal qilish muddatini bashorat qiladi, moslashtirilgan retseptlar yaratadi va mahalliy restoranlardan buyurtma berish imkonini beradi.';
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
+      'Plately sizning sun\'iy intellekt asosida ishlaydigan oshxona ekotizimidir. U avtomatik ravishda ingredientlaringizni kuzatib boradi, amal qilish muddatini bashorat qiladi, moslashtirilgan retseptlar yaratadi va mahalliy restoranlardan buyurtma berish imkonini beradi.';
 
   @override
   String get auto_gotIt => 'Tushundim';
@@ -1398,11 +1398,11 @@ class AppLocalizationsUzCyrl extends AppLocalizationsUz {
       'Ҳисобни оʻчириш соʻралди. Тугатиш учун қо‘ллаб-қувватлаш хизматига мурожаат қилинг.';
 
   @override
-  String get auto_ifridge => 'иФридге';
+  String get auto_plately => 'иФридге';
 
   @override
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants =>
       'иФридге сизнинг сун\'ий интеллект асосида ишлайдиган ошхона екотизимидир. У автоматик равишда ингредиентларингизни кузатиб боради, амал қилиш муддатини башорат қилади, мослаштирилган ретсептлар йаратади ва маҳаллий ресторанлардан буйуртма бериш имконини беради.';
 
   @override

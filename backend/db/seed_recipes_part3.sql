@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Famous World Recipes (Part 3) — 25 Recipes
+-- Plately — Seed: Famous World Recipes (Part 3) — 25 Recipes
 -- ============================================================
 -- Creates a temp helper function, seeds 25 famous dishes,
 -- then drops the helper.

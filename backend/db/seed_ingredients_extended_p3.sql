@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Extended Ingredient Seed (Part 3: Fruits, Oils, Legumes, Nuts, Beverages)
+-- Plately — Extended Ingredient Seed (Part 3: Fruits, Oils, Legumes, Nuts, Beverages)
 -- ============================================================
 
 -- ── FRUITS ──────────────────────────────────────────────────

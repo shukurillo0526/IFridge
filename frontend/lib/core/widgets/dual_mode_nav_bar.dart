@@ -1,4 +1,4 @@
-// I-Fridge — Dual Mode Navigation Bar
+// Plately — Dual Mode Navigation Bar
 // =====================================
 // A distinctive bottom nav with:
 // - A single thin line running across the bottom
@@ -9,7 +9,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ifridge_app/core/services/app_settings.dart';
+import 'package:plately_app/core/services/app_settings.dart';
 
 /// Describes a single navigation item.
 class NavItem {

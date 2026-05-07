@@ -1,5 +1,5 @@
 """
-I-Fridge — Health Check Router
+Plately — Health Check Router
 ================================
 Comprehensive health check that reports the status of all
 backend dependencies. Used by monitoring systems and the
@@ -18,7 +18,7 @@ from fastapi import APIRouter
 from app.services.ollama_service import get_ollama_service
 from app.db.supabase_client import get_supabase
 
-logger = logging.getLogger("ifridge.health")
+logger = logging.getLogger("plately.health")
 
 router = APIRouter(tags=["Health"])
 

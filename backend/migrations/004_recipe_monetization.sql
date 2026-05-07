@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════
--- iFridge Recipe Monetization — Migration 004
+-- Plately Recipe Monetization — Migration 004
 -- Adds premium recipe support: pricing, creator ownership, copies
 -- Run in Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════════

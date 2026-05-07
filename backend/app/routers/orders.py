@@ -1,5 +1,5 @@
 """
-I-Fridge — Order Router
+Plately — Order Router
 ========================
 REST API for the mobile ordering system.
 Handles order creation, status updates, history, and cancellation.
@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field
 from app.db.supabase_client import get_supabase
 from app.models.api_response import api_success, api_error
 
-logger = logging.getLogger("ifridge.orders")
+logger = logging.getLogger("plately.orders")
 
 router = APIRouter(prefix="/api/v1/orders", tags=["Orders"])
 

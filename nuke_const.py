@@ -26,7 +26,7 @@ def nuke_consts(filepath):
     return False
 
 if __name__ == '__main__':
-    base_dir = r'd:\dev\projects\iFridge\frontend\lib'
+    base_dir = r'd:\dev\projects\Plately\frontend\lib'
     count = 0
     for root, dirs, files in os.walk(base_dir):
         for file in files:

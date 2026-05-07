@@ -4,7 +4,7 @@ import re
 
 def main():
     print("Running flutter build to find const errors...")
-    result = subprocess.run(["flutter", "build", "apk", "--debug"], cwd=r"d:\dev\projects\iFridge\frontend", capture_output=True, text=True, shell=True)
+    result = subprocess.run(["flutter", "build", "apk", "--debug"], cwd=r"d:\dev\projects\Plately\frontend", capture_output=True, text=True, shell=True)
     
     error_pattern = re.compile(r"lib/(.*?\.dart):(\d+):\d+: Error: Not a constant expression.")
     
@@ -13,7 +13,7 @@ def main():
     for line in result.stdout.split('\n') + result.stderr.split('\n'):
         match = error_pattern.search(line)
         if match:
-            filepath = os.path.join(r"d:\dev\projects\iFridge\frontend\lib", match.group(1).replace('/', '\\'))
+            filepath = os.path.join(r"d:\dev\projects\Plately\frontend\lib", match.group(1).replace('/', '\\'))
             line_num = int(match.group(2))
             
             if filepath not in files_to_fix:

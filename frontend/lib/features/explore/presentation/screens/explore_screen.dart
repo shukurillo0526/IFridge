@@ -1,4 +1,4 @@
-// I-Fridge — Explore Screen
+// Plately — Explore Screen
 // ===========================
 // Social discovery hub with two tabs:
 // 1. Reels — vertical video/tip feed
@@ -6,19 +6,19 @@
 // Features: likes, bookmarks, external video links, tags.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:ifridge_app/core/services/video_feed_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
-import 'package:ifridge_app/features/explore/presentation/screens/creator_page.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/recipe_detail_screen.dart';
-import 'package:ifridge_app/core/widgets/youtube_embed.dart';
-import 'package:ifridge_app/core/widgets/community_post_card.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/post_upload_form.dart';
-import 'package:ifridge_app/core/widgets/story_ring.dart';
-import 'package:ifridge_app/features/explore/presentation/screens/social_search_page.dart';
+import 'package:plately_app/core/services/video_feed_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:plately_app/features/explore/presentation/screens/creator_page.dart';
+import 'package:plately_app/features/cook/presentation/screens/recipe_detail_screen.dart';
+import 'package:plately_app/core/widgets/youtube_embed.dart';
+import 'package:plately_app/core/widgets/community_post_card.dart';
+import 'package:plately_app/core/services/social_service.dart';
+import 'package:plately_app/features/profile/presentation/screens/post_upload_form.dart';
+import 'package:plately_app/core/widgets/story_ring.dart';
+import 'package:plately_app/features/explore/presentation/screens/social_search_page.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ExploreScreen extends StatefulWidget {

@@ -1,14 +1,14 @@
-// I-Fridge — Restaurant Dashboard
+// Plately — Restaurant Dashboard
 // =================================
 // Management dashboard for restaurant/business owners.
 // Shows analytics, allows content creation, and business profile editing.
 // Accessible from Manage → "Restaurant Dashboard" (only visible if business account).
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/business_service.dart';
-import 'package:ifridge_app/core/services/social_service.dart';
-import 'package:ifridge_app/features/profile/presentation/screens/post_upload_form.dart';
-import 'package:ifridge_app/features/order/presentation/screens/incoming_orders_page.dart';
+import 'package:plately_app/core/services/business_service.dart';
+import 'package:plately_app/core/services/social_service.dart';
+import 'package:plately_app/features/profile/presentation/screens/post_upload_form.dart';
+import 'package:plately_app/features/order/presentation/screens/incoming_orders_page.dart';
 
 class RestaurantDashboardPage extends StatefulWidget {
   const RestaurantDashboardPage({super.key});

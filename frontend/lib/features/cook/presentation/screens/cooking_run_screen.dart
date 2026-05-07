@@ -1,4 +1,4 @@
-// I-Fridge — Active Cooking Screen (Enhanced)
+// Plately — Active Cooking Screen (Enhanced)
 // =============================================
 // Distraction-free, step-by-step cooking tutorial.
 // Features: persistent timer bar, auto-start timers, interactive countdown,
@@ -8,8 +8,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/features/cook/presentation/screens/cooking_reward_screen.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/features/cook/presentation/screens/cooking_reward_screen.dart';
 
 class CookingRunScreen extends StatefulWidget {
   final String recipeId;

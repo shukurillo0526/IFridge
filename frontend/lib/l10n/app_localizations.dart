@@ -106,7 +106,7 @@ abstract class AppLocalizations {
   /// The title of the application
   ///
   /// In en, this message translates to:
-  /// **'iFridge'**
+  /// **'Plately'**
   String get appTitle;
 
   /// No description provided for @tabShelf.
@@ -406,7 +406,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'About iFridge'**
+  /// **'About Plately'**
   String get aboutApp;
 
   /// No description provided for @myFridge.
@@ -1093,18 +1093,18 @@ abstract class AppLocalizations {
   /// **'Account deletion requested. Contact support to finalize.'**
   String get auto_accountDeletionRequestedContactSupportToFinalize;
 
-  /// No description provided for @auto_ifridge.
+  /// No description provided for @auto_plately.
   ///
   /// In en, this message translates to:
-  /// **'iFridge'**
-  String get auto_ifridge;
+  /// **'Plately'**
+  String get auto_plately;
 
-  /// No description provided for @auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants.
+  /// No description provided for @auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants.
   ///
   /// In en, this message translates to:
-  /// **'iFridge is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.'**
+  /// **'Plately is your AI-powered kitchen ecosystem. It automatically tracks your ingredients, predicts expirations, generates personalized recipes, and lets you order from local restaurants.'**
   String
-  get auto_ifridgeIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants;
+  get auto_platelyIsYourAipoweredKitchenEcosystemItAutomaticallyTracksYourIngredientsPredictsExpirationsGeneratesPersonalizedRecipesAndLetsYouOrderFromLocalRestaurants;
 
   /// No description provided for @auto_gotIt.
   ///

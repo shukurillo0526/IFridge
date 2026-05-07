@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Uzbek Recipes — 15 Authentic Dishes
+-- Plately — Seed: Uzbek Recipes — 15 Authentic Dishes
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION _ensure_ing(p_name TEXT, p_cat TEXT, p_unit TEXT)

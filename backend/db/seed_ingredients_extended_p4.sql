@@ -1,5 +1,5 @@
 -- ============================================================
--- I-Fridge — Seed: Extended Ingredients Part 4
+-- Plately — Seed: Extended Ingredients Part 4
 -- ============================================================
 -- ~260 additional ingredients covering world cuisines.
 -- Includes Uzbek, Korean, Japanese, Mexican, Middle Eastern.

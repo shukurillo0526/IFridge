@@ -1,1 +1,1 @@
-# I-Fridge Backend Application
+# Plately Backend Application

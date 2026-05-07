@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/api_service.dart';
-import 'package:ifridge_app/core/services/cache_service.dart';
+import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/cache_service.dart';
 
 // ═══════════════════════════════════════════════════════════════════
-//  I-Fridge — Riverpod Providers
+//  Plately — Riverpod Providers
 //  Centralized state management for shared data across screens.
 //
 //  Strategy:

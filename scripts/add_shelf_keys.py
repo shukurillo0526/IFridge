@@ -26,7 +26,7 @@ keys = {
     "expiringSoonCount": "⚠️ Expiring Soon ({count})",
 }
 
-l10n_dir = r"d:\dev\projects\iFridge\frontend\lib\l10n"
+l10n_dir = r"d:\dev\projects\Plately\frontend\lib\l10n"
 
 for lang in ["en", "ko", "ru", "uz", "uz_Cyrl"]:
     path = os.path.join(l10n_dir, f"app_{lang}.arb")

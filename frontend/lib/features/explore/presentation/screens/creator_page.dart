@@ -1,12 +1,12 @@
-// I-Fridge — Creator Page
+// Plately — Creator Page
 // ========================
 // Profile page for a recipe/reel creator.
 // Shows bio, follower count, posts grid, and follow/unfollow.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class CreatorPage extends StatefulWidget {
   final String creatorId;

@@ -1,5 +1,5 @@
 """
-I-Fridge — Vision Models
+Plately — Vision Models
 =========================
 Pydantic models for the Clarifai vision pipeline.
 """

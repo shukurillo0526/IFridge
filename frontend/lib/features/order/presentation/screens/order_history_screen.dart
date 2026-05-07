@@ -1,12 +1,12 @@
-// I-Fridge — Order History Screen
+// Plately — Order History Screen
 // =================================
 // Shows user's past and active orders with status tracking.
 // Accessible from the Profile/Manage tab.
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/l10n/app_localizations.dart';
-import 'package:ifridge_app/core/services/order_service.dart';
-import 'package:ifridge_app/core/services/auth_helper.dart';
+import 'package:plately_app/l10n/app_localizations.dart';
+import 'package:plately_app/core/services/order_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});

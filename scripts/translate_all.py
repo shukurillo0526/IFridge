@@ -41,7 +41,7 @@ def uz_latin_to_cyrillic(text):
     return text
 
 def main():
-    l10n_dir = r"d:\dev\projects\iFridge\frontend\lib\l10n"
+    l10n_dir = r"d:\dev\projects\Plately\frontend\lib\l10n"
     
     with open(os.path.join(l10n_dir, "app_en.arb"), 'r', encoding='utf-8') as f:
         en_arb = json.load(f)

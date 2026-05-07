@@ -1,4 +1,4 @@
-// I-Fridge — Story Ring
+// Plately — Story Ring
 // ======================
 // Horizontal scrollable row of user story avatars.
 // - Gradient ring = has unviewed stories
@@ -8,8 +8,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ifridge_app/core/services/story_service.dart';
-import 'package:ifridge_app/core/widgets/story_viewer.dart';
+import 'package:plately_app/core/services/story_service.dart';
+import 'package:plately_app/core/widgets/story_viewer.dart';
 
 class StoryRing extends StatefulWidget {
   const StoryRing({super.key});

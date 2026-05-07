@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
-import 'package:ifridge_app/core/services/api_service.dart' show ApiConfig;
+import 'package:plately_app/core/services/api_service.dart' show ApiConfig;
 import 'dart:async';
 
 /// Offline-first caching service using Hive.

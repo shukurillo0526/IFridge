@@ -1,4 +1,4 @@
-// I-Fridge — Recipe Attachment Widget
+// Plately — Recipe Attachment Widget
 // =====================================
 // Toggleable section for attaching a recipe to a reel/post.
 // Modes:
@@ -8,7 +8,7 @@
 // Pricing: Free or Premium (creator sets price)
 
 import 'package:flutter/material.dart';
-import 'package:ifridge_app/core/services/recipe_monetization_service.dart';
+import 'package:plately_app/core/services/recipe_monetization_service.dart';
 
 class RecipeAttachmentWidget extends StatefulWidget {
   final ValueChanged<RecipeAttachmentResult?> onChanged;

@@ -10,19 +10,19 @@ def to_camel_case(text):
 
 def main():
     files_to_localize = [
-        r"D:\dev\projects\iFridge\frontend\lib\features\explore\presentation\screens\creator_page.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\explore\presentation\screens\explore_screen.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\explore\presentation\screens\social_search_page.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\checkout_screen.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\incoming_orders_page.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\order_feeds_screen.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\order_history_screen.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\order_screen.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\order\presentation\screens\restaurant_detail_page.dart",
-        r"D:\dev\projects\iFridge\frontend\lib\features\profile\presentation\screens\profile_screen.dart" # "Manage"
+        r"D:\dev\projects\Plately\frontend\lib\features\explore\presentation\screens\creator_page.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\explore\presentation\screens\explore_screen.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\explore\presentation\screens\social_search_page.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\checkout_screen.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\incoming_orders_page.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\order_feeds_screen.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\order_history_screen.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\order_screen.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\order\presentation\screens\restaurant_detail_page.dart",
+        r"D:\dev\projects\Plately\frontend\lib\features\profile\presentation\screens\profile_screen.dart" # "Manage"
     ]
     
-    l10n_dir = r"d:\dev\projects\iFridge\frontend\lib\l10n"
+    l10n_dir = r"d:\dev\projects\Plately\frontend\lib\l10n"
     
     arbs = {}
     for lang in ['en', 'ko', 'ru', 'uz', 'uz_Cyrl']:
@@ -60,8 +60,8 @@ def main():
             replacements.append((full_match, new_text))
 
         if replacements:
-            if "import 'package:ifridge_app/l10n/app_localizations.dart';" not in content:
-                content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:ifridge_app/l10n/app_localizations.dart';")
+            if "import 'package:plately_app/l10n/app_localizations.dart';" not in content:
+                content = content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport 'package:plately_app/l10n/app_localizations.dart';")
             
             for old, new in replacements:
                 content = content.replace(old, new)
