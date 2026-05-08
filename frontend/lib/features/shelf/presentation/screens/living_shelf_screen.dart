@@ -14,6 +14,7 @@ import 'package:plately_app/features/cook/presentation/screens/cook_screen.dart'
 import 'package:plately_app/features/scan/presentation/screens/scan_screen.dart';
 import 'package:plately_app/features/shelf/presentation/widgets/inventory_detail_sheet.dart';
 import 'package:plately_app/core/utils/category_images.dart';
+import 'package:plately_app/core/utils/l10n_helper.dart';
 import 'package:plately_app/core/services/auth_helper.dart';
 import 'package:plately_app/l10n/app_localizations.dart';
 
@@ -338,7 +339,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
         padding: EdgeInsets.symmetric(horizontal: 12),
         children: [
           _filterChip(null, AppLocalizations.of(context)?.all ?? 'All'),
-          ..._categories.map((c) => _filterChip(c, _cap(c))),
+          ..._categories.map((c) => _filterChip(c, L10nHelper.translateCategory(c, Localizations.localeOf(context)))),
         ],
       ),
     );

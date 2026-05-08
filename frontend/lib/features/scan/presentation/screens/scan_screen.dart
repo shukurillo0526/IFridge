@@ -1296,7 +1296,7 @@ class _ManualEntryBottomSheetState extends State<_ManualEntryBottomSheet> {
                                 default: displayName = option['display_name_en'] ?? '';
                               }
                             }
-                            final translatedCat = L10nHelper.translateCategory(cat, lang);
+                            final translatedCat = L10nHelper.translateCategory(cat, Localizations.localeOf(context));
                             return ListTile(
                               leading: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
@@ -1337,8 +1337,7 @@ class _ManualEntryBottomSheetState extends State<_ManualEntryBottomSheet> {
                 prefixIcon: Icon(Icons.category),
               ),
               items: _categories.map((c) {
-                final lang = Localizations.localeOf(context).languageCode;
-                return DropdownMenuItem(value: c, child: Text(L10nHelper.translateCategory(c, lang)));
+                return DropdownMenuItem(value: c, child: Text(L10nHelper.translateCategory(c, Localizations.localeOf(context))));
               }).toList(),
               onChanged: (v) {
                 if (v != null) {

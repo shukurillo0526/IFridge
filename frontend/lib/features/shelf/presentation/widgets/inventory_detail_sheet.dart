@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:plately_app/core/utils/category_images.dart';
+import 'package:plately_app/core/utils/l10n_helper.dart';
 import 'package:plately_app/features/shelf/domain/inventory_item.dart';
 
 class InventoryDetailSheet extends StatefulWidget {
@@ -231,7 +232,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
               textAlign: TextAlign.center),
           SizedBox(height: 6),
           Text(
-              '${_cap(item.category)} · ${_cap(_location)} · ${_cap(_itemState)}',
+              '${L10nHelper.translateCategory(item.category, Localizations.localeOf(context))} · ${L10nHelper.translateLocation(_location, Localizations.localeOf(context))} · ${L10nHelper.translateState(_itemState, Localizations.localeOf(context))}',
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
               textAlign: TextAlign.center),
@@ -288,7 +289,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
             Row(children: [
               _infoCell('⏰', AppLocalizations.of(context)?.inv_expires ?? 'Expires', _fmtDate(item.computedExpiry)),
               _vDiv(),
-              _infoCell('🎯', AppLocalizations.of(context)?.inv_source ?? 'Source', _cap(item.source)),
+              _infoCell('🎯', AppLocalizations.of(context)?.inv_source ?? 'Source', L10nHelper.translateSource(item.source, Localizations.localeOf(context))),
             ]),
           ]),
         ),
@@ -375,6 +376,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
   Widget _locationSelector() => _chipRow(
         label: AppLocalizations.of(context)?.inv_storageLocation ?? 'Storage Location',
         options: const ['fridge', 'freezer', 'pantry'],
+        displayLabels: ['fridge', 'freezer', 'pantry'].map((l) => L10nHelper.translateLocation(l, Localizations.localeOf(context))).toList(),
         icons: const [Icons.kitchen, Icons.ac_unit, Icons.inventory_2],
         selected: _location,
         color: Theme.of(context).colorScheme.primary,
@@ -387,6 +389,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
   Widget _stateSelector() => _chipRow(
         label: AppLocalizations.of(context)?.inv_itemState ?? 'Item State',
         options: const ['sealed', 'opened', 'frozen'],
+        displayLabels: ['sealed', 'opened', 'frozen'].map((s) => L10nHelper.translateState(s, Localizations.localeOf(context))).toList(),
         icons: const [Icons.verified_outlined, Icons.lock_open, Icons.ac_unit],
         selected: _itemState,
         color: Theme.of(context).colorScheme.secondary,
@@ -399,6 +402,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
   Widget _chipRow({
     required String label,
     required List<String> options,
+    List<String>? displayLabels,
     required List<IconData> icons,
     required String selected,
     required Color color,
@@ -438,7 +442,7 @@ class _InventoryDetailSheetState extends State<InventoryDetailSheet> {
                         color: active ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         size: 20),
                     SizedBox(height: 4),
-                    Text(_cap(options[i]),
+                    Text(displayLabels != null ? displayLabels![i] : _cap(options[i]),
                         style: TextStyle(
                             color: active ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 12,

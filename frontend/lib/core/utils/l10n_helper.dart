@@ -1,12 +1,48 @@
 import 'package:flutter/material.dart';
 
 class L10nHelper {
-  static String translateCuisine(String cuisine, String localeCode) {
+  static String translateCuisine(String cuisine, dynamic localeOrCode) {
     if (cuisine.isEmpty) return cuisine;
     
     final lower = cuisine.toLowerCase();
     
-    if (localeCode.startsWith('uz')) {
+    // Support both String and Locale
+    String key;
+    if (localeOrCode is Locale) {
+      key = _localeKey(localeOrCode);
+    } else {
+      key = (localeOrCode as String);
+    }
+    
+    if (key == 'uz_Cyrl') {
+      switch (lower) {
+        case 'asian': return 'Осиёча';
+        case 'middle eastern': return 'Яқин Шарқ';
+        case 'italian': return 'Италиянча';
+        case 'mexican': return 'Мексиканча';
+        case 'american': return 'Американча';
+        case 'korean': return 'Корейсча';
+        case 'japanese': return 'Йапонча';
+        case 'uzbek': return 'Ўзбекча';
+        case 'indian': return 'Ҳиндча';
+        case 'french': return 'Франсузча';
+        case 'chinese': return 'Хитойча';
+        case 'thai': return 'Тайча';
+        case 'mediterranean': return 'Ўртайер денгизи';
+        case 'european': return 'Йевропача';
+        case 'british': return 'Британча';
+        case 'spanish': return 'Испанча';
+        case 'greek': return 'Грекча';
+        case 'turkish': return 'Туркча';
+        case 'vietnamese': return 'Вьетнамча';
+        case 'russian': return 'Русча';
+        case 'latin': return 'Лотин';
+        case 'fusion': return 'Фужн';
+        case 'eastern european': return 'Шарқий Йевропа';
+        case 'western': return 'Ғарбий';
+        default: return cuisine;
+      }
+    } else if (key == 'uz' || key.startsWith('uz')) {
       switch (lower) {
         case 'asian': return 'Osiyocha';
         case 'middle eastern': return 'Yaqin Sharq';
@@ -22,9 +58,19 @@ class L10nHelper {
         case 'thai': return 'Taycha';
         case 'mediterranean': return 'O\'rtayer dengizi';
         case 'european': return 'Yevropacha';
+        case 'british': return 'Britancha';
+        case 'spanish': return 'Ispancha';
+        case 'greek': return 'Grekcha';
+        case 'turkish': return 'Turkcha';
+        case 'vietnamese': return 'Vyetnamcha';
+        case 'russian': return 'Ruscha';
+        case 'latin': return 'Lotin';
+        case 'fusion': return 'Fuzhn';
+        case 'eastern european': return 'Sharqiy Yevropa';
+        case 'western': return 'G\'arbiy';
         default: return cuisine;
       }
-    } else if (localeCode.startsWith('ru')) {
+    } else if (key == 'ru' || key.startsWith('ru')) {
       switch (lower) {
         case 'asian': return 'Азиатская';
         case 'middle eastern': return 'Ближневосточная';
@@ -40,6 +86,44 @@ class L10nHelper {
         case 'thai': return 'Тайская';
         case 'mediterranean': return 'Средиземноморская';
         case 'european': return 'Европейская';
+        case 'british': return 'Британская';
+        case 'spanish': return 'Испанская';
+        case 'greek': return 'Греческая';
+        case 'turkish': return 'Турецкая';
+        case 'vietnamese': return 'Вьетнамская';
+        case 'russian': return 'Русская';
+        case 'latin': return 'Латинская';
+        case 'fusion': return 'Фьюжн';
+        case 'eastern european': return 'Восточноевропейская';
+        case 'western': return 'Западная';
+        default: return cuisine;
+      }
+    } else if (key == 'ko' || key.startsWith('ko')) {
+      switch (lower) {
+        case 'asian': return '아시아';
+        case 'middle eastern': return '중동';
+        case 'italian': return '이탈리아';
+        case 'mexican': return '멕시코';
+        case 'american': return '미국';
+        case 'korean': return '한국';
+        case 'japanese': return '일본';
+        case 'uzbek': return '우즈벡';
+        case 'indian': return '인도';
+        case 'french': return '프랑스';
+        case 'chinese': return '중국';
+        case 'thai': return '태국';
+        case 'mediterranean': return '지중해';
+        case 'european': return '유럽';
+        case 'british': return '영국';
+        case 'spanish': return '스페인';
+        case 'greek': return '그리스';
+        case 'turkish': return '터키';
+        case 'vietnamese': return '베트남';
+        case 'russian': return '러시아';
+        case 'latin': return '라틴';
+        case 'fusion': return '퓨전';
+        case 'eastern european': return '동유럽';
+        case 'western': return '서양';
         default: return cuisine;
       }
     }
@@ -93,13 +177,55 @@ class L10nHelper {
     return unit; // Default English
   }
 
+  /// Helper to get effective locale key for switches.
+  static String _localeKey(Locale locale) {
+    if (locale.languageCode == 'uz' && locale.scriptCode == 'Cyrl') return 'uz_Cyrl';
+    return locale.languageCode; // 'en', 'uz', 'ru', 'ko'
+  }
+
   /// Translate an ingredient category for display.
-  static String translateCategory(String category, String localeCode) {
+  static String translateCategory(String category, Locale locale) {
     if (category.isEmpty) return category;
     
     final lower = category.toLowerCase();
+    final key = _localeKey(locale);
     
-    if (localeCode.startsWith('uz')) {
+    if (key == 'uz_Cyrl') {
+      switch (lower) {
+        case 'produce': return 'Маҳсулотлар';
+        case 'vegetable': return 'Сабзавот';
+        case 'fruit': return 'Мева';
+        case 'meat': return 'Гўшт';
+        case 'poultry': return 'Парранда';
+        case 'seafood': return 'Денгиз маҳсулоти';
+        case 'dairy': return 'Сут маҳсулоти';
+        case 'milk': return 'Сут';
+        case 'cheese': return 'Пишлоқ';
+        case 'yogurt': return 'Йогурт';
+        case 'eggs': return 'Тухум';
+        case 'bakery': return 'Новвойхона';
+        case 'bread': return 'Нон';
+        case 'grain': return 'Дон';
+        case 'pasta': return 'Макарон';
+        case 'pantry': return 'Омбор';
+        case 'canned': return 'Консерва';
+        case 'frozen': return 'Музлатилган';
+        case 'beverage': return 'Ичимлик';
+        case 'juice': return 'Шарбат';
+        case 'snack': return 'Газак';
+        case 'condiment': return 'Зираворлар';
+        case 'spice': return 'Зиравор';
+        case 'oil': return 'Йоғ';
+        case 'sauce': return 'Соус';
+        case 'nuts': return 'Йонғоқ';
+        case 'legumes': return 'Дуккакли';
+        case 'tofu': return 'Тофу';
+        case 'protein': return 'Оқсил';
+        case 'baking': return 'Пиширилади';
+        case 'seasoning': return 'Зираворлар';
+        default: return category;
+      }
+    } else if (key == 'uz') {
       switch (lower) {
         case 'produce': return 'Mahsulotlar';
         case 'vegetable': return 'Sabzavot';
@@ -134,7 +260,7 @@ class L10nHelper {
         case 'seasoning': return 'Ziravorlar';
         default: return category;
       }
-    } else if (localeCode.startsWith('ru')) {
+    } else if (key == 'ru') {
       switch (lower) {
         case 'produce': return 'Продукты';
         case 'vegetable': return 'Овощи';
@@ -169,7 +295,7 @@ class L10nHelper {
         case 'seasoning': return 'Приправы';
         default: return category;
       }
-    } else if (localeCode.startsWith('ko')) {
+    } else if (key == 'ko') {
       switch (lower) {
         case 'produce': return '농산물';
         case 'vegetable': return '채소';
@@ -207,5 +333,99 @@ class L10nHelper {
     }
     
     return category; // Default English
+  }
+
+  /// Translate storage location for chip display.
+  static String translateLocation(String location, Locale locale) {
+    final key = _localeKey(locale);
+    final lower = location.toLowerCase();
+    switch (key) {
+      case 'uz_Cyrl':
+        if (lower == 'fridge') return 'Музлатгич';
+        if (lower == 'freezer') return 'Музлатиш камераси';
+        if (lower == 'pantry') return 'Омборхона';
+        return location;
+      case 'uz':
+        if (lower == 'fridge') return 'Muzlatgich';
+        if (lower == 'freezer') return 'Muzlatish kamerasi';
+        if (lower == 'pantry') return 'Omborxona';
+        return location;
+      case 'ru':
+        if (lower == 'fridge') return 'Холодильник';
+        if (lower == 'freezer') return 'Морозилка';
+        if (lower == 'pantry') return 'Кладовая';
+        return location;
+      case 'ko':
+        if (lower == 'fridge') return '냉장고';
+        if (lower == 'freezer') return '냉동실';
+        if (lower == 'pantry') return '식료품장';
+        return location;
+      default:
+        return location;
+    }
+  }
+
+  /// Translate item state for chip display.
+  static String translateState(String state, Locale locale) {
+    final key = _localeKey(locale);
+    final lower = state.toLowerCase();
+    switch (key) {
+      case 'uz_Cyrl':
+        if (lower == 'sealed') return 'Йопиқ';
+        if (lower == 'opened') return 'Очилган';
+        if (lower == 'frozen') return 'Музлатилган';
+        return state;
+      case 'uz':
+        if (lower == 'sealed') return 'Yopiq';
+        if (lower == 'opened') return 'Ochilgan';
+        if (lower == 'frozen') return 'Muzlatilgan';
+        return state;
+      case 'ru':
+        if (lower == 'sealed') return 'Закрытый';
+        if (lower == 'opened') return 'Открытый';
+        if (lower == 'frozen') return 'Замороженный';
+        return state;
+      case 'ko':
+        if (lower == 'sealed') return '밀봉';
+        if (lower == 'opened') return '개봉';
+        if (lower == 'frozen') return '냉동';
+        return state;
+      default:
+        return state;
+    }
+  }
+
+  /// Translate source value for display.
+  static String translateSource(String source, Locale locale) {
+    final key = _localeKey(locale);
+    final lower = source.toLowerCase();
+    switch (key) {
+      case 'uz_Cyrl':
+        if (lower == 'manual') return 'Қўлда';
+        if (lower == 'scan') return 'Сканер';
+        if (lower == 'receipt') return 'Чек';
+        if (lower == 'barcode') return 'Штрих-код';
+        return source;
+      case 'uz':
+        if (lower == 'manual') return 'Qo\'lda';
+        if (lower == 'scan') return 'Skaner';
+        if (lower == 'receipt') return 'Chek';
+        if (lower == 'barcode') return 'Shtrix-kod';
+        return source;
+      case 'ru':
+        if (lower == 'manual') return 'Вручную';
+        if (lower == 'scan') return 'Сканер';
+        if (lower == 'receipt') return 'Чек';
+        if (lower == 'barcode') return 'Штрих-код';
+        return source;
+      case 'ko':
+        if (lower == 'manual') return '수동';
+        if (lower == 'scan') return '스캔';
+        if (lower == 'receipt') return '영수증';
+        if (lower == 'barcode') return '바코드';
+        return source;
+      default:
+        return source;
+    }
   }
 }

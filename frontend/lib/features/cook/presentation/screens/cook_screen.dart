@@ -184,7 +184,7 @@ class _CookScreenState extends State<CookScreen>
       // Pre-fetch ALL recipe_ingredients in ONE query (avoid N+1)
       final allRiRows = await client
           .from('recipe_ingredients')
-          .select('recipe_id, ingredient_id, ingredients(display_name_en)');
+          .select('recipe_id, ingredient_id, ingredients(display_name_en, display_name_ko, display_name_uz, display_name_uz_cyrl, display_name_ru)');
 
       // Group by recipe_id
       final Map<String, List<Map<String, dynamic>>> riByRecipe = {};
@@ -211,7 +211,7 @@ class _CookScreenState extends State<CookScreen>
           for (final ri in riRows) {
             final ingId = ri['ingredient_id'] as String;
             final ingData = ri['ingredients'] as Map?;
-            final displayName = ingData?['display_name_en'] ?? 'Unknown';
+            final displayName = _localizedIngName(ingData, currentLang);
 
             if (ownedIds.contains(ingId)) {
               matchedCount++;
@@ -272,7 +272,7 @@ class _CookScreenState extends State<CookScreen>
           for (final ri in riRows) {
             final ingId = ri['ingredient_id'] as String;
             final ingData = ri['ingredients'] as Map?;
-            final displayName = ingData?['display_name_en'] ?? 'Unknown';
+            final displayName = _localizedIngName(ingData, currentLang);
 
             if (ownedIds.contains(ingId)) {
               matchedCount++;
@@ -378,6 +378,21 @@ class _CookScreenState extends State<CookScreen>
       }
     } catch (e) {
       debugPrint('[Cook] Batch title translation error: $e');
+    }
+  }
+
+  /// Pick the localized ingredient name from joined data.
+  String _localizedIngName(Map? ingData, String langCode) {
+    if (ingData == null) return 'Unknown';
+    final locale = AppSettings().locale;
+    if (locale.languageCode == 'uz' && locale.scriptCode == 'Cyrl') {
+      return ingData['display_name_uz_cyrl'] ?? ingData['display_name_uz'] ?? ingData['display_name_en'] ?? 'Unknown';
+    }
+    switch (langCode) {
+      case 'ko': return ingData['display_name_ko'] ?? ingData['display_name_en'] ?? 'Unknown';
+      case 'uz': return ingData['display_name_uz'] ?? ingData['display_name_en'] ?? 'Unknown';
+      case 'ru': return ingData['display_name_ru'] ?? ingData['display_name_en'] ?? 'Unknown';
+      default: return ingData['display_name_en'] ?? 'Unknown';
     }
   }
 
@@ -928,8 +943,8 @@ class _CookScreenState extends State<CookScreen>
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.fromLTRB(16, 10, 16, 2),
                   children: [
-                    _cuisineChip(null, 'All'),
-                    ..._allCuisines.map((c) => _cuisineChip(c, c)),
+                    _cuisineChip(null, AppLocalizations.of(context)?.all ?? 'All'),
+                    ..._allCuisines.map((c) => _cuisineChip(c, L10nHelper.translateCuisine(c, Localizations.localeOf(context)))),
                   ],
                 ),
               ),
@@ -1238,7 +1253,7 @@ class _RecipeCard extends StatelessWidget {
                   if (cuisine.isNotEmpty)
                     _InfoChip(
                       icon: Icons.public,
-                      label: L10nHelper.translateCuisine(cuisine, Localizations.localeOf(context).languageCode),
+                      label: L10nHelper.translateCuisine(cuisine, Localizations.localeOf(context)),
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                     ),
                   if (prepTime != null)

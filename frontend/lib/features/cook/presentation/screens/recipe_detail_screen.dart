@@ -651,7 +651,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 runSpacing: 8,
                 children: [
                   if (widget.cuisine != null && widget.cuisine!.isNotEmpty)
-                    _QuickChip(icon: Icons.public, label: L10nHelper.translateCuisine(widget.cuisine!, Localizations.localeOf(context).languageCode)),
+                    _QuickChip(icon: Icons.public, label: L10nHelper.translateCuisine(widget.cuisine!, Localizations.localeOf(context))),
                   if (_totalTime > 0)
                     _QuickChip(icon: Icons.timer, label: '$_totalTime ${AppLocalizations.of(context)?.min_tag ?? "min"}'),
                   if (widget.servings != null)
