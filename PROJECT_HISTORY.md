@@ -348,6 +348,45 @@ Consumer                           Restaurant
 
 ---
 
+# 📦 v0.0.1 — Preparation for the First Public Deploy
+
+Initial public release of the iFridge consumer app. Deployed to GitHub Pages via Flutter Web with CI/CD pipeline.
+
+### Highlights
+- **Full Consumer MVP:** All screens functional — Shelf, Scan, Cook, Profile, Order.
+- **Marketplace Foundation:** Cart, checkout, order lifecycle, restaurant dashboard all operational.
+- **Local AI Pipeline:** Ollama-powered recipe generation, ingredient detection, and cooking tips running on consumer hardware.
+- **GitHub Pages Deployment:** Automated via `flutter_web_deploy.yml` on every push to `main`.
+- **33 Uzbek Recipes:** Seeded `seed_recipes_uzbek.sql` with traditional dishes (Plov, Lagman, Somsa, Shashlik, Manti, Chuchvara, Norin, etc.) — bringing total recipe count to 133.
+
+---
+
+# 📦 v0.0.2 — Multilingual Infrastructure & Locale System
+
+Built the full internationalization (i18n) framework and added 4-language UI support.
+
+### Highlights
+- **Flutter Locale System:** Implemented `AppSettings` locale management with `Locale.fromSubtags()` supporting language + script code combinations.
+- **5 ARB Files:** `app_en.arb`, `app_ko.arb`, `app_uz.arb`, `app_uz_Cyrl.arb`, `app_ru.arb` — covering all UI strings.
+- **Language Picker:** Profile settings screen with runtime language switching (persisted via `SharedPreferences`).
+- **Uzbek Cyrillic Detection:** Script-aware localization using `Localizations.localeOf(context).scriptCode == 'Cyrl'` to differentiate Uzbek Latin vs Cyrillic.
+- **Supabase Ingredient Columns:** Added `display_name_ko`, `display_name_uz`, `display_name_uz_cyrl`, `display_name_ru` to the `ingredients` table.
+
+---
+
+# 📦 v0.0.3 — AI Translation Pipeline & Recipe Translations
+
+Translated all recipes and ingredients across 4 languages using a hybrid AI pipeline.
+
+### Highlights
+- **Hybrid Translation Engine:** `qwen3:14b` via Ollama (primary) with Google Gemini Flash fallback when rate-limited.
+- **Culinary Glossary:** Curated term mappings ensuring domain-accurate translations (e.g., "gochujang" → "고추장", "plov" → "плов").
+- **Recipe Translations:** Title, description, and step-by-step instructions for all 133 recipes translated and cached in `recipe_translations` table.
+- **Ingredient Translations:** 319 canonical ingredients translated to Korean, Uzbek Latin, Uzbek Cyrillic, and Russian (100% coverage across all languages).
+- **Translation Scripts:** `scripts/translate_all.py`, `scripts/translate_missed.py`, `scripts/patch_translation_ollama.py` for batch and incremental translation runs.
+
+---
+
 # 📦 v0.0.4 — Plately: Multilingual Ingredients, Relational Recipes & Rebrand
 
 The pivotal release where I-Fridge became **Plately** — rebuilt the recipe-ingredient data model from the ground up with full multilingual support.
