@@ -6,6 +6,7 @@
 
 import 'package:plately_app/core/services/location_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:plately_app/core/theme/app_theme.dart';
 import 'package:plately_app/core/services/app_settings.dart';
 import 'package:plately_app/core/widgets/dual_mode_nav_bar.dart';
@@ -223,19 +224,19 @@ class _AppShellState extends State<AppShell> with TickerProviderStateMixin {
   // ── Cook mode nav items ────────────────────────────
   List<NavItem> _cookNavItems(AppLocalizations? l10n) => [
     NavItem(
-      icon: Icons.restaurant_menu_outlined,
-      activeIcon: Icons.restaurant_menu,
+      icon: CupertinoIcons.book,
+      activeIcon: CupertinoIcons.book_fill,
       label: l10n?.tabCook ?? 'Cook',
     ),
     NavItem(
-      icon: Icons.center_focus_strong_outlined,
-      activeIcon: Icons.center_focus_strong,
+      icon: CupertinoIcons.viewfinder,
+      activeIcon: CupertinoIcons.viewfinder,
       label: l10n?.tabScan ?? 'Scan',
       isCenter: true,
     ),
     NavItem(
-      icon: Icons.kitchen_outlined,
-      activeIcon: Icons.kitchen,
+      icon: CupertinoIcons.cube_box,
+      activeIcon: CupertinoIcons.cube_box_fill,
       label: l10n?.tabShelf ?? 'Shelf',
     ),
   ];

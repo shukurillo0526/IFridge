@@ -462,27 +462,37 @@
     "needLabel": "Need: {items}",
     "@needLabel": {
         "placeholders": {
-            "items": { "type": "String" }
+            "items": {
+                "type": "String"
+            }
         }
     },
     "nOfNIngredients": "{matched}/{total} ingredients",
     "@nOfNIngredients": {
         "placeholders": {
-            "matched": { "type": "String" },
-            "total": { "type": "String" }
+            "matched": {
+                "type": "String"
+            },
+            "total": {
+                "type": "String"
+            }
         }
     },
     "servingsLabel": "Servings",
     "nHave": "{count} have",
     "@nHave": {
         "placeholders": {
-            "count": { "type": "String" }
+            "count": {
+                "type": "String"
+            }
         }
     },
     "nMissing": "{count} missing",
     "@nMissing": {
         "placeholders": {
-            "count": { "type": "String" }
+            "count": {
+                "type": "String"
+            }
         }
     },
     "ingredientsHeader": "Ingredients",
@@ -506,10 +516,21 @@
     "recordedTasteProfileEvolving": "Recorded! Your taste profile is evolving 🧠",
     "addedMissingItemsToShoppingList": "Added missing items to Shopping List!",
     "ingredientsWithCount": "Ingredients ({count})",
-    "@ingredientsWithCount": { "placeholders": { "count": { "type": "String" } } },
+    "@ingredientsWithCount": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
     "cookingStepsWithCount": "Cooking Steps ({count})",
-    "@cookingStepsWithCount": { "placeholders": { "count": { "type": "String" } } },
-
+    "@cookingStepsWithCount": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
     "inv_quantity": "Quantity",
     "inv_purchased": "Purchased",
     "inv_expires": "Expires",
@@ -522,11 +543,23 @@
     "inv_criticalLabel": "🔴 Critical",
     "inv_expiredLabel": "⚫ Expired",
     "inv_expiredDaysAgo": "Expired {days}d ago",
-    "@inv_expiredDaysAgo": { "placeholders": { "days": { "type": "String" } } },
+    "@inv_expiredDaysAgo": {
+        "placeholders": {
+            "days": {
+                "type": "String"
+            }
+        }
+    },
     "inv_expiresToday": "Expires today!",
     "inv_expiresTomorrow": "Expires tomorrow",
     "inv_daysRemaining": "{days} days remaining",
-    "@inv_daysRemaining": { "placeholders": { "days": { "type": "String" } } },
+    "@inv_daysRemaining": {
+        "placeholders": {
+            "days": {
+                "type": "String"
+            }
+        }
+    },
     "inv_stateOpened": "OPENED",
     "inv_stateFrozen": "FROZEN",
     "inv_stateThawed": "THAWED",
@@ -536,8 +569,13 @@
     "inv_sortCategory": "Category",
     "inv_sortNewest": "Newest first",
     "inv_removeConfirm": "Remove \"{name}\" from your inventory?",
-    "@inv_removeConfirm": { "placeholders": { "name": { "type": "String" } } },
-
+    "@inv_removeConfirm": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "manual_addIngredient": "Add Ingredient",
     "manual_ingredientName": "Ingredient Name",
     "manual_ingredientHint": "e.g. Apples, Bread, Milk",

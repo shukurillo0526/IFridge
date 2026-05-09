@@ -4,6 +4,7 @@
 // Connected to Supabase with Realtime for live updates.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:plately_app/core/widgets/shimmer_loading.dart';
 import 'package:plately_app/core/widgets/empty_state_illustration.dart';
@@ -163,7 +164,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
         title: Text(AppLocalizations.of(context)?.myFridge ?? '🧊 My Fridge'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(CupertinoIcons.refresh),
             onPressed: _loadInventory,
             tooltip: AppLocalizations.of(context)?.refresh ?? 'Refresh',
           ),
@@ -173,7 +174,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
               label: Text('$_alertCount',
                   style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700)),
               backgroundColor: Theme.of(context).colorScheme.error,
-              child: Icon(Icons.notifications_outlined),
+              child: Icon(CupertinoIcons.bell),
             ),
             onPressed: _showExpiryAlerts,
             tooltip: AppLocalizations.of(context)?.expiryAlerts ?? 'Expiry alerts',
@@ -202,38 +203,14 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
   }
 
   Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off,
-                size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
-            SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)?.errorLoadInventory ?? 'Couldn\'t load inventory',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)?.errorCheckConnection ?? 'Check your connection and try again.',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
-            ),
-            SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _loadInventory,
-              icon: Icon(Icons.refresh),
-              label: Text(AppLocalizations.of(context)?.retry ?? 'Retry'),
-              style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: EdgeInsets.only(top: 100),
+      child: EmptyStateIllustration(
+        emoji: '🔌',
+        title: AppLocalizations.of(context)?.errorLoadInventory ?? 'Couldn\'t load inventory',
+        description: AppLocalizations.of(context)?.errorCheckConnection ?? 'Check your connection and try again.',
+        actionLabel: AppLocalizations.of(context)?.retry ?? 'Retry',
+        onAction: _loadInventory,
       ),
     );
   }
@@ -294,10 +271,10 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
           hintText: AppLocalizations.of(context)?.searchIngredients ?? 'Search ingredients...',
           hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4), fontSize: 14),
           prefixIcon:
-              Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4), size: 20),
+              Icon(CupertinoIcons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4), size: 20),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.close, size: 18,
+                  icon: Icon(CupertinoIcons.clear_thick, size: 18,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
                   onPressed: () {
                     _searchCtrl.clear();
@@ -392,7 +369,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
             child: DropdownButton<_SortMode>(
               value: _sortMode,
               isDense: true,
-              icon: Icon(Icons.swap_vert,
+              icon: Icon(CupertinoIcons.arrow_up_arrow_down,
                   size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
               dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
@@ -424,7 +401,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
       return Padding(
         padding: EdgeInsets.only(top: 100),
         child: EmptyStateIllustration(
-          icon: _zoneIcon(zone),
+          emoji: _zoneEmoji(zone),
           title: AppLocalizations.of(context)?.zoneEmptyTitle(_getLocalizedZone(zone)) ?? 'Your ${_getLocalizedZone(zone)} is Empty',
           description:
               AppLocalizations.of(context)?.zoneEmptyDesc ?? 'Ready to fill up your digital kitchen.\nAdd items manually or tap scan.',
@@ -523,10 +500,7 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
                 padding: EdgeInsets.only(top: 60),
                 child: Center(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.search_off,
-                        size: 48,
-                        color:
-                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                    Text('🕵️', style: TextStyle(fontSize: 48)),
                     SizedBox(height: 12),
                     Text(AppLocalizations.of(context)?.noItemsMatch ?? 'No items match your filters',
                         style: TextStyle(
@@ -578,11 +552,11 @@ class _LivingShelfScreenState extends State<LivingShelfScreen>
     );
   }
 
-  IconData _zoneIcon(String zone) {
-    if (zone == 'Fridge') return Icons.kitchen;
-    if (zone == 'Freezer') return Icons.ac_unit;
-    if (zone == 'Pantry') return Icons.inventory_2;
-    return Icons.shelves;
+  String _zoneEmoji(String zone) {
+    if (zone == 'Fridge') return '🧊';
+    if (zone == 'Freezer') return '🥶';
+    if (zone == 'Pantry') return '🥫';
+    return '📦';
   }
 
   String _getLocalizedZone(String zone) {

@@ -139,6 +139,7 @@ class OllamaService:
         system_prompt: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: int = 1024,
+        format: Optional[str] = None,
     ) -> str:
         """
         Generate text from a prompt using a local LLM via /api/chat.
@@ -160,6 +161,9 @@ class OllamaService:
                 "num_predict": max_tokens,
             },
         }
+        
+        if format:
+            payload["format"] = format
 
         logger.info(f"[Ollama] Text generation → {model}")
         try:
@@ -199,7 +203,7 @@ class OllamaService:
     ) -> Dict[str, Any]:
         """Generate text and parse as JSON."""
         raw = await self.generate_text(
-            prompt, model, system_prompt, temperature=0.1, max_tokens=max_tokens
+            prompt, model, system_prompt, temperature=0.1, max_tokens=max_tokens, format="json"
         )
         return self._parse_json_response(raw)
 

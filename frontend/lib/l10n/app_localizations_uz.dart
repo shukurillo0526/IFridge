@@ -980,7 +980,7 @@ class AppLocalizationsUzCyrl extends AppLocalizationsUz {
   AppLocalizationsUzCyrl() : super('uz_Cyrl');
 
   @override
-  String get appTitle => 'иФридге';
+  String get appTitle => 'Plately';
 
   @override
   String get tabShelf => 'Жавон';

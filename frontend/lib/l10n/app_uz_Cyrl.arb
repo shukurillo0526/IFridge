@@ -1,6 +1,6 @@
 {
     "@@locale": "uz_Cyrl",
-    "appTitle": "иФридге",
+    "appTitle": "Plately",
     "tabShelf": "Жавон",
     "tabCook": "Пишириш",
     "tabScan": "Сканерлаш",
@@ -295,14 +295,41 @@
     "tierBadge4": "🛒 Бир нечта маҳсулот йетишмайди",
     "tierBadge5": "🌍 Йанги нарса кашф етинг",
     "needLabel": "Керак: {items}",
-    "@needLabel": { "placeholders": { "items": { "type": "String" } } },
+    "@needLabel": {
+        "placeholders": {
+            "items": {
+                "type": "String"
+            }
+        }
+    },
     "nOfNIngredients": "{matched}/{total} ингредиент",
-    "@nOfNIngredients": { "placeholders": { "matched": { "type": "String" }, "total": { "type": "String" } } },
+    "@nOfNIngredients": {
+        "placeholders": {
+            "matched": {
+                "type": "String"
+            },
+            "total": {
+                "type": "String"
+            }
+        }
+    },
     "servingsLabel": "Порсийа",
     "nHave": "{count} та бор",
-    "@nHave": { "placeholders": { "count": { "type": "String" } } },
+    "@nHave": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
     "nMissing": "{count} та йетишмайди",
-    "@nMissing": { "placeholders": { "count": { "type": "String" } } },
+    "@nMissing": {
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    },
     "ingredientsHeader": "Ингредиентлар",
     "swapButton": "Алмаштириш →",
     "aiAssistant": "🤖 АИ йордамчи",
@@ -313,7 +340,6 @@
     "unitLabel": "Бирлик",
     "handsOn": "Қўлда",
     "automatic": "Автоматик",
-
     "inv_quantity": "Миқдор",
     "inv_purchased": "Сотиб олинган",
     "inv_expires": "Муддати",
@@ -338,7 +364,6 @@
     "inv_sortCategory": "Категория",
     "inv_sortNewest": "Енг янги",
     "inv_removeConfirm": "\"{name}\" инвентардан ўчирилсинми?",
-
     "manual_addIngredient": "Ингредиент қўшиш",
     "manual_ingredientName": "Ингредиент номи",
     "manual_ingredientHint": "масалан: Олма, Нон, Сут",

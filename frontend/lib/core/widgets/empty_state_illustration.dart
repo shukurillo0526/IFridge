@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class EmptyStateIllustration extends StatefulWidget {
   final String title;
   final String description;
-  final IconData icon;
+  final IconData? icon;
+  final String? emoji;
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -14,7 +15,8 @@ class EmptyStateIllustration extends StatefulWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.icon,
+    this.icon,
+    this.emoji,
     this.actionLabel,
     this.onAction,
   });
@@ -79,10 +81,14 @@ class _EmptyStateIllustrationState extends State<EmptyStateIllustration>
                     )
                   ],
                 ),
-                child: Icon(
-                  widget.icon,
-                  size: 60,
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                child: Center(
+                  child: widget.emoji != null 
+                      ? Text(widget.emoji!, style: TextStyle(fontSize: 48))
+                      : Icon(
+                          widget.icon,
+                          size: 60,
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                        ),
                 ),
               ),
             ),
