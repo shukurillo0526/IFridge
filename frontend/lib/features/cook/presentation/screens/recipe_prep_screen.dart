@@ -6,8 +6,10 @@
 // and serving size scaler with proper math.
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:plately_app/l10n/app_localizations.dart';
 import 'package:plately_app/core/services/api_service.dart';
+import 'package:plately_app/core/services/auth_helper.dart';
 import 'package:plately_app/core/utils/unit_converter.dart';
 import 'package:plately_app/core/utils/l10n_helper.dart';
 import 'package:plately_app/core/utils/ingredient_icons.dart';
@@ -147,14 +149,28 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
 
     setState(() => _loadingSub[index] = true);
 
-    // Build inventory context so AI knows what user has available
-    final haveItems = widget.ingredients.where((i) {
-      final id = i['ingredient_id'] ?? i['id'] ?? i['name'] ?? '';
-      return widget.ownedIngredientIds.contains(id);
-    }).map((i) => i['translated_name'] ?? i['name'] ?? '').where((n) => n.isNotEmpty);
-    final inventoryHint = haveItems.isNotEmpty
-        ? '${widget.title}. User has: ${haveItems.join(', ')}'
-        : widget.title;
+    // Build full inventory context so AI knows what user has available
+    String fullInventoryText = 'User has: ';
+    try {
+      final rows = await Supabase.instance.client
+          .from('inventory_items')
+          .select('quantity, unit, ingredients(display_name_en)')
+          .eq('user_id', currentUserId());
+          
+      final items = (rows as List).map((r) {
+        final name = r['ingredients']?['display_name_en'] ?? 'item';
+        final qty = r['quantity'] ?? '';
+        final unit = r['unit'] ?? '';
+        return '$qty $unit $name'.trim();
+      }).where((s) => s.isNotEmpty).toList();
+      
+      fullInventoryText += items.isNotEmpty ? items.join(', ') : 'nothing else';
+    } catch (e) {
+      debugPrint('Failed to load full inventory for AI context: $e');
+      fullInventoryText += 'unknown items';
+    }
+
+    final inventoryHint = '${widget.title}. $fullInventoryText';
 
     try {
       final result = await _api.suggestSubstitute(
@@ -207,8 +223,28 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
         return '- $name $qtyStr ($status)$subNote';
       }).join('\n');
 
+      // Also fetch full inventory so the AI can answer general substitute questions
+      String fullInventoryText = '';
+      try {
+        final rows = await Supabase.instance.client
+            .from('inventory_items')
+            .select('quantity, unit, ingredients(display_name_en)')
+            .eq('user_id', currentUserId());
+            
+        final items = (rows as List).map((r) {
+          final name = r['ingredients']?['display_name_en'] ?? 'item';
+          final qty = r['quantity'] ?? '';
+          final unit = r['unit'] ?? '';
+          return '$qty $unit $name'.trim();
+        }).where((s) => s.isNotEmpty).toList();
+        
+        fullInventoryText = items.isNotEmpty ? '\n\nUSER ENTIRE INVENTORY:\n${items.join(', ')}' : '';
+      } catch (e) {
+        debugPrint('Failed to load full inventory for AI chat context: $e');
+      }
+
       final contextText = 'Recipe: ${widget.title} (${_servings} servings)\n'
-          'Ingredients:\n$ingLines';
+          'Ingredients:\n$ingLines$fullInventoryText';
 
       final result = await _api.getCookingTip(
         stepText: contextText,
@@ -228,8 +264,8 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
     }
   }
 
-  String _buildUserInventoryText() {
-    return widget.ingredients.map((ing) {
+  Future<String> _buildUserInventoryText() async {
+    final recipeIngs = widget.ingredients.map((ing) {
       final name = ing['translated_name'] ?? ing['name'] ?? 'Unknown';
       final ingId = ing['ingredient_id'] ?? ing['id'] ?? ing['name'] ?? '';
       final rawQty = ing['quantity'];
@@ -241,9 +277,35 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
       
       return hasIt ? "$name $qtyStr" : "No $name";
     }).join(', ');
+
+    String fullInventory = '';
+    try {
+      final rows = await Supabase.instance.client
+          .from('inventory_items')
+          .select('quantity, unit, ingredients(display_name_en)')
+          .eq('user_id', currentUserId());
+          
+      final items = (rows as List).map((r) {
+        final name = r['ingredients']?['display_name_en'] ?? 'item';
+        final qty = r['quantity'] ?? '';
+        final unit = r['unit'] ?? '';
+        return '$qty $unit $name'.trim();
+      }).where((s) => s.isNotEmpty).toList();
+      
+      if (items.isNotEmpty) {
+        fullInventory = '\n\nENTIRE INVENTORY: ' + items.join(', ');
+      }
+    } catch (e) {
+      debugPrint('Error getting full inventory for run screen: $e');
+    }
+
+    return 'Recipe ingredients context: $recipeIngs$fullInventory';
   }
 
-  void _startCooking() {
+  Future<void> _startCooking() async {
+    final inventoryText = await _buildUserInventoryText();
+    
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -255,7 +317,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
           prepNotes: widget.prepNotes,
           matchedIngredientsCount: widget.ownedIngredientIds.length,
           matchPct: widget.matchPct,
-          userInventoryText: _buildUserInventoryText(),
+          userInventoryText: inventoryText,
           servingsCooked: _servings,
           ownedIngredientIds: widget.ownedIngredientIds,
         ),
