@@ -57,6 +57,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   String _displayTitle = '';
   String? _displayDescription;
   String? _imageUrl;
+  
+  // Dynamic Nutrition
+  int? _dynamicCalories;
+  double? _dynamicProtein;
+  double? _dynamicCarbs;
+  double? _dynamicFat;
 
   @override
   void initState() {
@@ -160,6 +166,26 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           debugPrint('DB Translation fetch failed: $e');
           _triggerBackgroundTranslation(userLanguage);
         }
+      }
+
+      // 5. Fetch dynamic nutrition data
+      try {
+        final calResult = await ApiService().getRecipeCalories(
+          recipeId: widget.recipeId,
+          servings: widget.servings ?? 2,
+        );
+        final totals = calResult['totals'];
+        if (totals != null) {
+          final s = widget.servings ?? 2;
+          final totalCal = (totals['calories'] as num?)?.toInt() ?? 0;
+          _dynamicCalories = totalCal > 0 ? (totalCal ~/ s) : null;
+          
+          _dynamicProtein = ((totals['protein_g'] as num?)?.toDouble() ?? 0) / s;
+          _dynamicCarbs = ((totals['carbs_g'] as num?)?.toDouble() ?? 0) / s;
+          _dynamicFat = ((totals['fat_g'] as num?)?.toDouble() ?? 0) / s;
+        }
+      } catch (e) {
+        debugPrint('Failed to load dynamic nutrition: $e');
       }
 
       setState(() {
@@ -706,11 +732,22 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                       icon: Icons.signal_cellular_alt,
                       label: '${'⚡' * widget.difficulty!} ${AppLocalizations.of(context)?.difficulty_tag ?? "Difficulty"}',
                     ),
-                  if (widget.caloriesPerServing != null && widget.caloriesPerServing! > 0)
+                  if (_dynamicCalories != null && _dynamicCalories! > 0)
                     _QuickChip(
                       icon: Icons.local_fire_department,
-                      label: '${widget.caloriesPerServing} cal/serving',
+                      label: '$_dynamicCalories kcal/srv',
+                    )
+                  else if (widget.caloriesPerServing != null && widget.caloriesPerServing! > 0)
+                    _QuickChip(
+                      icon: Icons.local_fire_department,
+                      label: '${widget.caloriesPerServing} kcal/srv',
                     ),
+                  if (_dynamicProtein != null && _dynamicProtein! > 0)
+                    _QuickChip(icon: Icons.fitness_center, label: '${_dynamicProtein!.toStringAsFixed(1)}g P', color: Colors.blueAccent),
+                  if (_dynamicCarbs != null && _dynamicCarbs! > 0)
+                    _QuickChip(icon: Icons.bolt, label: '${_dynamicCarbs!.toStringAsFixed(1)}g C', color: Colors.amber),
+                  if (_dynamicFat != null && _dynamicFat! > 0)
+                    _QuickChip(icon: Icons.water_drop, label: '${_dynamicFat!.toStringAsFixed(1)}g F', color: Colors.orangeAccent),
                 ],
               ),
             ),
@@ -1046,7 +1083,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 class _QuickChip extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _QuickChip({required this.icon, required this.label});
+  final Color? color;
+  const _QuickChip({required this.icon, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -1060,7 +1098,7 @@ class _QuickChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+          Icon(icon, size: 16, color: color ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
           SizedBox(width: 6),
           Text(
             label,

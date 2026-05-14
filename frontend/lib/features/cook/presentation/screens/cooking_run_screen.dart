@@ -218,7 +218,11 @@ class _CookingRunScreenState extends State<CookingRunScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(ctx, <String>[]),
+                  onPressed: () {
+                    // Skip button means SKIP EVERYTHING
+                    final allOwned = widget.ownedIngredientIds.toList();
+                    Navigator.pop(ctx, allOwned);
+                  },
                   child: Text('Skip', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
                 ),
                 FilledButton.icon(
