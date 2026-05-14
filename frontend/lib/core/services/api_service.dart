@@ -639,7 +639,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/substitute'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'ingredient': ingredient,
         'recipe_context': recipeContext,
@@ -676,7 +676,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/user/cook'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({'user_id': userId, 'recipe_id': recipeId}),
     );
     return _handleResponse(response);
@@ -690,7 +690,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/user/engagement'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'user_id': userId,
         'video_id': videoId,
@@ -709,7 +709,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/youtube-recipe'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'video_title': videoTitle,
         'video_description': videoDescription,
@@ -727,7 +727,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/shopping-list'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'user_id': userId,
         'recipe_ids': recipeIds,
@@ -743,7 +743,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/chat'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'messages': messages,
         'stream': false,
@@ -762,7 +762,7 @@ class ApiService {
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/inventory/predict-expiry'),
-      headers: _headers,
+      headers: {..._headers, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'category': category,
         'purchase_date': purchaseDate,

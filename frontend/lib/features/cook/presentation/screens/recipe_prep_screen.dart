@@ -191,8 +191,9 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
         _aiLoading = false;
       });
     } catch (e) {
+      debugPrint('AI cooking tip error: $e');
       setState(() {
-        _aiResponse = 'Error: $e';
+        _aiResponse = 'AI is temporarily unavailable. Please try again later.';
         _aiLoading = false;
       });
     }
@@ -201,7 +202,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
   String _buildUserInventoryText() {
     return widget.ingredients.map((ing) {
       final name = ing['translated_name'] ?? ing['name'] ?? 'Unknown';
-      final ingId = ing['id'] ?? ing['name'] ?? '';
+      final ingId = ing['ingredient_id'] ?? ing['id'] ?? ing['name'] ?? '';
       final rawQty = ing['quantity'];
       final unit = ing['unit'] ?? '';
       final hasIt = widget.ownedIngredientIds.contains(ingId);
@@ -234,7 +235,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
   @override
   Widget build(BuildContext context) {
     final haveCount = widget.ingredients.where((ing) {
-      final id = ing['id'] ?? ing['name'];
+      final id = ing['ingredient_id'] ?? ing['id'] ?? ing['name'];
       return widget.ownedIngredientIds.contains(id);
     }).length;
     final missingCount = widget.ingredients.length - haveCount;
@@ -337,7 +338,7 @@ class _RecipePrepScreenState extends State<RecipePrepScreen> {
                   ...List.generate(widget.ingredients.length, (i) {
                     final ing = widget.ingredients[i];
                     final name = ing['translated_name'] ?? ing['name'] ?? 'Unknown';
-                    final ingId = ing['id'] ?? '';
+                    final ingId = ing['ingredient_id'] ?? ing['id'] ?? '';
                     final rawQty = ing['quantity'];
                     final unit = ing['unit'] ?? '';
                     final translatedUnit = L10nHelper.translateUnit(unit, Localizations.localeOf(context).languageCode);

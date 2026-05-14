@@ -752,8 +752,21 @@ class _CookScreenState extends State<CookScreen>
     } catch (e) {
       if (!context.mounted) return;
       Navigator.of(context).pop();
+      debugPrint('AI generate recipe error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI error: $e')),
+        SnackBar(
+          content: Row(children: [
+            Icon(Icons.cloud_off, color: Theme.of(context).colorScheme.onSurface, size: 18),
+            SizedBox(width: 8),
+            Expanded(child: Text(
+              'AI is temporarily unavailable. Please try again later.',
+              style: TextStyle(fontSize: 13),
+            )),
+          ]),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }
