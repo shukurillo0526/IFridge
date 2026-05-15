@@ -642,6 +642,7 @@ class ApiService {
   Future<Map<String, dynamic>> getSubstitution({
     required String ingredient,
     String? recipeContext,
+    List<String>? inventoryIngredients,
   }) async {
     final response = await _client.post(
       Uri.parse('${ApiConfig.baseUrl}/api/v1/ai/substitute'),
@@ -649,6 +650,7 @@ class ApiService {
       body: jsonEncode({
         'ingredient': ingredient,
         'recipe_context': recipeContext,
+        if (inventoryIngredients != null) 'inventory_ingredients': inventoryIngredients,
       }),
     );
     return _handleResponse(response);

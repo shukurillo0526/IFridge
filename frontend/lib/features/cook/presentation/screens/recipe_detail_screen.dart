@@ -73,7 +73,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     Future<void> _loadDetails() async {
     try {
       final supabase = Supabase.instance.client;
-      final userLanguage = Localizations.localeOf(context).languageCode;
+      final locale = Localizations.localeOf(context);
+      final userLanguage = locale.languageCode;
 
       // 1. Fetch relational ingredients from recipe_ingredients + ingredients
       final ingredientData = await supabase
@@ -92,7 +93,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           .maybeSingle();
 
       // 3. Map relational ingredients to the format the UI expects
-      final locale = Localizations.localeOf(context);
       final isUzCyrillic = userLanguage == 'uz' && locale.scriptCode == 'Cyrl';
 
       _ingredients = (ingredientData as List).map<Map<String, dynamic>>((ri) {
@@ -368,9 +368,48 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   int get _totalTime => (widget.prepTime ?? 0) + (widget.cookTime ?? 0);
 
-  /// Show AI-powered ingredient substitution suggestions
-  void _showSubstitutionSheet(String ingredientName, String recipeTitle) {
+  Future<Map<String, dynamic>> _fetchSubstitutes(String ingredientName, String recipeTitle) async {
     final api = ApiService();
+    List<String> inventoryNames = [];
+    if (widget.ownedIngredientIds.isNotEmpty) {
+      try {
+        final supabase = Supabase.instance.client;
+        final res = await supabase
+            .from('ingredients')
+            .select('canonical_name')
+            .inFilter('id', widget.ownedIngredientIds.toList());
+        inventoryNames = (res as List).map((r) => r['canonical_name'] as String).toList();
+      } catch (e) {
+        debugPrint('Failed to load inventory names: $e');
+      }
+    }
+    return api.getSubstitution(
+      ingredient: ingredientName,
+      recipeContext: recipeTitle,
+      inventoryIngredients: inventoryNames.isNotEmpty ? inventoryNames : null,
+    );
+  }
+
+  void _applySwap(String oldName, String newName, String ratioStr) {
+    setState(() {
+      for (var ing in _ingredients) {
+        final currentName = ing['translated_name'] ?? ing['name'];
+        if (currentName == oldName) {
+          ing['translated_name'] = newName;
+          ing['name'] = newName;
+          ing['prep_note'] = 'Swapped from $oldName ($ratioStr)';
+        }
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Swapped $oldName with $newName!'),
+        backgroundColor: Colors.green,
+      )
+    );
+  }
+
+  void _showSubstitutionSheet(String ingredientName, String recipeTitle) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -385,10 +424,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         ),
         padding: EdgeInsets.all(24),
         child: FutureBuilder<Map<String, dynamic>>(
-          future: api.getSubstitution(
-            ingredient: ingredientName,
-            recipeContext: recipeTitle,
-          ),
+          future: _fetchSubstitutes(ingredientName, recipeTitle),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Column(
@@ -484,6 +520,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                       final subName = sub['name'] ?? sub['substitute'] ?? 'Unknown';
                       final ratio = sub['ratio'] ?? sub['swap_ratio'] ?? '1:1';
                       final notes = sub['notes'] ?? sub['reason'] ?? '';
+                      final isAvailable = sub['available'] == true;
 
                       return Container(
                         margin: EdgeInsets.only(bottom: 10),
@@ -541,21 +578,46 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                                 ],
                               ),
                             ),
-                            // Ratio chip
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                ratio.toString(),
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                            // Actions column
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    ratio.toString(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: 8),
+                                if (isAvailable)
+                                  FilledButton.icon(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _applySwap(ingredientName, subName.toString(), ratio.toString());
+                                    },
+                                    icon: Icon(Icons.check_circle_outline, size: 14),
+                                    label: Text('Swap'),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                      minimumSize: Size(0, 28),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      textStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                                    ),
+                                  )
+                                else
+                                  Text('Could have swapped with this...', style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
+                              ],
                             ),
                           ],
                         ),
@@ -861,23 +923,21 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             .from('shopping_list')
                             .insert(insertData);
                             
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(AppLocalizations.of(context)?.addedMissingItemsToShoppingList ?? 'Added missing items to Shopping List!'),
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                            ),
-                          );
-                        }
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)?.addedMissingItemsToShoppingList ?? 'Added missing items to Shopping List!'),
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                          ),
+                        );
                       } catch (e) {
-                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(AppLocalizations.of(context)?.failedToAddItemsX(e.toString()) ?? 'Failed to add items: $e'),
-                              backgroundColor: Colors.redAccent,
-                            ),
-                          );
-                        }
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(AppLocalizations.of(context)?.failedToAddItemsX(e.toString()) ?? 'Failed to add items: $e'),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
                       }
                     },
                     icon: Icon(Icons.shopping_cart_outlined, size: 20),
@@ -989,26 +1049,24 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                         userId: currentUserId(),
                         recipeId: widget.recipeId,
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                Icon(Icons.celebration, color: Theme.of(context).colorScheme.onSurface, size: 20),
-                                SizedBox(width: 8),
-                                Text(AppLocalizations.of(context)?.recordedTasteProfileEvolving ?? 'Recorded! Your taste profile is evolving 🧠'),
-                              ],
-                            ),
-                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.celebration, color: Theme.of(context).colorScheme.onSurface, size: 20),
+                              SizedBox(width: 8),
+                              Text(AppLocalizations.of(context)?.recordedTasteProfileEvolving ?? 'Recorded! Your taste profile is evolving 🧠'),
+                            ],
                           ),
-                        );
-                      }
+                          backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      );
                     } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(AppLocalizations.of(context)?.failedToRecordX(e.toString()) ?? 'Failed to record: $e')),
-                        );
-                      }
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)?.failedToRecordX(e.toString()) ?? 'Failed to record: $e')),
+                      );
                     }
                   },
                   icon: Icon(Icons.restaurant, size: 20),

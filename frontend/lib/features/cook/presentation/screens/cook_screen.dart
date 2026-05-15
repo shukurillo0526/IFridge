@@ -15,6 +15,8 @@ import 'package:plately_app/core/utils/l10n_helper.dart';
 import 'package:plately_app/features/cook/presentation/screens/recipe_detail_screen.dart';
 import 'package:plately_app/features/cook/presentation/screens/recipe_import_screen.dart';
 import 'package:plately_app/features/cook/presentation/screens/my_recipes_screen.dart';
+import 'package:plately_app/features/cook/presentation/screens/recipe_prep_screen.dart';
+import 'package:plately_app/core/services/cache_service.dart';
 import 'package:plately_app/core/services/auth_helper.dart';
 import 'package:plately_app/core/services/app_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -623,10 +625,6 @@ class _CookScreenState extends State<CookScreen>
       Navigator.of(context).pop();
 
       final data = result['data'] ?? {};
-      final title = data['title'] ?? 'AI Recipe';
-      final desc = data['description'] ?? '';
-      final stepsList = (data['steps'] as List?) ?? [];
-      final aiIngredients = (data['ingredients'] as List?) ?? [];
 
       // Show formatted result bottom sheet
       if (!context.mounted) return;
@@ -634,121 +632,7 @@ class _CookScreenState extends State<CookScreen>
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (_) => DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (_, scrollCtrl) => Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: ListView(
-              controller: scrollCtrl,
-              padding: EdgeInsets.all(24),
-              children: [
-                Center(child: Container(
-                  width: 40, height: 4,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(2)),
-                )),
-                SizedBox(height: 16),
-                Row(children: [
-                  Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
-                  SizedBox(width: 8),
-                  Expanded(child: Text(title,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700))),
-                ]),
-                if (desc.isNotEmpty) ...[
-                  SizedBox(height: 8),
-                  Text(desc,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                          fontSize: 13,
-                          height: 1.5)),
-                ],
-
-                // Ingredients
-                if (aiIngredients.isNotEmpty) ...[
-                  SizedBox(height: 20),
-                  Text(AppLocalizations.of(context)?.auto_ingredients ?? '🧂 Ingredients',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600)),
-                  SizedBox(height: 8),
-                  ...aiIngredients.map((ing) => Padding(
-                        padding: EdgeInsets.symmetric(vertical: 3),
-                        child: Row(children: [
-                          Icon(Icons.circle, size: 6,
-                              color: Theme.of(context).colorScheme.primary),
-                          SizedBox(width: 10),
-                          Expanded(child: Text(
-                            ing is Map ? '${ing['quantity'] ?? ''} ${ing['unit'] ?? ''} ${ing['name'] ?? ing}' : '$ing',
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontSize: 13),
-                          )),
-                        ]),
-                      )),
-                ],
-
-                // Steps
-                if (stepsList.isNotEmpty) ...[
-                  SizedBox(height: 20),
-                  Text(AppLocalizations.of(context)?.auto_steps ?? '👨‍🍳 Steps',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600)),
-                  SizedBox(height: 8),
-                  ...List.generate(stepsList.length, (i) {
-                    final step = stepsList[i];
-                    final text = step is Map ? (step['text'] ?? '') : '$step';
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
-                      ),
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 28, height: 28,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text('${i + 1}',
-                                  style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 13)),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(child: Text(text,
-                                style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 13,
-                                    height: 1.5))),
-                          ]),
-                    );
-                  }),
-                ],
-                SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
+        builder: (_) => _GeneratedRecipeSheet(recipeData: data),
       );
     } catch (e) {
       if (!context.mounted) return;
@@ -1517,3 +1401,287 @@ class _RecipeSearchDelegate extends SearchDelegate<void> {
   }
 }
 
+class _GeneratedRecipeSheet extends StatefulWidget {
+  final Map<String, dynamic> recipeData;
+
+  const _GeneratedRecipeSheet({required this.recipeData});
+
+  @override
+  State<_GeneratedRecipeSheet> createState() => _GeneratedRecipeSheetState();
+}
+
+class _GeneratedRecipeSheetState extends State<_GeneratedRecipeSheet> {
+  bool _saving = false;
+
+  Future<void> _saveRecipe() async {
+    setState(() => _saving = true);
+    try {
+      final userId = currentUserId();
+      CacheService().saveLocalRecipe(userId, widget.recipeData);
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saved to My Recipes!'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  void _cookNow() {
+    Navigator.pop(context);
+    
+    // Map JSON steps to the format expected by RecipePrepScreen
+    final stepsList = (widget.recipeData['steps'] as List?) ?? [];
+    final mappedSteps = stepsList.map<Map<String, dynamic>>((s) {
+      if (s is Map) return Map<String, dynamic>.from(s);
+      return {'text': s.toString()};
+    }).toList();
+
+    // Map ingredients
+    final aiIngredients = (widget.recipeData['ingredients'] as List?) ?? [];
+    final mappedIngredients = aiIngredients.map<Map<String, dynamic>>((ing) {
+      if (ing is Map) {
+        return {
+          'name': ing['name'] ?? 'Unknown',
+          'quantity': ing['quantity'] ?? 1,
+          'unit': ing['unit'] ?? '',
+          'ingredient_id': 'ai_${DateTime.now().millisecondsSinceEpoch}',
+        };
+      }
+      return {
+        'name': ing.toString(),
+        'quantity': 1,
+        'unit': '',
+        'ingredient_id': 'ai_${DateTime.now().millisecondsSinceEpoch}',
+      };
+    }).toList();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecipePrepScreen(
+          recipeId: 'ai_generated',
+          title: widget.recipeData['title'] ?? 'AI Recipe',
+          originalServings: widget.recipeData['servings'] ?? 2,
+          ingredients: mappedIngredients,
+          steps: mappedSteps,
+          ownedIngredientIds: const <String>{}, // We don't have matching IDs since it's raw text
+          matchPct: 100,
+          tierColor: Theme.of(context).colorScheme.primary,
+          caloriesPerServing: widget.recipeData['calories_per_serving'] ?? 400,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = widget.recipeData['title'] ?? 'AI Recipe';
+    final desc = widget.recipeData['description'] ?? '';
+    final stepsList = (widget.recipeData['steps'] as List?) ?? [];
+    final aiIngredients = (widget.recipeData['ingredients'] as List?) ?? [];
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (_, scrollCtrl) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                controller: scrollCtrl,
+                padding: EdgeInsets.all(24),
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(children: [
+                    Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(title,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ]),
+                  if (desc.isNotEmpty) ...[
+                    SizedBox(height: 8),
+                    Text(desc,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+
+                  // Ingredients
+                  if (aiIngredients.isNotEmpty) ...[
+                    SizedBox(height: 20),
+                    Text(AppLocalizations.of(context)?.auto_ingredients ?? '🧂 Ingredients',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    ...aiIngredients.map((ing) => Padding(
+                          padding: EdgeInsets.symmetric(vertical: 3),
+                          child: Row(children: [
+                            Icon(Icons.circle, size: 6, color: Theme.of(context).colorScheme.primary),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                ing is Map ? '${ing['quantity'] ?? ''} ${ing['unit'] ?? ''} ${ing['name'] ?? ing}' : '$ing',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ]),
+                        )),
+                  ],
+
+                  // Steps
+                  if (stepsList.isNotEmpty) ...[
+                    SizedBox(height: 20),
+                    Text(AppLocalizations.of(context)?.auto_steps ?? '👨‍🍳 Steps',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    ...List.generate(stepsList.length, (i) {
+                      final step = stepsList[i];
+                      final text = step is Map ? (step['text'] ?? '') : '$step';
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 28,
+                              height: 28,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text('${i + 1}',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(text,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 13,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                  SizedBox(height: 80), // Padding for buttons
+                ],
+              ),
+            ),
+            
+            // Action Buttons
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _saving ? null : _saveRecipe,
+                      icon: _saving 
+                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                          : Icon(Icons.bookmark_border),
+                      label: Text(AppLocalizations.of(context)?.auto_save ?? 'Save'),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton.icon(
+                      onPressed: _saving ? null : _cookNow,
+                      icon: Icon(Icons.restaurant),
+                      label: Text(AppLocalizations.of(context)?.startCooking ?? 'Cook Now'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

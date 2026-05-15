@@ -4,9 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:plately_app/core/theme/app_theme.dart';
+
 import 'package:plately_app/core/services/api_service.dart';
 import 'package:plately_app/core/services/auth_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NutritionTrackerPage extends StatefulWidget {
   const NutritionTrackerPage({super.key});
@@ -17,6 +18,7 @@ class NutritionTrackerPage extends StatefulWidget {
 class _NutritionTrackerPageState extends State<NutritionTrackerPage> {
   final ApiService _api = ApiService();
   Map<String, dynamic>? _daily;
+  List<dynamic> _history = [];
   bool _loading = true;
 
   @override
@@ -26,9 +28,26 @@ class _NutritionTrackerPageState extends State<NutritionTrackerPage> {
     try {
       final uid = currentUserId();
       final result = await _api.getDailyNutrition(uid);
-      setState(() { _daily = result; _loading = false; });
+      
+      final supabase = Supabase.instance.client;
+      final historyData = await supabase
+          .from('user_recipe_history')
+          .select('cooked_at, recipes(id, title, image_url, calories_per_serving)')
+          .eq('user_id', uid)
+          .order('cooked_at', ascending: false)
+          .limit(20);
+
+      if (mounted) {
+        setState(() { 
+          _daily = result; 
+          _history = historyData as List<dynamic>;
+          _loading = false; 
+        });
+      }
     } catch (e) {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -61,6 +80,14 @@ class _NutritionTrackerPageState extends State<NutritionTrackerPage> {
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w700)),
                   SizedBox(height: 12),
                   _buildMealLog(),
+                  SizedBox(height: 32),
+
+                  // Cooking History
+                  Text('Cooking History',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w700)),
+                  SizedBox(height: 12),
+                  _buildCookingHistory(),
+                  SizedBox(height: 40),
                 ],
               ),
             ),
@@ -185,6 +212,72 @@ class _NutritionTrackerPageState extends State<NutritionTrackerPage> {
       }).toList(),
     );
   }
+  Widget _buildCookingHistory() {
+    if (_history.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(32),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16)),
+        child: Center(child: Text('No cooking history yet.\nCook a recipe to start your flavor journey!',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))),
+      );
+    }
+    return Column(
+      children: _history.map((h) {
+        final r = h['recipes'] as Map<String, dynamic>? ?? {};
+        final dateStr = h['cooked_at']?.toString() ?? '';
+        final title = r['title'] ?? 'Unknown Recipe';
+        final imageUrl = r['image_url'];
+        final cal = r['calories_per_serving'] ?? 0;
+        
+        return Container(
+          margin: EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+          ),
+          child: Row(
+            children: [
+              // Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: imageUrl != null && imageUrl.toString().startsWith('http')
+                  ? Image.network(imageUrl.toString(), width: 64, height: 64, fit: BoxFit.cover)
+                  : Container(
+                      width: 64, height: 64, 
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Icon(Icons.restaurant, color: Theme.of(context).colorScheme.primary),
+                    ),
+              ),
+              SizedBox(width: 16),
+              // Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title.toString(), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600)),
+                    SizedBox(height: 4),
+                    Text(dateStr.split('T').first, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                  ],
+                ),
+              ),
+              // Calorie chip
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text('$cal cal', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
 }
 
 class _RingPainter extends CustomPainter {
@@ -196,7 +289,7 @@ class _RingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final r = size.width / 2 - 12;
-    canvas.drawCircle(center, r, Paint()..color = Colors.white.withOpacity(0.06)..style = PaintingStyle.stroke..strokeWidth = 12);
+    canvas.drawCircle(center, r, Paint()..color = Colors.white.withValues(alpha: 0.06)..style = PaintingStyle.stroke..strokeWidth = 12);
     final arc = Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 12..strokeCap = StrokeCap.round;
     canvas.drawArc(Rect.fromCircle(center: center, radius: r), -math.pi / 2, 2 * math.pi * progress.clamp(0.0, 1.0), false, arc);
   }

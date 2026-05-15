@@ -572,3 +572,9 @@ A massive polishing release ensuring stability, extensive localization, local-fi
 - **Static Substitution Map**: Deployed an offline, hardcoded 105-rule dictionary for 35+ of the most common cooking ingredients. Completely eliminates ~60% of AI calls for simple swaps (like butter to oil).
 - **AI Response LRU Cache**: Implemented an in-memory, TTL-backed LRU cache using SHA-256 key hashing to serve identical requests instantly across the user base.
 - **Three-Tier Pipeline**: Substitutions now check Static Map -> AI Cache -> Live AI (Gemini Flash Lite), saving massive amounts of latency and LLM token usage. Included `/api/v1/ai/cache-stats` for monitoring.
+U p d a t e d   G a m i f i c a t i o n ,   N u t r i t i o n ,   B a c k e n d   N a m e E r r o r ,   a n d   M y   R e c i p e s   U I  
+   
+### Phase 6: AI Cooking Flow and Nutrition History  
+- **AI Recipe Save vs Cook Flow:** Replaced the static AI recipe modal with a dynamic _GeneratedRecipeSheet. Ephemeral AI recipes can now be saved natively to Hive local storage or directly cooked using a zero-persistence Cook Now path.  
+- **Nutrition Tracker History:** Implemented a scrollable Cooking History section inside the Nutrition Tracker. It directly queries user_recipe_history, presenting chronological meal logs with thumbnail images, dates, and calorie chips.  
+- **Code Cleanup:** Resolved 13+ use_build_context_synchronously warnings across async gaps in recipe_detail_screen.dart via modern context.mounted checks. 
